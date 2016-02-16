@@ -1,0 +1,83 @@
+swagger: '2.0'
+info:
+  title: Pazuzu registry
+  description: Generating Dockerfiles by sets of required functions
+  version: "0.0.1"
+schemes:
+  - http
+basePath: /
+produces:
+  - application/json
+paths:
+  /features:
+    get:
+      summary: Array of all available Features
+      description: |
+        The features endpoint returns information about all available features in the registry. The response is an array of feature_refs containing the features unique name and a short description.
+      responses:
+        200:
+          description: An array of feature_ref objects
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/feature_ref'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /featurama:
+    get:
+      summary: Creates topologically sorted list of all required features and their dependencies
+      description: |
+        The featurama endpoint returns a list of all required features and their dependencies necesseray to create a working Dockerfile. A feature consists of its unique name, its dockerfile-snippet and a test in form of a shell-script which should be run on the created Docker-Image to validate the correct installation of the feature.
+      parameters:
+        - name: feature
+          in: query
+          description: List of requested features.
+          required: true
+          type: array
+          items:
+            type: string
+      responses:
+        200:
+          description: An array of feature objects
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/feature'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  
+definitions:
+  feature_ref:
+    type: object
+    properties:
+      feature_name:
+        type: string
+        description: Unique identifier representing a specific feature. For example jre_1.8u73
+      description:
+        type: string
+        description: Short description of the feature.
+  feature:
+    type: object
+    properties:
+      feature_name:
+        type: string
+        description: Unique identifier representing a specific feature. For example jre_1.8u73
+      dockerfile_snippet:
+        type: string
+        description: The actual Dockerfile-Snippet which is used to compose the final Dockerfile
+      test:
+        type: string
+        description: Shell-Script which can be run on the generated Docker-Image to validate the correct installation of the specific feature
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+        description: Unique identifier representing a 
+      message:
+        type: string
