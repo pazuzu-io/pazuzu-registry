@@ -1,11 +1,13 @@
 package pazuzu.web.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import pazuzu.web.services.Dao.Feature;
-import pazuzu.web.services.to.FeatureTO;
-import pazuzu.web.services.to.FeatureRefTO;
+import pazuzu.service.FeatureService;
+import pazuzu.model.Feature;
+import pazuzu.web.to.FeatureTO;
+import pazuzu.web.to.FeatureRefTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +15,12 @@ import java.util.List;
 @RestController
 public class FeatureRefsController {
 
+    @Autowired
+    public FeatureService featureService;
+
     @RequestMapping(value = "/featurerefs", method = RequestMethod.GET)
     FeatureRefTO getFeatureRefs(){
+
         return FeatureRefTO.byFeature(new Feature("Java", "super duper awesome java stuff"));
     }
 

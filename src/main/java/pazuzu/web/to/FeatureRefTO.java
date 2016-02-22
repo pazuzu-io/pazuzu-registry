@@ -1,6 +1,6 @@
-package pazuzu.web.services.to;
+package pazuzu.web.to;
 
-import pazuzu.web.services.Dao.Feature;
+import pazuzu.model.Feature;
 
 /**
  * Created by cseidel on 22/02/16.

@@ -1,4 +1,4 @@
-package pazuzu.web.services.to;
+package pazuzu.web.to;
 
 /**
  * Created by cseidel on 22/02/16.

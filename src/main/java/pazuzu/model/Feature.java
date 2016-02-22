@@ -1,4 +1,4 @@
-package pazuzu.web.services.Dao;
+package pazuzu.model;
 
 public class Feature {
 
