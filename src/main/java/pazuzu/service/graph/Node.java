@@ -6,11 +6,11 @@ import java.util.HashSet;
  * Created by smohamed on 22/02/16.
  */
 public class Node{
-    public Feature feature;
+    public String feature_name;
     public HashSet<Edge> inEdges;
     public HashSet<Edge> outEdges;
-    public Node(Feature feature) {
-        this.feature = feature;
+    public Node(String feature_name) {
+        this.feature_name = feature_name;
         inEdges = new HashSet<Edge>();
         outEdges = new HashSet<Edge>();
     }
@@ -22,6 +22,6 @@ public class Node{
     }
     @Override
     public String toString() {
-        return feature.toString();
+        return feature_name;
     }
 }
