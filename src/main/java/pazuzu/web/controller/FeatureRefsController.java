@@ -21,7 +21,7 @@ public class FeatureRefsController {
     @RequestMapping(value = "/featurerefs", method = RequestMethod.GET)
     FeatureRefTO getFeatureRefs(){
 
-        return FeatureRefTO.byFeature(new Feature("Java", "super duper awesome java stuff"));
+        return FeatureRefTO.byFeature(new Feature("Java", "super duper awesome java stuff", dockerfile_snippet, test_command, dependencies));
     }
 
 
