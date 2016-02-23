@@ -6,11 +6,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import pazuzu.service.FeatureService;
 import pazuzu.model.Feature;
+import pazuzu.web.InvalidFeatureException;
+import pazuzu.web.to.ErrorTO;
 import pazuzu.web.to.FeatureTO;
 import pazuzu.web.to.FeatureRefTO;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class FeatureRefsController {
@@ -18,21 +22,43 @@ public class FeatureRefsController {
     @Autowired
     public FeatureService featureService;
 
-    @RequestMapping(value = "/featurerefs", method = RequestMethod.GET)
-    FeatureRefTO getFeatureRefs(){
+    public ErrorTO handleFeatureExceptions(InvalidFeatureException e){
+        return new ErrorTO(ErrorTO.INVALID_FEATURE_REQUESTED, e.getMessage());
+    }
 
-        return FeatureRefTO.byFeature(new Feature("Java", "super duper awesome java stuff", dockerfile_snippet, test_command, dependencies));
+    /**
+     * Return a List of all Features
+     * @return
+     */
+    @RequestMapping(value = "/featurerefs", method = RequestMethod.GET)
+    List<FeatureRefTO> getFeatureRefs(){
+
+        return featureService.getAllFeatures().stream()
+                .map(FeatureRefTO.byFeature)
+                .collect(Collectors.toList());
     }
 
 
+    /**
+     * Return a List of Features
+     * @param features
+     * @return
+     */
     @RequestMapping(value = "/featurama", method = RequestMethod.GET)
-    List<FeatureTO> getFeatures(){
-        ArrayList features = new ArrayList<FeatureTO>();
-        features.add(new FeatureTO("asf", "asdfasdfa"));
-        features.add(new FeatureTO("ewrgwer", "4t34t234t"));
-        features.add(new FeatureTO("nfghng", "67j6767"));
-        features.add(new FeatureTO("rtertyer", "wergwerg"));
+    List<FeatureTO> getFeatures(List<String> features) throws InvalidFeatureException{
 
-        return features;
+        List<String> validFeatureNames = featureService.validateFeatureNames(features);
+        if(validFeatureNames.size() != features.size()){
+            throw new InvalidFeatureException("You requested a invalid feature.");
+        }
+
+        try {
+            return featureService.createSortedFeaturelistWithDependencies(validFeatureNames).stream()
+                    .map(FeatureTO.byFeature)
+                    .collect(Collectors.toList());
+        } catch (IllegalArgumentException e) {
+            // Feature was removed between check an actual List creation. Try again
+            throw new InvalidFeatureException("The requested Feature is not available");
+        }
     }
 }

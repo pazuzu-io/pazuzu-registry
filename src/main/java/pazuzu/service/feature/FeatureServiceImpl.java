@@ -18,11 +18,18 @@ public class FeatureServiceImpl implements FeatureService {
     @Autowired
     FeatureRepository featureRepository;
 
-    public List<Feature> getAllAvailableFeatures(){
-        throw new RuntimeException("not yet implemented");
+    @Override
+    public List<Feature> getAllFeatures() {
+        return null;
     }
 
-    public List<Feature> getRequestedFeatures(List<String> featureNames){
-        throw new RuntimeException("Not yet implemented");
+    @Override
+    public List<Feature> createSortedFeaturelistWithDependencies(List<String> featureNames) throws IllegalArgumentException {
+        return null;
+    }
+
+    @Override
+    public List<String> validateFeatureNames(List<String> requestedFeatures) {
+        return null;
     }
 }

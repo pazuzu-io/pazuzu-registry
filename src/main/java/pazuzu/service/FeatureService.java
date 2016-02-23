@@ -1,6 +1,5 @@
 package pazuzu.service;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
 import pazuzu.model.Feature;
 
 import java.util.List;
@@ -22,9 +21,9 @@ public interface FeatureService {
      *
      * @param featureNames List of all required featurenames
      * @return List of topologically sorted features with their required dependencies
-     * @throws InvalidArgumentException if a requested Feature is not available
+     * @throws IllegalArgumentException if a requested Feature is not available
      */
-    List<Feature> createSortedFeaturelistWithDependencies(List<String> featureNames) throws InvalidArgumentException;
+    List<Feature> createSortedFeaturelistWithDependencies(List<String> featureNames) throws IllegalArgumentException;
 
     /**
      *
