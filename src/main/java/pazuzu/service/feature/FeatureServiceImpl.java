@@ -1,23 +1,26 @@
 package pazuzu.service.feature;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
+
 import pazuzu.model.Feature;
 import pazuzu.persistence.FeatureRepository;
 import pazuzu.service.FeatureService;
 import pazuzu.service.graph.Graph;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 public class FeatureServiceImpl implements FeatureService {
 
-    @Autowired
+    @Resource(name="featureRepositoryFileSystemImpl")
     public FeatureRepository featureRepository;
 
     @Override
-    public List<Feature> getAllFeatures() {
+    public Collection<Feature> getAllFeatures() {
         //query the feature repository to get all the features
         return featureRepository.getFeatures();
     }

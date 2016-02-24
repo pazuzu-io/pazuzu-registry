@@ -4,14 +4,16 @@ import java.util.List;
 
 public class Feature {
 
-    public final String name;
-    public final String description;
-    public final String dockerfile_snippet;
-    public final String test_command;
-    public final List<Feature> dependencies;
+    public String name;
+    public String description;
+    public String dockerfile_snippet;
+    public String test_command;
+    public List<Feature> dependencies;
 
+    public Feature() {
+	}
 
-    public Feature(String name, String description,
+	public Feature(String name, String description,
                    String dockerfile_snippet,
                    String test_command,
                    List<Feature> dependencies) {

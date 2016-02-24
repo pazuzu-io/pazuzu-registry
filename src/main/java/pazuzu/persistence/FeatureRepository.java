@@ -1,7 +1,6 @@
 package pazuzu.persistence;
 
 import java.util.Collection;
-import java.util.List;
 
 import pazuzu.model.Feature;
 
@@ -10,5 +9,5 @@ import pazuzu.model.Feature;
  */
 public interface FeatureRepository {
 
-	List<Feature> getFeatures();
+	Collection<Feature> getFeatures();
 }
