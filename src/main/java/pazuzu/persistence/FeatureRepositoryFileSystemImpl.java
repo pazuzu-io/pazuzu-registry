@@ -44,7 +44,7 @@ public class FeatureRepositoryFileSystemImpl implements FeatureRepository {
 			}
 		} else {
 			try {
-				Files.createDirectory(storePath);
+				Files.createDirectories(storePath);
 			} catch (IOException ex) {
 				throw new RuntimeException(ex);
 			}

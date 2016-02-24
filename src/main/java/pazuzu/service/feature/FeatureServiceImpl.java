@@ -4,7 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 
 import pazuzu.model.Feature;
@@ -15,7 +16,7 @@ import pazuzu.service.graph.Graph;
 @Service
 public class FeatureServiceImpl implements FeatureService {
 
-    @Autowired
+    @Resource(name="featureRepositoryFileSystemImpl")
     public FeatureRepository featureRepository;
 
     @Override
