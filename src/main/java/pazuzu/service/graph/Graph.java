@@ -13,7 +13,7 @@ public class Graph {
     public Graph(){
         graphMap = new HashMap<>();
     }
-    public void buildGraph(ArrayList<Feature> features) {
+    public void buildGraph(List<Feature> features) {
         //iterates over all features and adds them to the graph
         for (Feature feat : features) {
             Node node = new Node(feat.name);
@@ -23,6 +23,7 @@ public class Graph {
         System.out.println(graphMap.toString());
         //iterates over the dependencies of each feature and adds it to the node of that feature
         for (Feature feat : features) {
+            if (feat.dependencies == null) continue;
             for (Feature dep : feat.dependencies) {
                 graphMap.get(feat.name).addEdge(graphMap.get(dep.name));
             }
@@ -39,7 +40,7 @@ public class Graph {
         }
         return featureNames;
     }
-    public ArrayList<String> Tsort(ArrayList<String> root)
+    public List<String> Tsort(List<String> root)
     {
         ArrayList<Node> allNodes = new ArrayList<>();
         for (String feat:root){
@@ -93,7 +94,6 @@ public class Graph {
         }
         //has to be removed in later iteration
         if(cycle){
-
             System.out.println("Cycle present, topological sort not possible");
         }else{
             System.out.println("Topological Sort: "+Arrays.toString(L.toArray()));

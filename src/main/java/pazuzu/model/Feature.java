@@ -1,6 +1,6 @@
 package pazuzu.model;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class Feature {
 
@@ -8,13 +8,13 @@ public class Feature {
     public final String description;
     public final String dockerfile_snippet;
     public final String test_command;
-    public final ArrayList<Feature> dependencies;
+    public final List<Feature> dependencies;
 
 
     public Feature(String name, String description,
                    String dockerfile_snippet,
                    String test_command,
-                   ArrayList<Feature> dependencies) {
+                   List<Feature> dependencies) {
         this.name = name;
         this.description = description;
         this.dockerfile_snippet = dockerfile_snippet;

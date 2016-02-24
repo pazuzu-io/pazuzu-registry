@@ -1,7 +1,9 @@
 package pazuzu.persistence;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
@@ -30,7 +32,7 @@ public class FeatureRepositoryInMemoryImpl implements FeatureRepository {
 	}
 
 	@Override
-	public Collection<Feature> getFeatures() {
-		return store.values();
+	public List<Feature> getFeatures() {
+		return new ArrayList<Feature>(store.values());
 	}
 }
