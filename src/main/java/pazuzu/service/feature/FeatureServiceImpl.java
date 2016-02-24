@@ -15,9 +15,6 @@ import pazuzu.service.graph.Graph;
 @Service
 public class FeatureServiceImpl implements FeatureService {
 
-//    @Autowired
-//    GraphService graphService;
-
     @Autowired
     public FeatureRepository featureRepository;
 

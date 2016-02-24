@@ -1,9 +1,8 @@
 package pazuzu.web.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import pazuzu.service.FeatureService;
 import pazuzu.model.Feature;
 import pazuzu.web.InvalidFeatureException;
@@ -30,8 +29,8 @@ public class FeatureRefsController {
      * Return a List of all Features
      * @return
      */
-    @RequestMapping(value = "/featurerefs", method = RequestMethod.GET)
-    List<FeatureRefTO> getFeatureRefs(){
+    @RequestMapping(value = "/featurerefs", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody List<FeatureRefTO> getFeatureRefs(){
 
         return featureService.getAllFeatures().stream()
                 .map(FeatureRefTO.byFeature)
@@ -44,8 +43,8 @@ public class FeatureRefsController {
      * @param features
      * @return
      */
-    @RequestMapping(value = "/featurama", method = RequestMethod.GET)
-    List<FeatureTO> getFeatures(List<String> features) throws InvalidFeatureException{
+    @RequestMapping(value = "/featurama", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public @ResponseBody List<FeatureTO> getFeatures(@RequestParam List<String> features) throws InvalidFeatureException{
 
         List<String> validFeatureNames = featureService.validateFeatureNames(features);
         if(validFeatureNames.size() != features.size()){

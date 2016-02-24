@@ -35,4 +35,25 @@ public class Feature {
                 '}';
     }
 
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getDockerfile_snippet() {
+        return dockerfile_snippet;
+    }
+
+    public String getTest_command() {
+        return test_command;
+    }
+
+    public List<Feature> getDependencies() {
+        return dependencies;
+    }
+
 }
