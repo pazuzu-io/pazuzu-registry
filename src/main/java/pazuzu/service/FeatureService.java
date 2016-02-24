@@ -1,8 +1,9 @@
 package pazuzu.service;
 
-import pazuzu.model.Feature;
-
+import java.util.Collection;
 import java.util.List;
+
+import pazuzu.model.Feature;
 
 /**
  * Created by cseidel on 22/02/16.
@@ -14,7 +15,7 @@ public interface FeatureService {
      *
      * @return List of all available features
      */
-    List<Feature> getAllFeatures();
+    Collection<Feature> getAllFeatures();
 
     /**
      * Creates a topologically sorted List of Features

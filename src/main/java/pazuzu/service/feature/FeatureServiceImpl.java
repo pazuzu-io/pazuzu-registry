@@ -1,35 +1,48 @@
 package pazuzu.service.feature;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import pazuzu.model.Feature;
 import pazuzu.persistence.FeatureRepository;
 import pazuzu.service.FeatureService;
-import pazuzu.service.GraphService;
-
-import java.util.List;
+import pazuzu.service.graph.Graph;
 
 @Service
 public class FeatureServiceImpl implements FeatureService {
 
-    @Autowired
-    GraphService graphService;
+//    @Autowired
+//    GraphService graphService;
 
     @Autowired
-    FeatureRepository featureRepository;
+    public FeatureRepository featureRepository;
 
     @Override
-    public List<Feature> getAllFeatures() {
-        return null;
+    public Collection<Feature> getAllFeatures() {
+        //query the feature repository to get all the features
+        return featureRepository.getFeatures();
     }
 
     @Override
     public List<Feature> createSortedFeaturelistWithDependencies(List<String> featureNames) throws IllegalArgumentException {
-        return null;
+        Graph graph = new Graph();
+        graph.buildGraph(featureRepository.getFeatures());
+        List<String> sortedFeatureNamesList =  graph.Tsort(featureNames);
+        return featureRepository.getFeatures().stream()
+                .filter(feature -> sortedFeatureNamesList.contains(feature.name))
+                .collect(Collectors.toList());
+
     }
 
     @Override
     public List<String> validateFeatureNames(List<String> requestedFeatures) {
-        return null;
+        return featureRepository.getFeatures().stream()
+                .map(feature -> feature.name)
+                .filter(s -> requestedFeatures.contains(s))
+                .collect(Collectors.toList());
     }
 }
