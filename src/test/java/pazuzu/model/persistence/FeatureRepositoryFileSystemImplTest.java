@@ -29,7 +29,8 @@ public class FeatureRepositoryFileSystemImplTest {
 	@Test
 	public void getFeaturesShouldReturnFeaturePerFile() throws Exception {
 		// Arrange
-		Path pazuzuTestPath = Paths.get(System.getProperty("user.home") + "/.pazuzu/test/features");
+		Path pazuzuTestPath = Paths.get("/usr/local/.pazuzu/test/features");
+		Files.createDirectories(pazuzuTestPath);
 
 		Feature feature1 = new Feature("feature1", "feature1", "", "", null);
 		Feature feature2 = new Feature("feature2", "feature2", "", "", Arrays.asList(feature1));
