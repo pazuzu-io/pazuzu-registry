@@ -11,7 +11,7 @@ public class Graph {
     public Graph(){
         graphMap = new HashMap<>();
     }
-    public void buildGraph(List<Feature> features) {
+    public void buildGraph(Collection<Feature> features) {
         //iterates over all features and adds them to the graph
         for (Feature feat : features) {
             Node node = new Node(feat.name);
