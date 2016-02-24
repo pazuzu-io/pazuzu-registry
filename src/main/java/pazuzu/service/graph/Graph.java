@@ -1,8 +1,6 @@
 package pazuzu.service.graph;
 
 import pazuzu.model.Feature;
-
-import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -27,10 +25,17 @@ public class Graph {
             for (Feature dep : feat.dependencies) {
                 graphMap.get(feat.name).addEdge(graphMap.get(dep.name));
             }
-
-
         }
-
+    }
+    public void DisplayGraph(){
+        for (String key:graphMap.keySet()){
+            System.out.print(key+" -> in Edges:");
+            for (Edge e: graphMap.get(key).inEdges)
+                System.out.print(e.toString());
+            System.out.print(" out Edges: ");
+            for (Edge e: graphMap.get(key).outEdges)
+                System.out.print(e.toString());
+        }
     }
 
     public ArrayList<String> getFeatureNamesFromFeatures(ArrayList<Feature> features){
@@ -40,8 +45,12 @@ public class Graph {
         }
         return featureNames;
     }
+
+
     public List<String> Tsort(List<String> root)
     {
+
+        System.out.println("our list" + root.toString());
         ArrayList<Node> allNodes = new ArrayList<>();
         for (String feat:root){
             allNodes.add(graphMap.get(feat));
@@ -56,11 +65,13 @@ public class Graph {
             if(n.inEdges.size() == 0){
                 S.add(n);
             }
+            //else we would just add it to the sorted list first because there's no dependencies
+            else
+                L.add(n);
         }
 
         //while S is non-empty do
         while(!S.isEmpty()){
-
             //remove a node n from S
             Node n = S.iterator().next();
             S.remove(n);
@@ -84,22 +95,6 @@ public class Graph {
             }
         }
 
-        //Check to see if all edges are removed
-        boolean cycle = false;
-        for(Node n : allNodes){
-            if(!n.inEdges.isEmpty()){
-                cycle = true;
-                break;
-            }
-        }
-        //has to be removed in later iteration
-        if(cycle){
-            System.out.println("Cycle present, topological sort not possible");
-        }else{
-            System.out.println("Topological Sort: "+Arrays.toString(L.toArray()));
-        }
-
-
         ArrayList<String> sortedFeatureNames = new ArrayList<>();
         for (Node n:L){
             sortedFeatureNames.add(n.feature_name);
@@ -109,29 +104,5 @@ public class Graph {
         return sortedFeatureNames;
 
     }
-
-
-//    public static void main(String[] args){
-//        System.out.println(" Starting graph builder");
-//        Feature one = new Feature("one","one","one","one",new ArrayList<Feature>());
-//        Feature two = new Feature("two","two", "two","two",new ArrayList<Feature>());
-//        Feature three = new Feature("three","three", "three","three",new ArrayList<Feature>());
-//        Feature four = new Feature("four","four", "four","four",new ArrayList<Feature>());
-//        one.dependencies.add(two);
-//        three.dependencies.add(one);
-//        three.dependencies.add(two);
-//        ArrayList<Feature> featureGraph = new ArrayList<>();
-//        featureGraph.add(one);
-//        featureGraph.add(two);
-//        featureGraph.add(three);
-//        Graph g = new Graph();
-//        g.buildGraph(featureGraph);
-//        System.out.println("graph built");
-//        ArrayList<String> sortedfeats = g.Tsort(g.getFeatureNamesFromFeatures(featureGraph));
-//        System.out.println(sortedfeats.toString());
-//
-//
-//    }
-
 
 }

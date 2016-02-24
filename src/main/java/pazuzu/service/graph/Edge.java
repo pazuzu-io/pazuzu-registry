@@ -15,4 +15,9 @@ public class Edge {
         Edge e = (Edge)obj;
         return e.from == from && e.to == to;
     }
+
+    @Override
+    public String toString(){
+        return "From: "+this.from + " To: "+ this.to;
+    }
 }
