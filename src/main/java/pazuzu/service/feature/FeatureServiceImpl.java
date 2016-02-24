@@ -5,18 +5,13 @@ import org.springframework.stereotype.Service;
 import pazuzu.model.Feature;
 import pazuzu.persistence.FeatureRepository;
 import pazuzu.service.FeatureService;
-import pazuzu.service.GraphService;
 import pazuzu.service.graph.Graph;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 public class FeatureServiceImpl implements FeatureService {
-
-//    @Autowired
-//    GraphService graphService;
 
     @Autowired
     public FeatureRepository featureRepository;
