@@ -29,7 +29,8 @@ public class FeatureRepositoryFileSystemImplTest {
 	@Test
 	public void getFeaturesShouldReturnFeaturePerFile() throws Exception {
 		// Arrange
-		Path pazuzuTestPath = Paths.get("/usr/local/.pazuzu/test/features");
+		Path pazuzuTestPath = Files.createTempDirectory("featuresdir");
+		pazuzuTestPath.toFile().deleteOnExit();
 		Files.createDirectories(pazuzuTestPath);
 
 		Feature feature1 = new Feature("feature1", "feature1", "", "", null);
@@ -69,7 +70,9 @@ public class FeatureRepositoryFileSystemImplTest {
 	@Test
 	public void getFeaturesShouldCreateStoreFolderWhenNotExisting() throws IOException {
 		// Arrange
-		Path pazuzuTestPath = Paths.get(System.getProperty("user.home") + "/.pazuzu/test/non_existing_store");
+		Path baseDirectory = Files.createTempDirectory("pazuzu");
+		baseDirectory.toFile().deleteOnExit();
+		Path pazuzuTestPath = baseDirectory.resolve("non_existing_store");
 		assertThat(Files.exists(pazuzuTestPath), is(false));
 
 		featureRepository.setStorePathStr(pazuzuTestPath.toString());
