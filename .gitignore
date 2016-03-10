@@ -83,3 +83,4 @@ local.properties
 
 # STS (Spring Tool Suite)
 .springBeans
+scm-source.json
