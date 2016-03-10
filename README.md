@@ -19,7 +19,6 @@ Project is still in early stages - this file will be updated to reflect the prog
 What are the current libraries/Frameworks used?
 ------------------------------------------------------------
 For the API documentation and specs we are using [swagger.io](http://swagger.io/)
-For the Implementation we are using [play-swagger](https://github.com/zalando/play-swagger)
 
 
 License
