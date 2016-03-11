@@ -13,7 +13,7 @@ paths:
     get:
       summary: List all the features in pazuzu
       description: |
-        Returns all the features without it's dependences. Each features can further be accessed
+        Returns all the features without it's dependencies. Each features can further be accessed
         one by one and the dependencies will be there
       parameters:
         - name: name
@@ -163,11 +163,11 @@ paths:
         required: true
         type: string
         in: path
-        description: continer name
+        description: Container name
     get:
       tags:
         - Containers
-      summary: get contaner information
+      summary: Get container information
       description: Get container information
       responses:
         200:
@@ -218,7 +218,7 @@ paths:
         required: true
         type: string
         in: path
-        description: continer name
+        description: container name
     get:
       tags:
         - Containers
@@ -261,7 +261,7 @@ paths:
         required: true
         type: string
         in: path
-        description: continer name
+        description: container name
       - name: feature
         required: true
         type: string
