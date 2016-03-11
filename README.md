@@ -6,15 +6,23 @@
 
 What is Pazuzu
 ------------------------------------------------------------
-Pazuzu is a tool that builds Docker images from feature snippets, while resolving all dependencies between them. One of the common use cases is Continuous Integration environment, where jobs require specific tooling present to build and test. Pazuzu can significantly ease that process, by letting user choose from a wide selection of predefined Dockerfile snippets that represent those dependencies (e.x. golang, python, Android SDK). 
+Pazuzu is a tool that builds Docker images from feature snippets, while 
+resolving all dependencies between them. One of the common use cases is 
+Continuous Integration environment, where jobs require specific tooling present 
+to build and test. Pazuzu can significantly ease that process, by letting user 
+choose from a wide selection of predefined Dockerfile snippets that represent 
+those dependencies (e.x. golang, python, Android SDK). 
 
 What is Pazuzu Registry
 ------------------------------------------------------------
-Pazuzu Registry is a central storage of features, together with their dependencies and test cases. Pazuzu client can access it for building Docker images with a specified set of features. 
+Pazuzu Registry is a central storage of features, together with their 
+dependencies and test cases. Pazuzu client can access it for building Docker 
+images with a specified set of features. 
 
 What is current stage?
 ------------------------------------------------------------
-Project is still in early stages - this file will be updated to reflect the progress and document usage and functionality
+Project is still in early stages - this file will be updated to reflect the 
+progress and document usage and functionality
 
 What are the current libraries/Frameworks used?
 ------------------------------------------------------------
