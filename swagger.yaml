@@ -255,7 +255,7 @@ paths:
           description: Unexpected exception
           schema:
             $ref: '#/definitions/Error'
-  /api/container/{container_id}/features/{feature}:
+  /api/containers/{container_id}/features/{feature}:
     parameters:
       - name: container_id
         required: true
