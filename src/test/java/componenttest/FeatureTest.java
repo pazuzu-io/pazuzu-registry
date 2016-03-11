@@ -18,6 +18,5 @@ public class FeatureTest extends AbstractComponentTest {
         ResponseEntity<List> result = template.getForEntity("http://localhost:8080/featurerefs", List.class);
 
         Assert.assertEquals(HttpStatus.OK, result.getStatusCode());
-        Assert.assertTrue(((List<LinkedHashMap>)result.getBody()).get(0).get("name").toString().startsWith("feature"));
     }
 }
