@@ -12,7 +12,7 @@ public class FeatureTest extends AbstractComponentTest {
 
     // Just an example
     @Test
-    public void featureref_returns_some_features() throws Exception {
+    public void ensureThatGetOnTheFeaturerefResourceReturnsStatusCode200() throws Exception {
 
         ResponseEntity<List> result = template.getForEntity("http://localhost:8080/featurerefs", List.class);
 
