@@ -272,6 +272,8 @@ paths:
       description: |
         Delete specified feature from container. Feature is not deleted by itself, instead only reference 
         to that feature is removed
+      tags:
+        - Containers
       responses:
         204:
           description: Features successfully deleted from container
