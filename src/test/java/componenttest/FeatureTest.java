@@ -14,7 +14,7 @@ public class FeatureTest extends AbstractComponentTest {
     @Test
     public void ensureThatGetOnTheFeaturerefResourceReturnsStatusCode200() throws Exception {
 
-        ResponseEntity<List> result = template.getForEntity("http://localhost:8080/featurerefs", List.class);
+        ResponseEntity<List> result = template.getForEntity("http://localhost:8080/api/features", List.class);
 
         Assert.assertEquals(HttpStatus.OK, result.getStatusCode());
     }

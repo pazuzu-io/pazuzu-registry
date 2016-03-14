@@ -1,5 +1,6 @@
 package pazuzu.web;
 
+import java.util.Collections;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -22,9 +23,8 @@ public class FeaturesResource {
 
     @GET
     @Path("/")
-    public List<FeatureDto> listFeatures(
-            @QueryParam("name") @DefaultValue("") String name) {
-        throw new UnsupportedOperationException();
+    public List<FeatureDto> listFeatures(@QueryParam("name") @DefaultValue("") String name) {
+        return Collections.emptyList();
     }
 
     @POST
