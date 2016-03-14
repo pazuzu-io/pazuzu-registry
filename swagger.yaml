@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
-  title: Pazuzu api specification
-  description: Pazuzu api specification - what need to be done to create pazuzu cli and ui.
+  title: Pazuzu registry
+  description: Generating Dockerfiles by sets of required functions
   version: "0.0.2"
 host: pazuzu.zalando.net
 schemes:
@@ -18,7 +18,7 @@ paths:
       parameters:
         - name: name
           in: query
-          description: Optional value, that must present in feature name.
+          description: value, that must present in feature name.
           required: false
           type: string
       tags:
