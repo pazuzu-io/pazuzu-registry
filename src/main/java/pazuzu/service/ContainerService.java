@@ -1,6 +1,7 @@
 package pazuzu.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
@@ -9,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import pazuzu.dao.ContainerRepository;
 import pazuzu.model.Container;
-import pazuzu.web.dto.ContainerFullDto;
 
 @Service
 public class ContainerService {
@@ -61,5 +61,10 @@ public class ContainerService {
         }
         containerRepository.save(container);
         return converter.apply(container);
+    }
+
+    @Transactional
+    public <T> T getContainer(String containerName, Function<Container, T> converter) {
+        return Optional.ofNullable(containerRepository.findByName(containerName)).map(converter).orElse(null);
     }
 }

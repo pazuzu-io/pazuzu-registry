@@ -46,14 +46,14 @@ public class ContainersResource {
 
     @PUT
     @Path("/{container_id}")
-    public ContainerFullDto updateContainer(@PathParam("container_id") String containerName, ContainerToCreateDto value) {
-        return containerService.updateContainer(containerName, value.getName(), value.getFeatures());
+    public ContainerFullDto updateContainer(@PathParam("container_id") String containerName, ContainerToCreateDto value) throws ServiceException {
+        return containerService.updateContainer(containerName, value.getName(), value.getFeatures(), ContainerFullDto::buildFull);
     }
 
     @GET
     @Path("/{container_id}")
     public ContainerFullDto getContainer(@PathParam("container_id") String containerName) {
-        throw new UnsupportedOperationException();
+        return containerService.getContainer(containerName, ContainerFullDto::buildFull);
     }
 
     @DELETE
