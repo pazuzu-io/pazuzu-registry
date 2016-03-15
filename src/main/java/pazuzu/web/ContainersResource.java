@@ -52,7 +52,7 @@ public class ContainersResource {
 
     @GET
     @Path("/{container_id}")
-    public ContainerFullDto getContainer(@PathParam("container_id") String containerName) {
+    public ContainerFullDto getContainer(@PathParam("container_id") String containerName) throws ServiceException {
         return containerService.getContainer(containerName, ContainerFullDto::buildFull);
     }
 
@@ -64,14 +64,14 @@ public class ContainersResource {
 
     @GET
     @Path("/{container_id}/features")
-    public List<FeatureDto> getContainerFeatures(@PathParam("container_id") String containerName) {
+    public List<FeatureDto> getContainerFeatures(@PathParam("container_id") String containerName) throws ServiceException {
         return containerService.getContainer(containerName, ContainerFullDto::buildFull).getFeatures();
     }
 
     @POST
     @Path("/{container_id}/features")
-    public ContainerFullDto addFeatureToContainer(@PathParam("container_id") String containerName, FeatureToAddDto feature) {
-        throw new UnsupportedOperationException();
+    public ContainerFullDto addFeatureToContainer(@PathParam("container_id") String containerName, FeatureToAddDto feature) throws ServiceException {
+        return containerService.addFeature(containerName, feature.getName(), ContainerFullDto::buildFull);
     }
 
     @DELETE

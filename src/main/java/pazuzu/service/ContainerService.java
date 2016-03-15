@@ -9,16 +9,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import pazuzu.dao.ContainerRepository;
+import pazuzu.dao.FeatureRepository;
 import pazuzu.model.Container;
+import pazuzu.model.Feature;
 
 @Service
 public class ContainerService {
     private final ContainerRepository containerRepository;
+    private final FeatureRepository featureRepository;
     private final FeatureService featureService;
 
     @Inject
-    public ContainerService(ContainerRepository containerRepository, FeatureService featureService) {
+    public ContainerService(ContainerRepository containerRepository, FeatureRepository featureRepository, FeatureService featureService) {
         this.containerRepository = containerRepository;
+        this.featureRepository = featureRepository;
         this.featureService = featureService;
     }
 
@@ -63,13 +67,34 @@ public class ContainerService {
         return converter.apply(container);
     }
 
-    @Transactional
-    public <T> T getContainer(String containerName, Function<Container, T> converter) {
-        return Optional.ofNullable(containerRepository.findByName(containerName)).map(converter).orElse(null);
+    @Transactional(rollbackFor = ServiceException.class)
+    public <T> T getContainer(String containerName, Function<Container, T> converter) throws ServiceException {
+        final Container container = getContainer(containerName);
+        return converter.apply(container);
+    }
+
+    private Container getContainer(String containerName) throws ServiceException {
+        final Container container = containerRepository.findByName(containerName);
+        if (null == container) {
+            throw new ServiceException.NotFoundException("not_found", "Container with name is not found");
+        }
+        return container;
     }
 
     @Transactional
     public void deleteContainer(String containerName) {
         Optional.ofNullable(containerRepository.findByName(containerName)).ifPresent(containerRepository::delete);
+    }
+
+    @Transactional(rollbackFor = ServiceException.class)
+    public <T> T addFeature(String containerName, String featureName, Function<Container, T> converter) throws ServiceException {
+        final Container container = getContainer(containerName);
+        final Feature feature = featureRepository.findByName(featureName);
+        if (null == feature) {
+            throw new ServiceException("bad_feature", "Feature with name " + featureName + " is not found");
+        }
+        container.getFeatures().add(feature);
+        containerRepository.save(container);
+        return converter.apply(container);
     }
 }
