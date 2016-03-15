@@ -59,7 +59,7 @@ public class ContainersResource {
     @DELETE
     @Path("/{container_id}")
     public void deleteContainer(@PathParam("container_id") String containerName) {
-        throw new UnsupportedOperationException();
+        containerService.deleteContainer(containerName);
     }
 
     @GET

@@ -10,4 +10,6 @@ public interface ContainerRepository extends Repository<Container, Integer> {
     Container findByName(String name);
 
     Container save(Container container);
+
+    void delete(Container container);
 }

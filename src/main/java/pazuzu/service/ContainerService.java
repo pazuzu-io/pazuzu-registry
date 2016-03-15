@@ -67,4 +67,9 @@ public class ContainerService {
     public <T> T getContainer(String containerName, Function<Container, T> converter) {
         return Optional.ofNullable(containerRepository.findByName(containerName)).map(converter).orElse(null);
     }
+
+    @Transactional
+    public void deleteContainer(String containerName) {
+        Optional.ofNullable(containerRepository.findByName(containerName)).ifPresent(containerRepository::delete);
+    }
 }
