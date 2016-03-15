@@ -12,12 +12,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import pazuzu.model.Feature;
 import pazuzu.service.ContainerService;
 import pazuzu.service.ServiceException;
 import pazuzu.web.dto.ContainerDto;
 import pazuzu.web.dto.ContainerFullDto;
 import pazuzu.web.dto.ContainerToCreateDto;
+import pazuzu.web.dto.FeatureDto;
 import pazuzu.web.dto.FeatureToAddDto;
 
 @Path("/api/containers")
@@ -64,8 +64,8 @@ public class ContainersResource {
 
     @GET
     @Path("/{container_id}/features")
-    public List<Feature> getContainerFeatures(@PathParam("container_id") String containerName) {
-        throw new UnsupportedOperationException();
+    public List<FeatureDto> getContainerFeatures(@PathParam("container_id") String containerName) {
+        return containerService.getContainer(containerName, ContainerFullDto::buildFull).getFeatures();
     }
 
     @POST
