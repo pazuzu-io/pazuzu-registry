@@ -1,0 +1,3 @@
+tokens:
+  access-token-uri: https://token.services.auth.zalando.com/oauth2/access_token?realm=/services
+  credentials-directory: ${user.dir}/../credentials
