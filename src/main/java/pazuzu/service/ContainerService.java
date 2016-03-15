@@ -107,4 +107,10 @@ public class ContainerService {
             containerRepository.save(container);
         }
     }
+
+    @Transactional(rollbackFor = ServiceException.class)
+    public String generateDockerFile(String containerName) throws ServiceException {
+        final Container container = getContainer(containerName);
+        return DockerFileUtil.generateDockerfile(container.getName(), container.getFeatures());
+    }
 }

@@ -83,7 +83,7 @@ public class ContainersResource {
     @GET
     @Path("/{container_id}/dockerfile")
     @Produces("text/plain")
-    public String getDockerFile(@PathParam("container_id") String containerName) {
-        throw new UnsupportedOperationException();
+    public String getDockerFile(@PathParam("container_id") String containerName) throws ServiceException {
+        return containerService.generateDockerFile(containerName);
     }
 }

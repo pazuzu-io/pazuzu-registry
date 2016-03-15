@@ -113,4 +113,8 @@ public class FeatureService {
         return existing;
     }
 
+    @Transactional(rollbackFor = ServiceException.class)
+    public String generateDockerFile(List<String> featureNames) throws ServiceException {
+        return DockerFileUtil.generateDockerfile(null, loadFeatures(featureNames));
+    }
 }
