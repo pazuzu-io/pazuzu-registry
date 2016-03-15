@@ -102,8 +102,8 @@ paths:
     delete:
       summary: Delete feature
       description: |
-        Delete this feature. Links from other features are not deleted, 
-        so one need to handle it manually
+        Delete this feature. In case when another features has links to this feature - nothing will be deleted and
+        error will be returned.
       tags:
         - Features
       responses:

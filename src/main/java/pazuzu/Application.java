@@ -8,7 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 @EntityScan(basePackages = "pazuzu.model")
-@ComponentScan(basePackages = "pazuzu.service")
+@ComponentScan(basePackages = {"pazuzu.service", "pazuzu.dao"})
 @EnableAutoConfiguration
 public class Application {
     @Component
@@ -17,6 +17,7 @@ public class Application {
         public JerseyConfig() {
             packages("pazuzu.web");
             registerClasses(UnknownExceptionMapper.class);
+            registerClasses(ServiceExceptionMapper.class);
         }
     }
 

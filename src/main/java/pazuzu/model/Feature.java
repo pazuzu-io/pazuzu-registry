@@ -65,4 +65,11 @@ public class Feature {
     public void setDependencies(Set<Feature> dependencies) {
         this.dependencies = dependencies;
     }
+
+    public boolean containsDependencyRecursively(Feature f) {
+        if (this == f) {
+            return true;
+        }
+        return getDependencies().stream().filter(item -> item.containsDependencyRecursively(f)).findAny().isPresent();
+    }
 }

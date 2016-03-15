@@ -12,6 +12,4 @@ import pazuzu.Application;
 @WebIntegrationTest
 public class AbstractComponentTest {
     protected TestRestTemplate template = new TestRestTemplate();
-
-
 }
