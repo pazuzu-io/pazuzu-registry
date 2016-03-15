@@ -2,14 +2,10 @@ package pazuzu;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import pazuzu.service.ServiceException;
 import pazuzu.web.dto.ErrorDto;
 
 public class ServiceExceptionMapper implements ExceptionMapper<ServiceException> {
-    private static final Logger LOG = LoggerFactory.getLogger(UnknownExceptionMapper.class);
-
     @Override
     public Response toResponse(ServiceException e) {
         return Response.status(getHttpCode(e)).entity(new ErrorDto(e.getCode(), e.getMessage())).build();

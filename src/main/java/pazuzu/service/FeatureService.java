@@ -10,16 +10,20 @@ import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import pazuzu.dao.ContainerRepository;
 import pazuzu.dao.FeatureRepository;
+import pazuzu.model.Container;
 import pazuzu.model.Feature;
 
 @Service
 public class FeatureService {
     private final FeatureRepository featureRepository;
+    private final ContainerRepository containerRepository;
 
     @Inject
-    public FeatureService(FeatureRepository featureRepository) {
+    public FeatureService(FeatureRepository featureRepository, ContainerRepository containerRepository) {
         this.featureRepository = featureRepository;
+        this.containerRepository = containerRepository;
     }
 
     @Transactional
@@ -89,10 +93,15 @@ public class FeatureService {
             throw new ServiceException("references", "Can't delete feature " + feature.getName() +
                     ", references found: " + referencing.stream().map(Feature::getName).collect(Collectors.joining(", ")));
         }
+        final List<Container> referencingContainers = containerRepository.findByFeaturesContaining(feature);
+        if (!referencingContainers.isEmpty()) {
+            throw new ServiceException("references", "Can't delete feature " + feature.getName() +
+                    ", references from containers found: " + referencingContainers.stream().map(Container::getName).collect(Collectors.joining(", ")));
+        }
         featureRepository.delete(feature);
     }
 
-    Set<Feature> loadFeatures(List<String> dependencyNames) throws ServiceException {
+    protected Set<Feature> loadFeatures(List<String> dependencyNames) throws ServiceException {
         final Set<String> uniqueDependencies = null == dependencyNames ? new HashSet<>() : new HashSet<>(dependencyNames);
         final Set<Feature> dependencies = uniqueDependencies.stream()
                 .map(featureRepository::findByName).filter(f -> f != null)

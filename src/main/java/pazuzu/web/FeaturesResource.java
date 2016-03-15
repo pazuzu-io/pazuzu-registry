@@ -1,6 +1,5 @@
 package pazuzu.web;
 
-import java.util.Collections;
 import java.util.List;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;

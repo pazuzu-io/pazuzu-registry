@@ -28,7 +28,7 @@ public class TopologicalSort {
      * @param containsFunc contains(a, b) = True if a contains b
      * @param <T> Type of elements
      * @return Topologically sorted list
-     * @throws RuntimeException in case of recursive dependencies
+     * @throws IllegalStateException in case of recursive dependencies
      */
     @SuppressWarnings("unused")
     public static <T> List<T> sort(Collection<T> items, BiFunction<T, T, Boolean> containsFunc) {
@@ -50,7 +50,7 @@ public class TopologicalSort {
         while (!nodes.isEmpty()) {
             final List<Node<T>> toRemove = nodes.stream().filter(n -> n.outgoing.size() == 0).collect(Collectors.toList());
             if (toRemove.isEmpty()) {
-                throw new RuntimeException("Recursion found! can't do anything with nodes " + nodes.stream().map(n -> n.value).collect(Collectors.toList()));
+                throw new IllegalStateException("Recursion found! can't do anything with nodes " + nodes.stream().map(n -> n.value).collect(Collectors.toList()));
             }
             toRemove.forEach(node -> {
                 node.incoming.forEach(item -> item.outgoing.remove(node));
