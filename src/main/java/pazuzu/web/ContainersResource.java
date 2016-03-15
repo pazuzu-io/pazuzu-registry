@@ -76,8 +76,8 @@ public class ContainersResource {
 
     @DELETE
     @Path("/{container_id}/features/{feature_id}")
-    public void deleteContainerFeature(@PathParam("container_id") String containerId, @PathParam("feature_id") String featureId) {
-        throw new UnsupportedOperationException();
+    public void deleteContainerFeature(@PathParam("container_id") String containerName, @PathParam("feature_id") String featureName) throws ServiceException {
+        containerService.deleteFeature(containerName, featureName);
     }
 
     @GET

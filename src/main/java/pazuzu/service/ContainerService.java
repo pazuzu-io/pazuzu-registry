@@ -97,4 +97,14 @@ public class ContainerService {
         containerRepository.save(container);
         return converter.apply(container);
     }
+
+    @Transactional(rollbackFor = ServiceException.class)
+    public void deleteFeature(String containerName, String featureName) throws ServiceException {
+        final Container container = getContainer(containerName);
+        final Feature toDelete = container.getFeatures().stream().filter(f -> f.getName().equals(featureName)).findAny().orElse(null);
+        if (null != toDelete) {
+            container.getFeatures().remove(toDelete);
+            containerRepository.save(container);
+        }
+    }
 }
