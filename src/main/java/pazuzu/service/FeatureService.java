@@ -9,37 +9,41 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pazuzu.dao.FeaturesDao;
+import org.springframework.util.StringUtils;
+import pazuzu.dao.FeatureRepository;
 import pazuzu.model.Feature;
 
 @Service
 public class FeatureService {
-    private final FeaturesDao featuresDao;
+    private final FeatureRepository featureRepository;
 
     @Inject
-    public FeatureService(FeaturesDao featuresDao) {
-        this.featuresDao = featuresDao;
+    public FeatureService(FeatureRepository featureRepository) {
+        this.featureRepository = featureRepository;
     }
 
     @Transactional
     public <T> List<T> listFeatures(String name, Function<Feature, T> converter) {
-        return featuresDao.listFeatures(name).stream().map(converter).collect(Collectors.toList());
+        return featureRepository.findByNameIgnoreCaseContaining(name).stream().map(converter).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = ServiceException.class)
     public <T> T createFeature(String name, String dockerData, List<String> dependencyNames, Function<Feature, T> converter) throws ServiceException {
-        final Feature existing = featuresDao.findByName(name);
+        if (StringUtils.isEmpty(name)) {
+            throw new ServiceException("name", "Feature name is empty");
+        }
+        final Feature existing = featureRepository.findByName(name);
         if (null != existing) {
             throw new ServiceException("duplicate", "Feature with name " + name + " already exists");
         }
 
-        final Set<Feature> dependencies = loadDependencies(dependencyNames);
+        final Set<Feature> dependencies = loadFeatures(dependencyNames);
 
         final Feature newFeature = new Feature();
         newFeature.setName(name);
         newFeature.setDockerData(null == dockerData ? "" : dockerData);
         newFeature.setDependencies(dependencies);
-        featuresDao.save(newFeature);
+        featureRepository.save(newFeature);
         return converter.apply(newFeature);
     }
 
@@ -47,7 +51,7 @@ public class FeatureService {
     public <T> T updateFeature(String name, String newName, String dockerData, List<String> dependencyNames, Function<Feature, T> converter) throws ServiceException {
         final Feature existing = loadExistingFeature(name);
         if (null != newName && !newName.equals(existing.getName())) {
-            final Feature newExisting = featuresDao.findByName(newName);
+            final Feature newExisting = featureRepository.findByName(newName);
             if (null != newExisting) {
                 throw new ServiceException("duplicate", "Feature with name " + newName + " already exists");
             }
@@ -57,7 +61,7 @@ public class FeatureService {
             existing.setDockerData(dockerData);
         }
         if (null != dependencyNames) {
-            final Set<Feature> dependencies = loadDependencies(dependencyNames);
+            final Set<Feature> dependencies = loadFeatures(dependencyNames);
             final List<Feature> recursive = dependencies.stream()
                     .filter(f -> f.containsDependencyRecursively(existing)).collect(Collectors.toList());
             if (!recursive.isEmpty()) {
@@ -65,7 +69,7 @@ public class FeatureService {
             }
             existing.setDependencies(dependencies);
         }
-        featuresDao.save(existing);
+        featureRepository.save(existing);
         return converter.apply(existing);
     }
 
@@ -76,33 +80,33 @@ public class FeatureService {
 
     @Transactional(rollbackFor = ServiceException.class)
     public void deleteFeature(String featureName) throws ServiceException {
-        final Feature feature = featuresDao.findByName(featureName);
+        final Feature feature = featureRepository.findByName(featureName);
         if (null == feature) {
             return; // idempotent call
         }
-        final List<Feature> referencing = featuresDao.findReferencingFeatures(feature);
+        final List<Feature> referencing = featureRepository.findByDependenciesContaining(feature);
         if (!referencing.isEmpty()) {
             throw new ServiceException("references", "Can't delete feature " + feature.getName() +
                     ", references found: " + referencing.stream().map(Feature::getName).collect(Collectors.joining(", ")));
         }
-        featuresDao.deleteFeature(feature);
+        featureRepository.delete(feature);
     }
 
-    private Set<Feature> loadDependencies(List<String> dependencyNames) throws ServiceException {
+    Set<Feature> loadFeatures(List<String> dependencyNames) throws ServiceException {
         final Set<String> uniqueDependencies = null == dependencyNames ? new HashSet<>() : new HashSet<>(dependencyNames);
         final Set<Feature> dependencies = uniqueDependencies.stream()
-                .map(featuresDao::findByName).filter(f -> f != null)
+                .map(featureRepository::findByName).filter(f -> f != null)
                 .collect(Collectors.toSet());
         if (dependencies.size() != uniqueDependencies.size()) {
             dependencies.forEach(f -> uniqueDependencies.remove(f.getName()));
-            throw new ServiceException("no_dependencies", "Failed to find dependencies with names " +
+            throw new ServiceException("no_features", "Failed to find features with names " +
                     Arrays.deepToString(uniqueDependencies.toArray()));
         }
         return dependencies;
     }
 
     private Feature loadExistingFeature(String name) throws ServiceException.NotFoundException {
-        final Feature existing = featuresDao.findByName(name);
+        final Feature existing = featureRepository.findByName(name);
         if (null == existing) {
             throw new ServiceException.NotFoundException("not_found", "Feature with name " + name + " is not found");
         }
