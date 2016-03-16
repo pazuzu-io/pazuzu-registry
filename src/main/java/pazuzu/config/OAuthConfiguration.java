@@ -49,9 +49,6 @@ public class OAuthConfiguration extends ResourceServerConfigurerAdapter {
         resources.expressionHandler(new ExtendedOAuth2WebSecurityExpressionHandler());
     }
 
-    /**
-     * Configure scopes for specific controller/httpmethods/roles here.
-     */
     @Override
     public void configure(final HttpSecurity http) throws Exception {
 
@@ -61,9 +58,7 @@ public class OAuthConfiguration extends ResourceServerConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.NEVER)
             .and()
                 .authorizeRequests()
-                    .antMatchers(HttpMethod.GET, "/secured/**").access("#oauth2.hasScope('uid')")
-                    .antMatchers(HttpMethod.GET, "/realmSecured/**").access("#oauth2.hasRealm('/services')")
-                    .antMatchers(HttpMethod.GET, "/combinedRealmSecured/**").access("#oauth2.hasUidScopeAndRealm('/services')");
+                    .antMatchers(HttpMethod.GET, "/api/**").access("#oauth2.hasScope('uid')");
         // @formatter:on
     }
 
