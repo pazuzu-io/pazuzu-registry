@@ -2,6 +2,8 @@ package pazuzu;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pazuzu.service.ServiceException;
 import pazuzu.web.dto.ErrorDto;
 
@@ -12,6 +14,7 @@ public class ServiceExceptionMapper implements ExceptionMapper<ServiceException>
     }
 
     private Response.Status getHttpCode(ServiceException e) {
+
         if (e instanceof ServiceException.NotFoundException) {
             return Response.Status.NOT_FOUND;
         } else {

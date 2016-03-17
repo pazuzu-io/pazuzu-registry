@@ -1,15 +1,10 @@
 package pazuzu.web.dto;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import pazuzu.model.Container;
 
-@XmlRootElement(name = "Container")
-@XmlAccessorType(XmlAccessType.NONE)
 public class ContainerDto {
-    @XmlElement(name = "name")
+    @JsonProperty("name")
     private String name;
 
     public static ContainerDto ofShort(Container container) {
