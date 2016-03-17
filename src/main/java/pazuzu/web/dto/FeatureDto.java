@@ -1,17 +1,12 @@
 package pazuzu.web.dto;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import pazuzu.model.Feature;
 
-@XmlRootElement(name = "Feature")
-@XmlAccessorType(XmlAccessType.NONE)
 public class FeatureDto {
-    @XmlElement(name = "name")
+    @JsonProperty("name")
     private String name;
-    @XmlElement(name = "docker_data")
+    @JsonProperty("docker_data")
     private String dockerData;
 
     public String getName() {
@@ -20,6 +15,14 @@ public class FeatureDto {
 
     public String getDockerData() {
         return dockerData;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDockerData(String dockerData) {
+        this.dockerData = dockerData;
     }
 
     public static FeatureDto ofShort(Feature feature) {

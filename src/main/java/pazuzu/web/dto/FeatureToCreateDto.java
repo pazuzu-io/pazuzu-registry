@@ -1,17 +1,16 @@
 package pazuzu.web.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "FeatureToCreate")
-@XmlAccessorType(XmlAccessType.NONE)
 public class FeatureToCreateDto extends FeatureDto {
-    @XmlElement(name = "dependencies")
+    @JsonProperty("dependencies")
     private List<String> dependencies;
+
+    public void setDependencies(List<String> dependencies) {
+        this.dependencies = dependencies;
+    }
 
     public List<String> getDependencies() {
         if (null == dependencies) {

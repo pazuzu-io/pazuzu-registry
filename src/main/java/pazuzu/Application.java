@@ -18,6 +18,7 @@ public class Application {
             packages("pazuzu.web");
             registerClasses(UnknownExceptionMapper.class);
             registerClasses(ServiceExceptionMapper.class);
+            registerClasses(AnyExceptionMapper.class);
         }
     }
 
