@@ -1,0 +1,45 @@
+# basic information for generating and executing this definition
+SenzaInfo:
+  StackName: pazuzu-registry
+  Parameters:
+    - ImageSource:
+        Description: "Full quallified path to the docker image inside a docker-repo."
+    - ImageVersion:
+        Description: "Docker image version."
+    - MintBucket:
+        Description: "Mint Bucket"    
+
+# a list of senza components to apply to the definition
+SenzaComponents:
+
+  # this basic configuration is required for the other components
+  - Configuration:
+      Type: Senza::StupsAutoConfiguration # auto-detect network setup
+
+  # will create a launch configuration and auto scaling group with scaling triggers
+  - AppServer:
+      Type: Senza::TaupageAutoScalingGroup
+      InstanceType: t2.micro
+      SecurityGroups:
+        - app-pazuzu-registry
+      IamRoles:
+        - app-pazuzu-registry
+      ElasticLoadBalancer: AppLoadBalancer
+      AssociatePublicIpAddress: false # change for standalone deployment in default VPC
+      TaupageConfig:
+        application_version: "{{Arguments.ImageVersion}}"
+        runtime: Docker
+        source: "{{Arguments.ImageSource}}:{{Arguments.ImageVersion}}"
+        health_check_path: /api/features
+        ports:
+          8080: 8080
+        mint_bucket: "{{Arguments.MintBucket}}"
+
+  # creates an ELB entry and Route53 domains to this ELB
+  - AppLoadBalancer:
+      Type: Senza::WeightedDnsElasticLoadBalancer
+      HTTPPort: 8080
+      HealthCheckPath: /api/features
+      SecurityGroups:
+        - app-pazuzu-registry-lb
+      Scheme: internet-facing
