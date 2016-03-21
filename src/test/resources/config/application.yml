@@ -1,4 +1,5 @@
 tokens:
+  autoStartup: false
   access-token-uri: https://token.services.auth.zalando.com/oauth2/access_token?realm=/services
   credentials-directory: /meta/credentials
   token-info-uri: https://info.services.auth.zalando.com/oauth2/tokeninfo
@@ -6,6 +7,9 @@ tokens:
    - token-id: kio
      scopes:
       - uid
+security:
+  basic:
+    enabled: false
 spring:
   profiles:
-    active: production
+    active: test
