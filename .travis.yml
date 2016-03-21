@@ -1,3 +1,8 @@
 language: java
 jdk:
   - oraclejdk8
+after_success:
+  - curl http://www.jpm4j.org/install/script > jpmInstall.sh
+  - sudo sh jpmInstall.sh
+  - sudo jpm install com.codacy:codacy-coverage-reporter:assembly
+  - codacy-coverage-reporter -l Java -r target/site/jacoco/jacoco.xml
