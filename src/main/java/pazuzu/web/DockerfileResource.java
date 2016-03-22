@@ -1,27 +1,27 @@
 package pazuzu.web;
 
-import java.util.List;
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import pazuzu.service.FeatureService;
 import pazuzu.service.ServiceException;
 
-@Path("/api/dockerfile")
+import java.util.List;
+
+@CrossOrigin
+@RestController
+@RequestMapping(value = "/api/dockerfile")
 public class DockerfileResource {
 
     private final FeatureService featureService;
 
-    @Inject
+    @Autowired
     public DockerfileResource(FeatureService featureService) {
         this.featureService = featureService;
     }
 
-    @GET
-    @Produces("text/plain")
-    public String generateDockerfile(@QueryParam("feature") List<String> features) throws ServiceException {
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
+    public String generateDockerfile(@RequestParam(required = false) List<String> features) throws ServiceException {
         return featureService.generateDockerFile(features);
     }
 }

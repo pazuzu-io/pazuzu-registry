@@ -1,10 +1,6 @@
 package pazuzu.service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -13,13 +9,19 @@ import pazuzu.dao.FeatureRepository;
 import pazuzu.model.Container;
 import pazuzu.model.Feature;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 @Service
 public class ContainerService {
+
     private final ContainerRepository containerRepository;
     private final FeatureRepository featureRepository;
     private final FeatureService featureService;
 
-    @Inject
+    @Autowired
     public ContainerService(ContainerRepository containerRepository, FeatureRepository featureRepository, FeatureService featureService) {
         this.containerRepository = containerRepository;
         this.featureRepository = featureRepository;
