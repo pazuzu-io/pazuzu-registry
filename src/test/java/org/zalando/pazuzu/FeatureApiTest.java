@@ -34,8 +34,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<FeatureToCreateDto> entity = new HttpEntity<>(dto, headers);
-        ResponseEntity<FeatureFullDto> result = template.postForEntity(url(featuresUrl), entity, FeatureFullDto.class);
+        ResponseEntity<FeatureFullDto> result = template.postForEntity(url(featuresUrl), new HttpEntity<>(dto, headers), FeatureFullDto.class);
         assertEquals(201, result.getStatusCode().value());
 
         FeatureFullDto resultFeature = result.getBody();
@@ -53,8 +52,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<FeatureToCreateDto> entity = new HttpEntity<>(dto, headers);
-        ResponseEntity<FeatureFullDto> createdResult = template.postForEntity(url(featuresUrl), entity, FeatureFullDto.class);
+        ResponseEntity<FeatureFullDto> createdResult = template.postForEntity(url(featuresUrl), new HttpEntity<>(dto, headers), FeatureFullDto.class);
 
         ResponseEntity<FeatureFullDto> result = template.getForEntity(createdResult.getHeaders().getLocation(), FeatureFullDto.class);
         assertEquals(200, result.getStatusCode().value());
