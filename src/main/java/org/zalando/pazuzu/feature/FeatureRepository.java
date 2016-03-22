@@ -1,17 +1,14 @@
 package org.zalando.pazuzu.feature;
 
-import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface FeatureRepository extends Repository<Feature, Integer> {
-    Feature save(Feature value);
+public interface FeatureRepository extends CrudRepository<Feature, Integer> {
 
     List<Feature> findByNameIgnoreCaseContaining(String name);
 
     Feature findByName(String name);
 
     List<Feature> findByDependenciesContaining(Feature feature);
-
-    void delete(Feature feature);
 }
