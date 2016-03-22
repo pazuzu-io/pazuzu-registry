@@ -11,7 +11,7 @@ import pazuzu.Application;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(Application.class)
 @WebIntegrationTest(randomPort = true)
-public class AbstractComponentTest {
+public abstract class AbstractComponentTest {
 
     @Value("${local.server.port}")
     private int port;
