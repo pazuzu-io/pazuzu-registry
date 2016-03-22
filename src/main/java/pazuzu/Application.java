@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 @ComponentScan(basePackages = {"pazuzu.service", "pazuzu.dao"})
 @EnableAutoConfiguration
 public class Application {
+
     @Component
     @SuppressWarnings("unused")
     public static class JerseyConfig extends ResourceConfig {
@@ -23,9 +24,6 @@ public class Application {
     }
 
     public static void main(final String[] args) {
-        final SpringApplication application = new SpringApplication(Application.class);
-        application.setShowBanner(false);
-        application.run(args);
+        new SpringApplication(Application.class).run(args);
     }
-
 }
