@@ -288,13 +288,13 @@ paths:
       tags:
         - Dockerfile
       parameters:
-        - name: feature
+        - name: features
           required: true
           in: query
           type: string
           description: |
-            Feature to include in resulting docker file. To include several features just pass
-            several parameters with this name
+            Features to include in resulting docker file. To include several features just pass list
+            of features separated by comma
       responses:
         200:
           description: String with docker file
