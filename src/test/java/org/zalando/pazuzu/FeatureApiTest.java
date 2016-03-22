@@ -1,16 +1,12 @@
 package org.zalando.pazuzu;
 
 
-import java.util.List;
-
 import org.junit.Test;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.zalando.pazuzu.web.dto.FeatureFullDto;
-import org.zalando.pazuzu.web.dto.FeatureToCreateDto;
+import org.springframework.http.*;
+import org.zalando.pazuzu.feature.FeatureFullDto;
+import org.zalando.pazuzu.feature.FeatureToCreateDto;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 

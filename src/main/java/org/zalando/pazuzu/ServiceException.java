@@ -1,4 +1,4 @@
-package org.zalando.pazuzu.service;
+package org.zalando.pazuzu;
 
 public class ServiceException extends Exception {
     private final String code;

@@ -1,8 +1,8 @@
-package org.zalando.pazuzu.dao;
+package org.zalando.pazuzu.feature;
+
+import org.springframework.data.repository.Repository;
 
 import java.util.List;
-import org.springframework.data.repository.Repository;
-import org.zalando.pazuzu.model.Feature;
 
 public interface FeatureRepository extends Repository<Feature, Integer> {
     Feature save(Feature value);

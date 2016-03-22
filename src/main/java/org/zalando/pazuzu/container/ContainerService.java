@@ -1,13 +1,14 @@
-package org.zalando.pazuzu.service;
+package org.zalando.pazuzu.container;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.zalando.pazuzu.dao.ContainerRepository;
-import org.zalando.pazuzu.dao.FeatureRepository;
-import org.zalando.pazuzu.model.Container;
-import org.zalando.pazuzu.model.Feature;
+import org.zalando.pazuzu.ServiceException;
+import org.zalando.pazuzu.docker.DockerFileUtil;
+import org.zalando.pazuzu.feature.Feature;
+import org.zalando.pazuzu.feature.FeatureRepository;
+import org.zalando.pazuzu.feature.FeatureService;
 
 import java.util.List;
 import java.util.Optional;

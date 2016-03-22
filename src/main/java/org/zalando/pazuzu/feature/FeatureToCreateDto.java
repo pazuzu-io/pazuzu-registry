@@ -1,6 +1,7 @@
-package org.zalando.pazuzu.web.dto;
+package org.zalando.pazuzu.feature;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.ArrayList;
 import java.util.List;
 

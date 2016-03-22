@@ -1,7 +1,6 @@
-package org.zalando.pazuzu.web.dto;
+package org.zalando.pazuzu.feature;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.zalando.pazuzu.model.Feature;
 
 public class FeatureDto {
     @JsonProperty("name")

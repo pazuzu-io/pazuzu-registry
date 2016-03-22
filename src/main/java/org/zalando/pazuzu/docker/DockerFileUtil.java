@@ -1,12 +1,15 @@
-package org.zalando.pazuzu.service;
+package org.zalando.pazuzu.docker;
+
+import org.zalando.pazuzu.feature.Feature;
+import org.zalando.pazuzu.sort.TopologicalSort;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.zalando.pazuzu.model.Feature;
 
 public class DockerFileUtil {
+
     public static String generateDockerfile(String containerName, Collection<Feature> features) {
         final Set<Feature> expandedList = new HashSet<>();
         features.forEach(f -> collectRecursively(expandedList, f));

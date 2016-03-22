@@ -1,13 +1,13 @@
-package org.zalando.pazuzu.service;
+package org.zalando.pazuzu.feature;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.zalando.pazuzu.dao.ContainerRepository;
-import org.zalando.pazuzu.dao.FeatureRepository;
-import org.zalando.pazuzu.model.Container;
-import org.zalando.pazuzu.model.Feature;
+import org.zalando.pazuzu.ServiceException;
+import org.zalando.pazuzu.container.Container;
+import org.zalando.pazuzu.container.ContainerRepository;
+import org.zalando.pazuzu.docker.DockerFileUtil;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -102,7 +102,7 @@ public class FeatureService {
         featureRepository.delete(feature);
     }
 
-    protected Set<Feature> loadFeatures(List<String> dependencyNames) throws ServiceException {
+    public Set<Feature> loadFeatures(List<String> dependencyNames) throws ServiceException {
         final Set<String> uniqueDependencies = null == dependencyNames ? new HashSet<>() : new HashSet<>(dependencyNames);
         final Set<Feature> dependencies = uniqueDependencies.stream()
                 .map(featureRepository::findByName).filter(f -> f != null)

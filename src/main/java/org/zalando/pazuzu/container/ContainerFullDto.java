@@ -1,9 +1,10 @@
-package org.zalando.pazuzu.web.dto;
+package org.zalando.pazuzu.container;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.zalando.pazuzu.feature.FeatureDto;
+
 import java.util.List;
 import java.util.stream.Collectors;
-import org.zalando.pazuzu.model.Container;
 
 public class ContainerFullDto extends ContainerDto {
     @JsonProperty("features")

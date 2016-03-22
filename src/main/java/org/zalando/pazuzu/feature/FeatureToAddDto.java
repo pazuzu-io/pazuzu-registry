@@ -1,4 +1,4 @@
-package org.zalando.pazuzu.web.dto;
+package org.zalando.pazuzu.feature;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

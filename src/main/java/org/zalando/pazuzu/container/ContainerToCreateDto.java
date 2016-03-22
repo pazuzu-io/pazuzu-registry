@@ -1,6 +1,7 @@
-package org.zalando.pazuzu.web.dto;
+package org.zalando.pazuzu.container;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 public class ContainerToCreateDto {

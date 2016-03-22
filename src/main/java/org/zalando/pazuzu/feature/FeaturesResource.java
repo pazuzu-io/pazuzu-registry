@@ -1,15 +1,11 @@
-package org.zalando.pazuzu.web;
+package org.zalando.pazuzu.feature;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.zalando.pazuzu.service.FeatureService;
-import org.zalando.pazuzu.service.ServiceException;
-import org.zalando.pazuzu.web.dto.FeatureDto;
-import org.zalando.pazuzu.web.dto.FeatureFullDto;
-import org.zalando.pazuzu.web.dto.FeatureToCreateDto;
+import org.zalando.pazuzu.ServiceException;
 
 import java.util.List;
 

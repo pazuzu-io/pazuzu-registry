@@ -1,11 +1,12 @@
-package org.zalando.pazuzu.dao;
+package org.zalando.pazuzu.container;
+
+import org.springframework.data.repository.Repository;
+import org.zalando.pazuzu.feature.Feature;
 
 import java.util.List;
-import org.springframework.data.repository.Repository;
-import org.zalando.pazuzu.model.Container;
-import org.zalando.pazuzu.model.Feature;
 
 public interface ContainerRepository extends Repository<Container, Integer> {
+
     List<Container> findByNameIgnoreCaseContaining(String name);
 
     Container findByName(String name);

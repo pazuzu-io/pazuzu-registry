@@ -1,10 +1,6 @@
-package org.zalando.pazuzu.service;
+package org.zalando.pazuzu.sort;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 

@@ -1,7 +1,6 @@
-package org.zalando.pazuzu.web.dto;
+package org.zalando.pazuzu.container;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.zalando.pazuzu.model.Container;
 
 public class ContainerDto {
     @JsonProperty("name")
