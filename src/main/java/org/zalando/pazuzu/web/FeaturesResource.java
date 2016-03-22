@@ -36,7 +36,7 @@ public class FeaturesResource {
                 value.getName(), value.getDockerData(), value.getDependencies(), FeatureFullDto::makeFull);
 
         return ResponseEntity
-                .created(uriBuilder.path("/api/features/{name}").buildAndExpand(feature.getName()).toUri())
+                .created(uriBuilder.path("/api/features/{featureName}").buildAndExpand(feature.getName()).toUri())
                 .body(feature);
     }
 
