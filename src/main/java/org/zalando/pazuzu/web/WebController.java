@@ -10,7 +10,7 @@ import java.util.Map;
 public class WebController {
 
     @RequestMapping("/home")
-    public String pazuzuHome(@RequestParam() String username, Map<String, Object> model) {
+    public String pazuzuHome(@RequestParam String username, Map<String, Object> model) {
         model.put("username", username);
         return "home";
     }
