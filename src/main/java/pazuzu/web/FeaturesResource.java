@@ -1,22 +1,17 @@
 package pazuzu.web;
 
-import java.util.List;
-import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import pazuzu.service.FeatureService;
 import pazuzu.service.ServiceException;
 import pazuzu.web.dto.FeatureDto;
 import pazuzu.web.dto.FeatureFullDto;
 import pazuzu.web.dto.FeatureToCreateDto;
+
+import javax.inject.Inject;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import java.util.List;
 
 @Path("/api/features")
 @Produces("application/json")
@@ -38,9 +33,14 @@ public class FeaturesResource {
 
     @POST
     @Path("/")
-    public FeatureFullDto createFeature(FeatureToCreateDto value) throws ServiceException {
-        return featureService.createFeature(
+    public Response createFeature(FeatureToCreateDto value, @Context UriInfo uriInfo) throws ServiceException {
+        FeatureFullDto feature = featureService.createFeature(
                 value.getName(), value.getDockerData(), value.getDependencies(), FeatureFullDto::makeFull);
+
+        return Response
+                .created(uriInfo.getAbsolutePathBuilder().path(feature.getName()).build())
+                .entity(feature)
+                .build();
     }
 
     @PUT

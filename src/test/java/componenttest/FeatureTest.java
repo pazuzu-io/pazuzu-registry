@@ -16,9 +16,11 @@ import static org.junit.Assert.assertEquals;
 
 public class FeatureTest extends AbstractComponentTest {
 
+    private final String featuresUrl = "/api/features";
+
     @Test
     public void retrievingFeaturesShouldReturnEmptyListWhenNoFeaturesAreStored() throws Exception {
-        ResponseEntity<List> result = template.getForEntity(url("/api/features"), List.class);
+        ResponseEntity<List> result = template.getForEntity(url(featuresUrl), List.class);
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals(0, result.getBody().size());
     }
@@ -33,8 +35,8 @@ public class FeatureTest extends AbstractComponentTest {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<FeatureToCreateDto> entity = new HttpEntity<>(dto, headers);
-        ResponseEntity<FeatureFullDto> result = template.postForEntity(url("/api/features"), entity, FeatureFullDto.class);
-        assertEquals(200, result.getStatusCode().value());
+        ResponseEntity<FeatureFullDto> result = template.postForEntity(url(featuresUrl), entity, FeatureFullDto.class);
+        assertEquals(201, result.getStatusCode().value());
 
         FeatureFullDto resultFeature = result.getBody();
         assertEquals(dto.getName(), resultFeature.getName());
@@ -52,9 +54,9 @@ public class FeatureTest extends AbstractComponentTest {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<FeatureToCreateDto> entity = new HttpEntity<>(dto, headers);
-        ResponseEntity<FeatureFullDto> createdResult = template.postForEntity(url("/api/features"), entity, FeatureFullDto.class);
+        ResponseEntity<FeatureFullDto> createdResult = template.postForEntity(url(featuresUrl), entity, FeatureFullDto.class);
 
-        ResponseEntity<FeatureFullDto> result = template.getForEntity(url("/api/features/" + createdResult.getBody().getName()), FeatureFullDto.class);
+        ResponseEntity<FeatureFullDto> result = template.getForEntity(createdResult.getHeaders().getLocation(), FeatureFullDto.class);
         assertEquals(200, result.getStatusCode().value());
 
         FeatureFullDto resultFeature = result.getBody();
