@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.zalando.pazuzu.ServiceException;
+import org.zalando.pazuzu.docker.DockerfileService;
 import org.zalando.pazuzu.feature.FeatureDto;
 import org.zalando.pazuzu.feature.FeatureToAddDto;
 
@@ -15,10 +16,12 @@ import java.util.List;
 public class ContainersResource {
 
     private final ContainerService containerService;
+    private final DockerfileService dockerfileService;
 
     @Autowired
-    public ContainersResource(ContainerService containerService) {
+    public ContainersResource(ContainerService containerService, DockerfileService dockerfileService) {
         this.containerService = containerService;
+        this.dockerfileService = dockerfileService;
     }
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -67,6 +70,6 @@ public class ContainersResource {
 
     @RequestMapping(value = "/{containerName}/dockerfile", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
     public String getDockerFile(@PathVariable String containerName) throws ServiceException {
-        return containerService.generateDockerFile(containerName);
+        return dockerfileService.generateDockerfile(containerService.getContainer(containerName));
     }
 }

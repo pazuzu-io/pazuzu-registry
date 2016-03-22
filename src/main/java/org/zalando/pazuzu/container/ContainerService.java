@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.zalando.pazuzu.ServiceException;
-import org.zalando.pazuzu.docker.DockerFileUtil;
 import org.zalando.pazuzu.feature.Feature;
 import org.zalando.pazuzu.feature.FeatureRepository;
 import org.zalando.pazuzu.feature.FeatureService;
@@ -23,7 +22,9 @@ public class ContainerService {
     private final FeatureService featureService;
 
     @Autowired
-    public ContainerService(ContainerRepository containerRepository, FeatureRepository featureRepository, FeatureService featureService) {
+    public ContainerService(ContainerRepository containerRepository,
+                            FeatureRepository featureRepository,
+                            FeatureService featureService) {
         this.containerRepository = containerRepository;
         this.featureRepository = featureRepository;
         this.featureService = featureService;
@@ -76,7 +77,8 @@ public class ContainerService {
         return converter.apply(container);
     }
 
-    private Container getContainer(String containerName) throws ServiceException {
+    @Transactional(rollbackFor = ServiceException.class)
+    public Container getContainer(String containerName) throws ServiceException {
         final Container container = containerRepository.findByName(containerName);
         if (null == container) {
             throw new ServiceException.NotFoundException("not_found", "Container with name is not found");
@@ -109,11 +111,5 @@ public class ContainerService {
             container.getFeatures().remove(toDelete);
             containerRepository.save(container);
         }
-    }
-
-    @Transactional(rollbackFor = ServiceException.class)
-    public String generateDockerFile(String containerName) throws ServiceException {
-        final Container container = getContainer(containerName);
-        return DockerFileUtil.generateDockerfile(container.getName(), container.getFeatures());
     }
 }

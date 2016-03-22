@@ -7,7 +7,7 @@ import org.springframework.util.StringUtils;
 import org.zalando.pazuzu.ServiceException;
 import org.zalando.pazuzu.container.Container;
 import org.zalando.pazuzu.container.ContainerRepository;
-import org.zalando.pazuzu.docker.DockerFileUtil;
+import org.zalando.pazuzu.docker.DockerfileService;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -18,13 +18,18 @@ import java.util.stream.Collectors;
 
 @Service
 public class FeatureService {
+
     private final FeatureRepository featureRepository;
     private final ContainerRepository containerRepository;
+    private final DockerfileService dockerfileService;
 
     @Autowired
-    public FeatureService(FeatureRepository featureRepository, ContainerRepository containerRepository) {
+    public FeatureService(FeatureRepository featureRepository,
+                          ContainerRepository containerRepository,
+                          DockerfileService dockerfileService) {
         this.featureRepository = featureRepository;
         this.containerRepository = containerRepository;
+        this.dockerfileService = dockerfileService;
     }
 
     @Transactional
@@ -121,10 +126,5 @@ public class FeatureService {
             throw new ServiceException.NotFoundException("not_found", "Feature with name " + name + " is not found");
         }
         return existing;
-    }
-
-    @Transactional(rollbackFor = ServiceException.class)
-    public String generateDockerFile(List<String> featureNames) throws ServiceException {
-        return DockerFileUtil.generateDockerfile(null, loadFeatures(featureNames));
     }
 }

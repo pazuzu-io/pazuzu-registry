@@ -13,15 +13,17 @@ import java.util.List;
 @RequestMapping(value = "/api/dockerfile")
 public class DockerfileResource {
 
+    private final DockerfileService dockerfileService;
     private final FeatureService featureService;
 
     @Autowired
-    public DockerfileResource(FeatureService featureService) {
+    public DockerfileResource(DockerfileService dockerfileService, FeatureService featureService) {
+        this.dockerfileService = dockerfileService;
         this.featureService = featureService;
     }
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
     public String generateDockerfile(@RequestParam(required = false) List<String> features) throws ServiceException {
-        return featureService.generateDockerFile(features);
+        return dockerfileService.generateDockerfile(featureService.loadFeatures(features));
     }
 }

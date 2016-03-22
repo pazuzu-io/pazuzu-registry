@@ -1,6 +1,5 @@
 package org.zalando.pazuzu;
 
-
 import org.junit.Test;
 import org.springframework.http.*;
 import org.zalando.pazuzu.feature.FeatureFullDto;
