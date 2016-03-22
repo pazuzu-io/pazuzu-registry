@@ -2,8 +2,7 @@ package pazuzu;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import pazuzu.service.ServiceException;
 import pazuzu.web.dto.ErrorDto;
 
