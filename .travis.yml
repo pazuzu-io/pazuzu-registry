@@ -5,7 +5,7 @@ after_success:
 - curl http://www.jpm4j.org/install/script > jpmInstall.sh
 - sudo sh jpmInstall.sh
 - sudo jpm install com.codacy:codacy-coverage-reporter:assembly
-- codacy-coverage-reporter -l Java -t $CODACY_PROJECT_TOKEN -r target/site/jacoco/jacoco.xml --debug
+- codacy-coverage-reporter -l Java -t $CODACY_PROJECT_TOKEN -r target/site/jacoco/jacoco.xml
 env:
   matrix:
     secure: XME8GD5rVLBLv3KmyqxNCR5BzCpZH/fCKYb6zRbRkIvhnMvlmdo7RIx+wW1vXdpw++zNPA8us0jEJcRUENVyboUL8zsrfhcGOEIFYbF9Kf/MqJ0jHupx+ew9XVreM3FqhUzn8eSU3kh1ntPqsAdMNTbdzjl+E0M08fheSaJYStXPpZXSAczywyBUXg+zDPYtPWiN52Ino/RvLmu/6U+tCWGOMybN+mHMOWIeYtdLU2mmw64eqXLGRThpp3wXOTlBpIFXifIUFBv9VsIfbmJwCYE2SwNOdPK/qqSe8lNuvX0pG9p/0aRseWbPSDlGLaIFHzAao7kt2K03ic1zZkuO0tmZXoksAC+T0B/zLYSuwoIoPjM7rIuYVN1xNt5jjR8zG1yQEwXSuaFnnGtWTQRuIGzQXmseEG0qCher/79Rj8MZ+qp40GweYcGisgiXvab6kVqVaAX4PY9G05CL3ubnCqDEqJZa3GYPypJED7rdu+8OwI2sSr5ADFEVyldcuq2TxCzYVNnQkJ/SkpLklr4/3CZLW2F4wb6PSOXilQdyR3eNAg5laupjbLqQlmVhBcR8ccbsNwa3+w/Hitzj2x/iq5u2GULwQSUxO0TvZGJFVF05eYsGUpjtd2scMsmz93fC9h23xAnP8ePs219u8RqybZUred5pYcR1FEtJvoxFDFo=
