@@ -7,14 +7,18 @@ import java.util.Set;
 @Entity(name = "Feature")
 @Table(name = "feature")
 public class Feature {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "feature_id", nullable = false, updatable = false)
     private Integer id;
+
     @Column(name = "name", nullable = false)
     private String name;
+
     @Column(name = "docker_data", nullable = false, length = 4096)
     private String dockerData;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "feature_dependency",

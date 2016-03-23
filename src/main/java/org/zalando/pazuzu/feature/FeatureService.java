@@ -7,12 +7,9 @@ import org.springframework.util.StringUtils;
 import org.zalando.pazuzu.ServiceException;
 import org.zalando.pazuzu.container.Container;
 import org.zalando.pazuzu.container.ContainerRepository;
-import org.zalando.pazuzu.docker.DockerfileService;
+import org.zalando.pazuzu.docker.DockerfileUtil;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -21,15 +18,12 @@ public class FeatureService {
 
     private final FeatureRepository featureRepository;
     private final ContainerRepository containerRepository;
-    private final DockerfileService dockerfileService;
 
     @Autowired
     public FeatureService(FeatureRepository featureRepository,
-                          ContainerRepository containerRepository,
-                          DockerfileService dockerfileService) {
+                          ContainerRepository containerRepository) {
         this.featureRepository = featureRepository;
         this.containerRepository = containerRepository;
-        this.dockerfileService = dockerfileService;
     }
 
     @Transactional
@@ -105,6 +99,11 @@ public class FeatureService {
                     ", references from containers found: " + referencingContainers.stream().map(Container::getName).collect(Collectors.joining(", ")));
         }
         featureRepository.delete(feature);
+    }
+
+    @Transactional(rollbackFor = ServiceException.class)
+    public String generateDockerfile(List<String> features) throws ServiceException {
+        return DockerfileUtil.generateDockerfile(Optional.empty(), loadFeatures(features));
     }
 
     public Set<Feature> loadFeatures(List<String> dependencyNames) throws ServiceException {

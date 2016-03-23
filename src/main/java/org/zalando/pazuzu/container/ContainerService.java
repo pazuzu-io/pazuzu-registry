@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.zalando.pazuzu.ServiceException;
+import org.zalando.pazuzu.docker.DockerfileUtil;
 import org.zalando.pazuzu.feature.Feature;
 import org.zalando.pazuzu.feature.FeatureRepository;
 import org.zalando.pazuzu.feature.FeatureService;
@@ -111,5 +112,11 @@ public class ContainerService {
             container.getFeatures().remove(toDelete);
             containerRepository.save(container);
         }
+    }
+
+    @Transactional(rollbackFor = ServiceException.class)
+    public String generateDockerfile(String containerName) throws ServiceException {
+        Container container = getContainer(containerName);
+        return DockerfileUtil.generateDockerfile(Optional.of(container.getName()), container.getFeatures());
     }
 }
