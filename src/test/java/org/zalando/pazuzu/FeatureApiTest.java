@@ -1,60 +1,43 @@
 package org.zalando.pazuzu;
 
 import org.junit.Test;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.zalando.pazuzu.feature.FeatureFullDto;
-import org.zalando.pazuzu.feature.FeatureToCreateDto;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class FeatureApiTest extends AbstractComponentTest {
-
-    private final String featuresUrl = "/api/features";
 
     @Test
     public void retrievingFeaturesShouldReturnEmptyListWhenNoFeaturesAreStored() throws Exception {
         ResponseEntity<List> result = template.getForEntity(url(featuresUrl), List.class);
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(0, result.getBody().size());
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(result.getBody()).isEmpty();
     }
 
     @Test
     public void createFeatureShouldReturnCreatedFeature() throws Exception {
-        final FeatureToCreateDto dto = new FeatureToCreateDto();
-        dto.setName("Test");
-        dto.setDockerData("Test Data");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        ResponseEntity<FeatureFullDto> result = template.postForEntity(url(featuresUrl), new HttpEntity<>(dto, headers), FeatureFullDto.class);
-        assertEquals(201, result.getStatusCode().value());
+        ResponseEntity<FeatureFullDto> result = createFeature("Test", "Test Data");
 
         FeatureFullDto resultFeature = result.getBody();
-        assertEquals(dto.getName(), resultFeature.getName());
-        assertEquals(dto.getDockerData(), resultFeature.getDockerData());
-        assertEquals(0, dto.getDependencies().size());
+        assertThat(resultFeature.getName()).isEqualTo("Test");
+        assertThat(resultFeature.getDockerData()).isEqualTo("Test Data");
+        assertThat(resultFeature.getDependencies()).isEmpty();
     }
 
     @Test
     public void createdFeatureShouldBeRetrievableAfterwards() throws Exception {
-        final FeatureToCreateDto dto = new FeatureToCreateDto();
-        dto.setName("Test 2");
-        dto.setDockerData("Test Data 2");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        ResponseEntity<FeatureFullDto> createdResult = template.postForEntity(url(featuresUrl), new HttpEntity<>(dto, headers), FeatureFullDto.class);
+        ResponseEntity<FeatureFullDto> createdResult = createFeature("Test 2", "Test Data 2");
 
         ResponseEntity<FeatureFullDto> result = template.getForEntity(createdResult.getHeaders().getLocation(), FeatureFullDto.class);
-        assertEquals(200, result.getStatusCode().value());
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         FeatureFullDto resultFeature = result.getBody();
-        assertEquals(dto.getName(), resultFeature.getName());
-        assertEquals(dto.getDockerData(), resultFeature.getDockerData());
-        assertEquals(0, dto.getDependencies().size());
+        assertThat(resultFeature.getName()).isEqualTo("Test 2");
+        assertThat(resultFeature.getDockerData()).isEqualTo("Test Data 2");
+        assertThat(resultFeature.getDependencies()).isEmpty();
     }
 }
