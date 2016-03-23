@@ -26,7 +26,7 @@ public abstract class AbstractComponentTest {
 
     protected final TestRestTemplate template = new TestRestTemplate();
 
-    protected ObjectMapper mapper = new ObjectMapper();
+    protected final ObjectMapper mapper = new ObjectMapper();
 
     protected String url(String path) {
         return "http://127.0.0.1:" + port + path;
@@ -40,7 +40,9 @@ public abstract class AbstractComponentTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        ResponseEntity<FeatureFullDto> response = template.postForEntity(url("/api/features"), new HttpEntity<String>(mapper.writeValueAsString(map), headers), FeatureFullDto.class);
-        if (response.getStatusCode().value() > 299) throw new Exception("could not create feature " + name);
+        ResponseEntity<FeatureFullDto> response = template.postForEntity(url("/api/features"), new HttpEntity<>(mapper.writeValueAsString(map), headers), FeatureFullDto.class);
+        if (response.getStatusCode().value() != 201) {
+            throw new Exception("could not create feature " + name);
+        }
     }
 }
