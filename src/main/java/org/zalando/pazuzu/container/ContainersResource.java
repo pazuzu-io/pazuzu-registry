@@ -2,9 +2,10 @@ package org.zalando.pazuzu.container;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.zalando.pazuzu.ServiceException;
-import org.zalando.pazuzu.docker.DockerfileUtil;
 import org.zalando.pazuzu.feature.FeatureDto;
 import org.zalando.pazuzu.feature.FeatureToAddDto;
 
@@ -28,9 +29,11 @@ public class ContainersResource {
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ContainerFullDto createContainer(@RequestBody ContainerToCreateDto value) throws ServiceException {
-        // TODO fix status code and location header
-        return containerService.createContainer(value.getName(), value.getFeatures(), ContainerFullDto::buildFull);
+    public ResponseEntity<ContainerFullDto> createContainer(@RequestBody ContainerToCreateDto value, UriComponentsBuilder uriBuilder) throws ServiceException {
+        ContainerFullDto container = containerService.createContainer(value.getName(), value.getFeatures(), ContainerFullDto::buildFull);
+        return ResponseEntity
+                .created(uriBuilder.path("/api/containers/{containerName}").buildAndExpand(container.getName()).toUri())
+                .body(container);
     }
 
     @RequestMapping(value = "/{containerName}", method = RequestMethod.PUT,

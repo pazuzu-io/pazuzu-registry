@@ -10,7 +10,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 import org.zalando.pazuzu.feature.FeatureFullDto;
 
 import java.util.HashMap;
@@ -19,6 +23,7 @@ import java.util.Map;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(PazuzuAppLauncher.class)
 @WebIntegrationTest(randomPort = true)
+@DirtiesContext
 public abstract class AbstractComponentTest {
 
     @Value("${local.server.port}")
