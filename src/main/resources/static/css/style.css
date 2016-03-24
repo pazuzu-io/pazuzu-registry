@@ -36,10 +36,16 @@ html, body, #react, .pazuzuApp {
     margin-right: 8px;
 }
 
-.menu {
+.menuOpen {
     height: 100%;
     width: 150px;
     background-color: lightcyan;
+}
+
+.menuClosed {
+    height: 100%;
+    width: 150px;
+    background-color: red;
 }
 
 .menuItem {

@@ -9,12 +9,18 @@ var data = [
 ];
 
 var PazuzuApp = React.createClass({displayName: 'PazuzuApp',
+	getInitialState: function() {
+		return {menuOpen: true};
+	},
+	onMenuOpened: function(newState) {
+	     this.setState({menuOpen: newState});
+	},
 	render: function() {
 		return (
 			React.createElement('div', {className: 'pazuzuApp'},
 			<div>
-			  <Header />	
-			  <Menu data={this.props.data} />
+			  <Header menuOpen={this.state.menuOpen} callbackParent={this.onMenuOpened} />	
+			  <Menu data={this.props.data} menuOpen={this.state.menuOpen} />
 			</div>		
 )
 		)
@@ -22,11 +28,16 @@ var PazuzuApp = React.createClass({displayName: 'PazuzuApp',
 })
 
 var HeaderMenu = React.createClass({displayName: 'HeaderMenu',
+	handleClick: function() {
+		var isMenuOpen = !this.props.menuOpen;
+		this.props.callbackParent(isMenuOpen);
+	},
+
 	render: function() {
 		return (
-		React.createElement('div', {className: 'headerMenu'}
-			
-			)
+
+			<div className="headerMenu" onClick={this.handleClick} />
+
 		);
 	}
 });
@@ -40,10 +51,17 @@ var HeaderZalando = React.createClass({displayName: 'HeaderZalando',
 });
 
 var Header = React.createClass({displayName: 'Header',
+	getInitialState: function() {
+		return {menuOpen: this.props.menuOpen};
+	},
+	onMenuOpened: function(newState) {
+	     this.setState({menuOpen: newState});
+	     this.props.callbackParent(newState);
+	},
 	render: function() {
 		return (
 		<div className="header">
-			<HeaderMenu />
+			<HeaderMenu menuOpen={this.state.menuOpen} callbackParent={this.onMenuOpened} />
 			Pazuzu - The Docker Maker
 			<HeaderZalando />
 		</div>
@@ -53,6 +71,7 @@ var Header = React.createClass({displayName: 'Header',
 
 var Menu = React.createClass({displayName: 'Menu',
 	render: function() {
+	var menuClass = this.props.menuOpen ? 'menuOpen' : 'menuClosed' ;
 	var menuNodes = this.props.data.map(function(item) {
 		return (
 			<MenuItem key={item.id} text={item.text}> 
@@ -61,7 +80,7 @@ var Menu = React.createClass({displayName: 'Menu',
 		);
 	});
 	return (
-	  <div className="menu">
+	  <div className={menuClass}>
 		  {menuNodes}
 	  </div>
 	);
