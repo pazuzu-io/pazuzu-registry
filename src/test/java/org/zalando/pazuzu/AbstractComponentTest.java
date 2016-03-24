@@ -13,6 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.zalando.pazuzu.container.ContainerFullDto;
 import org.zalando.pazuzu.feature.FeatureFullDto;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,10 +38,11 @@ public abstract class AbstractComponentTest {
         return "http://127.0.0.1:" + port + path;
     }
 
-    protected ResponseEntity<FeatureFullDto> createFeature(String name, String dockerData) throws JsonProcessingException {
-        Map<String, String> map = new HashMap<>();
+    protected ResponseEntity<FeatureFullDto> createFeature(String name, String dockerData, String... dependencies) throws JsonProcessingException {
+        Map<String, Object> map = new HashMap<>();
         map.put("name", name);
         map.put("docker_data", dockerData);
+        map.put("dependencies", Arrays.asList(dependencies));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
