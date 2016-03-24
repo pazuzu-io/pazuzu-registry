@@ -88,3 +88,5 @@ src/main/resources/static/node_modules/
 # STS (Spring Tool Suite)
 .springBeans
 scm-source.json
+
+node/
