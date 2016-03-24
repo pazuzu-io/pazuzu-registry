@@ -115,7 +115,7 @@ public class FeatureService {
                 .collect(Collectors.toSet());
         if (dependencies.size() != uniqueDependencies.size()) {
             dependencies.forEach(f -> uniqueDependencies.remove(f.getName()));
-            throw new FeatureNotExistingException("no_features", "Failed to find features with names " +
+            throw new FeatureNotExistingException("features_not_present", "Failed to find features with names " +
                     Arrays.deepToString(uniqueDependencies.toArray()));
         }
         return dependencies;

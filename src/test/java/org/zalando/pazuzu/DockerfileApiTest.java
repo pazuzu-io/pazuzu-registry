@@ -4,6 +4,8 @@ import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DockerfileApiTest extends AbstractComponentTest {
@@ -21,8 +23,22 @@ public class DockerfileApiTest extends AbstractComponentTest {
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).contains("FROM ubuntu:latest");
         assertThat(response.getBody()).contains("sudo apt-get feature1");
         assertThat(response.getBody()).contains("sudo apt-get feature3");
+    }
+
+    @Test
+    public void errorIsReturnedWhenCreatingDockerfileWithNotExistingFeatures() throws Exception {
+        // when
+        ResponseEntity<String> response = template.getForEntity(url("/api/dockerfile") + "?features=non_existing_feature", String.class);
+
+        // then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        Map json = mapper.readValue(response.getBody(), Map.class);
+        assertThat(json.get("code")).isEqualTo("features_not_present");
+        assertThat(json.get("message")).isNotNull();
     }
 
 }
