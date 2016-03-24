@@ -1,6 +1,9 @@
 package org.zalando.pazuzu;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.zalando.pazuzu.feature.FeatureFullDto;
@@ -51,5 +54,24 @@ public class FeatureApiTest extends AbstractComponentTest {
         Map json = mapper.readValue(result.getBody(), Map.class);
         assertThat(json.get("code")).isEqualTo("not_found");
         assertThat(json.get("message")).isNotNull();
+    }
+
+    @Test
+    public void deleteFeatureProperly() throws JsonProcessingException {
+        createFeature("Feature", "some data");
+
+        template.delete(url(featuresUrl + "/Feature"));
+
+        ResponseEntity<List> result = template.getForEntity(url(featuresUrl), List.class);
+        assertThat(result.getBody()).isEmpty();
+    }
+
+    @Test
+    public void badRequestWhenDeletingStillReferencedFeature() throws JsonProcessingException {
+        createFeature("Feature", "some data");
+        createContainer("Container", "Feature");
+
+        ResponseEntity<Void> response = template.exchange(url(featuresUrl + "/Feature"), HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 }

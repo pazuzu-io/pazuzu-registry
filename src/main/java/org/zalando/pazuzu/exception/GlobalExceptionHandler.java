@@ -10,6 +10,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ServiceException.class)
+    @ResponseBody
+    public ErrorDto serviceException(ServiceException exception) {
+        return new ErrorDto(exception.getCode(), exception.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(FeatureNotExistingException.class)
     @ResponseBody
     public ErrorDto featureNotExistingException(FeatureNotExistingException exception) {

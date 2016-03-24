@@ -63,6 +63,17 @@ public class ContainerApiTest extends AbstractComponentTest {
     }
 
     @Test
+    public void deleteContainerProperly() throws JsonProcessingException {
+        createFeature("Feature", "some data");
+        createContainer("Container", "Feature");
+
+        template.delete(url(containersUrl + "/Container"));
+
+        ResponseEntity<List> result = template.getForEntity(url(containersUrl), List.class);
+        assertThat(result.getBody()).isEmpty();
+    }
+
+    @Test
     public void addFeatureToExistingContainer() throws JsonProcessingException {
         createFeature("Feature", "some data");
         createContainer("Container", "Feature");
