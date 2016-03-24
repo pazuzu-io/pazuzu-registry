@@ -15,4 +15,11 @@ public class GlobalExceptionHandler {
     public ErrorDto featureNotExistingException(FeatureNotExistingException exception) {
         return new ErrorDto(exception.getCode(), exception.getMessage());
     }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseBody
+    public ErrorDto notFoundException(NotFoundException exception) {
+        return new ErrorDto(exception.getCode(), exception.getMessage());
+    }
 }

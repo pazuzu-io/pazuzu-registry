@@ -124,7 +124,7 @@ public class FeatureService {
     private Feature loadExistingFeature(String name) throws NotFoundException {
         final Feature existing = featureRepository.findByName(name);
         if (null == existing) {
-            throw new NotFoundException("not_found", "Feature with name " + name + " is not found");
+            throw new NotFoundException("not_found", "Feature with name " + name + " was not found");
         }
         return existing;
     }
