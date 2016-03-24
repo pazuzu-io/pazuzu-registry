@@ -3,7 +3,7 @@ package org.zalando.pazuzu.docker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.zalando.pazuzu.ServiceException;
+import org.zalando.pazuzu.exception.ServiceException;
 import org.zalando.pazuzu.feature.FeatureService;
 
 import java.util.List;

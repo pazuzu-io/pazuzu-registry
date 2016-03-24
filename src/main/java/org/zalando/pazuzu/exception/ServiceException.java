@@ -1,4 +1,4 @@
-package org.zalando.pazuzu;
+package org.zalando.pazuzu.exception;
 
 public class ServiceException extends Exception {
     private final String code;
@@ -12,9 +12,4 @@ public class ServiceException extends Exception {
         return code;
     }
 
-    public static class NotFoundException extends ServiceException {
-        public NotFoundException(String code, String message) {
-            super(code, message);
-        }
-    }
 }

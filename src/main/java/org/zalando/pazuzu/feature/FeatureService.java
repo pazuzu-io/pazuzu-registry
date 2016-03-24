@@ -4,10 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.zalando.pazuzu.ServiceException;
 import org.zalando.pazuzu.container.Container;
 import org.zalando.pazuzu.container.ContainerRepository;
 import org.zalando.pazuzu.docker.DockerfileUtil;
+import org.zalando.pazuzu.exception.NotFoundException;
+import org.zalando.pazuzu.exception.ServiceException;
 
 import java.util.*;
 import java.util.function.Function;
@@ -119,10 +120,10 @@ public class FeatureService {
         return dependencies;
     }
 
-    private Feature loadExistingFeature(String name) throws ServiceException.NotFoundException {
+    private Feature loadExistingFeature(String name) throws NotFoundException {
         final Feature existing = featureRepository.findByName(name);
         if (null == existing) {
-            throw new ServiceException.NotFoundException("not_found", "Feature with name " + name + " is not found");
+            throw new NotFoundException("not_found", "Feature with name " + name + " is not found");
         }
         return existing;
     }
