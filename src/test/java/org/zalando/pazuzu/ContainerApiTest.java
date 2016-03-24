@@ -1,13 +1,13 @@
 package org.zalando.pazuzu;
 
-import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.zalando.pazuzu.container.ContainerFullDto;
 import org.zalando.pazuzu.feature.FeatureDto;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -48,7 +48,16 @@ public class ContainerApiTest extends AbstractComponentTest {
     }
 
     @Test
-    @Ignore
     public void badRequestWhenFeaturesAreNotExistingNewContainerIsReferencing() throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", "Container 2");
+        map.put("features", "NotExistingFeature");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        ResponseEntity<ContainerFullDto> response = template.postForEntity(url(containersUrl),
+                new HttpEntity<>(mapper.writeValueAsString(map), headers), ContainerFullDto.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 }
