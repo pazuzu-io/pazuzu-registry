@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.zalando.pazuzu.feature.FeatureFullDto;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,5 +40,16 @@ public class FeatureApiTest extends AbstractComponentTest {
         assertThat(resultFeature.getName()).isEqualTo("Test 2");
         assertThat(resultFeature.getDockerData()).isEqualTo("Test Data 2");
         assertThat(resultFeature.getDependencies()).isEmpty();
+    }
+
+    @Test
+    public void returnsNotFoundWhenTryingToRetrieveNonExistingFeature() throws Exception {
+        ResponseEntity<String> result = template.getForEntity(url("/api/features/non_existing"), String.class);
+
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+
+        Map json = mapper.readValue(result.getBody(), Map.class);
+        assertThat(json.get("code")).isEqualTo("not_found");
+        assertThat(json.get("message")).isNotNull();
     }
 }
