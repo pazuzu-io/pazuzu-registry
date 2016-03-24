@@ -60,7 +60,6 @@ public class ContainersResource {
     @RequestMapping(value = "/{containerName}/features", method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ContainerFullDto addFeatureToContainer(@PathVariable String containerName, @RequestBody FeatureToAddDto feature) throws ServiceException {
-        // TODO fix status code and location header
         return containerService.addFeature(containerName, feature.getName(), ContainerFullDto::buildFull);
     }
 

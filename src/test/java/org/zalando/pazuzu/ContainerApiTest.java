@@ -1,5 +1,6 @@
 package org.zalando.pazuzu;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
 import org.springframework.http.*;
 import org.zalando.pazuzu.container.ContainerFullDto;
@@ -59,5 +60,25 @@ public class ContainerApiTest extends AbstractComponentTest {
         ResponseEntity<ContainerFullDto> response = template.postForEntity(url(containersUrl),
                 new HttpEntity<>(mapper.writeValueAsString(map), headers), ContainerFullDto.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void addFeatureToExistingContainer() throws JsonProcessingException {
+        createFeature("Feature", "some data");
+        createContainer("Container", "Feature");
+        createFeature("Other Feature", "some data");
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", "Other Feature");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        ResponseEntity<ContainerFullDto> response = template.postForEntity(url(containersUrl + "/Container/features"),
+                new HttpEntity<>(mapper.writeValueAsString(map), headers), ContainerFullDto.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().getName()).isEqualTo("Container");
+        assertThat(response.getBody().getFeatures()).extracting(FeatureDto::getName).containsOnly("Feature", "Other Feature");
     }
 }
