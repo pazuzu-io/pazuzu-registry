@@ -12,10 +12,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(FeatureNotExistingException.class)
     @ResponseBody
-
     public ErrorDto featureNotExistingException(FeatureNotExistingException exception) {
         return new ErrorDto(exception.getCode(), exception.getMessage());
     }
-
-
 }
