@@ -89,7 +89,8 @@ public class FeatureApiTest extends AbstractComponentTest {
     public void deleteFeatureProperly() throws JsonProcessingException {
         createFeature("Feature", "some data");
 
-        template.delete(url(featuresUrl + "/Feature"));
+        ResponseEntity<Void> response = template.exchange(url(featuresUrl + "/Feature"), HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
         ResponseEntity<List> result = template.getForEntity(url(featuresUrl), List.class);
         assertThat(result.getBody()).isEmpty();

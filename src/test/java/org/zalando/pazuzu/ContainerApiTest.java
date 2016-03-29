@@ -1,11 +1,6 @@
 package org.zalando.pazuzu;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import static org.assertj.core.api.Assertions.assertThat;
-import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +11,12 @@ import org.springframework.http.ResponseEntity;
 import org.zalando.pazuzu.container.ContainerFullDto;
 import org.zalando.pazuzu.exception.ErrorDto;
 import org.zalando.pazuzu.feature.FeatureDto;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ContainerApiTest extends AbstractComponentTest {
 
@@ -93,7 +94,8 @@ public class ContainerApiTest extends AbstractComponentTest {
         createFeature("Feature", "some data");
         createContainer("Container", "Feature");
 
-        template.delete(url(containersUrl + "/Container"));
+        ResponseEntity<Void> response = template.exchange(url(containersUrl + "/Container"), HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
         ResponseEntity<List> result = template.getForEntity(url(containersUrl), List.class);
         assertThat(result.getBody()).isEmpty();
@@ -123,6 +125,19 @@ public class ContainerApiTest extends AbstractComponentTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody().getName()).isEqualTo("Container");
         assertThat(response.getBody().getFeatures()).extracting(FeatureDto::getName).containsOnly("Feature", "Other Feature");
+    }
+
+    @Test
+    public void deleteFeatureFromContainerProperly() throws JsonProcessingException {
+        createFeature("Feature", "some data");
+        createContainer("Container", "Feature");
+
+        ResponseEntity<Void> response = template.exchange(url(containersUrl + "/Container/features/Feature"),
+                HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        ResponseEntity<List> result = template.getForEntity(url(containersUrl + "/Container/features"), List.class);
+        assertThat(result.getBody()).isEmpty();
     }
 
     @Test

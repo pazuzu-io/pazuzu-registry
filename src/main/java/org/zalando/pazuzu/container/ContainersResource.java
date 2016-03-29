@@ -55,8 +55,9 @@ public class ContainersResource {
     }
 
     @RequestMapping(value = "/{containerName}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public void deleteContainer(@PathVariable String containerName) throws NotFoundException {
+    public ResponseEntity<Void> deleteContainer(@PathVariable String containerName) throws NotFoundException {
         containerService.deleteContainer(containerName);
+        return ResponseEntity.noContent().build();
     }
 
     @RequestMapping(value = "/{containerName}/features", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -71,8 +72,9 @@ public class ContainersResource {
     }
 
     @RequestMapping(value = "/{containerName}/features/{featureName}", method = RequestMethod.DELETE)
-    public void deleteContainerFeature(@PathVariable String containerName, @PathVariable String featureName) throws ServiceException {
+    public ResponseEntity<Void> deleteContainerFeature(@PathVariable String containerName, @PathVariable String featureName) throws ServiceException {
         containerService.deleteFeature(containerName, featureName);
+        return ResponseEntity.noContent().build();
     }
 
     @RequestMapping(value = "/{containerName}/dockerfile", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)

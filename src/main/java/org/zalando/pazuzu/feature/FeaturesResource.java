@@ -53,7 +53,8 @@ public class FeaturesResource {
     }
 
     @RequestMapping(value = "/{featureName}", method = RequestMethod.DELETE)
-    public void deleteFeature(@PathVariable String featureName) throws ServiceException {
+    public ResponseEntity<Void> deleteFeature(@PathVariable String featureName) throws ServiceException {
         featureService.deleteFeature(featureName);
+        return ResponseEntity.noContent().build();
     }
 }
