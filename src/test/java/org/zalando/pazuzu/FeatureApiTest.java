@@ -52,7 +52,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 
         Map json = mapper.readValue(result.getBody(), Map.class);
-        assertThat(json.get("code")).isEqualTo("not_found");
+        assertThat(json.get("code")).isEqualTo("feature_not_found");
         assertThat(json.get("message")).isNotNull();
     }
 

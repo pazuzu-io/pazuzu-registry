@@ -54,7 +54,7 @@ public class ContainersResource {
         return containerService.getContainer(containerName, ContainerFullDto::buildFull);
     }
 
-    @RequestMapping(value = "/{containerName}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{containerName}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public void deleteContainer(@PathVariable String containerName) throws NotFoundException {
         containerService.deleteContainer(containerName);
     }

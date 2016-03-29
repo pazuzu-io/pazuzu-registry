@@ -82,7 +82,7 @@ public class ContainerApiTest extends AbstractComponentTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 
         Map json = mapper.readValue(response.getBody(), Map.class);
-        assertThat(json.get("code")).isEqualTo("features_not_present");
+        assertThat(json.get("code")).isEqualTo("feature_not_found");
     }
 
     @Test

@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.zalando.pazuzu.docker.DockerfileUtil;
 import org.zalando.pazuzu.exception.BadRequestException;
+import org.zalando.pazuzu.exception.Error;
 import org.zalando.pazuzu.exception.NotFoundException;
 import org.zalando.pazuzu.exception.ServiceException;
 import org.zalando.pazuzu.feature.Feature;
@@ -40,7 +41,7 @@ public class ContainerService {
     @Transactional(rollbackFor = ServiceException.class)
     public <T> T createContainer(String name, List<String> features, Function<Container, T> converter) throws ServiceException {
         if (StringUtils.isEmpty(name)) {
-            throw new BadRequestException("name", "Feature name is empty");
+            throw new BadRequestException(Error.FEATURE_NAME_EMPTY);
         }
         ensureNameFree(name);
         final Container container = new Container();
@@ -53,7 +54,7 @@ public class ContainerService {
     private void ensureNameFree(String name) throws ServiceException {
         final Container existing = containerRepository.findByName(name);
         if (null != existing) {
-            throw new BadRequestException("duplicate", "Feature with name " + name + " already exists");
+            throw new BadRequestException(Error.FEATURE_DUPLICATE);
         }
     }
 
@@ -61,7 +62,7 @@ public class ContainerService {
     public <T> T updateContainer(String containerName, String newName, List<String> features, Function<Container, T> converter) throws ServiceException {
         final Container container = containerRepository.findByName(containerName);
         if (null == container) {
-            throw new NotFoundException("not_found", "Container with name " + containerName + " is not found");
+            throw new NotFoundException(Error.CONTAINER_NOT_FOUND);
         }
         if (null != newName) {
             ensureNameFree(newName);
@@ -84,7 +85,7 @@ public class ContainerService {
     public Container getContainer(String containerName) throws ServiceException {
         final Container container = containerRepository.findByName(containerName);
         if (null == container) {
-            throw new NotFoundException("not_found", "Container with name is not found");
+            throw new NotFoundException(Error.CONTAINER_NOT_FOUND);
         }
         return container;
     }
@@ -93,7 +94,7 @@ public class ContainerService {
     public void deleteContainer(String containerName) throws NotFoundException {
         Container container = containerRepository.findByName(containerName);
         if (container == null) {
-            throw new NotFoundException("container_not_present", "container is not existing");
+            throw new NotFoundException(Error.CONTAINER_NOT_FOUND);
         }
         containerRepository.delete(container);
     }
@@ -103,7 +104,7 @@ public class ContainerService {
         final Container container = getContainer(containerName);
         final Feature feature = featureRepository.findByName(featureName);
         if (null == feature) {
-            throw new BadRequestException("bad_feature", "Feature with name " + featureName + " is not found");
+            throw new BadRequestException(Error.FEATURE_NOT_FOUND);
         }
         container.getFeatures().add(feature);
         containerRepository.save(container);

@@ -10,9 +10,9 @@ public class ErrorDto {
     @JsonProperty("message")
     private String message;
 
-    public ErrorDto(String code, String message) {
-        this.code = code;
-        this.message = message;
+    public ErrorDto(Error error) {
+        this.code = error.getCode();
+        this.message = error.getMessage();
     }
 
     public String getCode() {

@@ -8,10 +8,10 @@ import org.zalando.pazuzu.container.Container;
 import org.zalando.pazuzu.container.ContainerRepository;
 import org.zalando.pazuzu.docker.DockerfileUtil;
 import org.zalando.pazuzu.exception.BadRequestException;
+import org.zalando.pazuzu.exception.Error;
 import org.zalando.pazuzu.exception.NotFoundException;
 import org.zalando.pazuzu.exception.ServiceException;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -40,11 +40,11 @@ public class FeatureService {
     @Transactional(rollbackFor = ServiceException.class)
     public <T> T createFeature(String name, String dockerData, List<String> dependencyNames, Function<Feature, T> converter) throws ServiceException {
         if (StringUtils.isEmpty(name)) {
-            throw new BadRequestException("name", "Feature name is empty");
+            throw new BadRequestException(Error.FEATURE_NAME_EMPTY);
         }
         final Feature existing = featureRepository.findByName(name);
         if (null != existing) {
-            throw new BadRequestException("duplicate", "Feature with name " + name + " already exists");
+            throw new BadRequestException(Error.FEATURE_DUPLICATE);
         }
 
         final Set<Feature> dependencies = loadFeatures(dependencyNames);
@@ -63,7 +63,7 @@ public class FeatureService {
         if (null != newName && !newName.equals(existing.getName())) {
             final Feature newExisting = featureRepository.findByName(newName);
             if (null != newExisting) {
-                throw new BadRequestException("duplicate", "Feature with name " + newName + " already exists");
+                throw new BadRequestException(Error.FEATURE_DUPLICATE);
             }
             existing.setName(newName);
         }
@@ -75,7 +75,7 @@ public class FeatureService {
             final List<Feature> recursive = dependencies.stream()
                     .filter(f -> f.containsDependencyRecursively(existing)).collect(Collectors.toList());
             if (!recursive.isEmpty()) {
-                throw new BadRequestException("recursive", "Recursive dependencies found: " + recursive.stream().map(Feature::getName).collect(Collectors.joining(", ")));
+                throw new BadRequestException(Error.FEATURE_HAS_RECURSIVE_DEPENDENCY);
             }
             existing.setDependencies(dependencies);
         }
@@ -92,17 +92,15 @@ public class FeatureService {
     public void deleteFeature(String featureName) throws ServiceException {
         final Feature feature = featureRepository.findByName(featureName);
         if (feature == null) {
-            throw new NotFoundException("000", "feature is not existing");
+            throw new NotFoundException(Error.FEATURE_NOT_FOUND);
         }
         final List<Feature> referencing = featureRepository.findByDependenciesContaining(feature);
         if (!referencing.isEmpty()) {
-            throw new BadRequestException("references", "Can't delete feature " + feature.getName() +
-                    ", references found: " + referencing.stream().map(Feature::getName).collect(Collectors.joining(", ")));
+            throw new BadRequestException(Error.FEATURE_NOT_DELETABLE_DUE_TO_REFERENCES);
         }
         final List<Container> referencingContainers = containerRepository.findByFeaturesContaining(feature);
         if (!referencingContainers.isEmpty()) {
-            throw new BadRequestException("references", "Can't delete feature " + feature.getName() +
-                    ", references from containers found: " + referencingContainers.stream().map(Container::getName).collect(Collectors.joining(", ")));
+            throw new BadRequestException(Error.FEATURE_NOT_DELETABLE_DUE_TO_REFERENCES);
         }
         featureRepository.delete(feature);
     }
@@ -119,8 +117,7 @@ public class FeatureService {
                 .collect(Collectors.toSet());
         if (dependencies.size() != uniqueDependencies.size()) {
             dependencies.forEach(f -> uniqueDependencies.remove(f.getName()));
-            throw new BadRequestException("features_not_present", "Failed to find features with names " +
-                    Arrays.deepToString(uniqueDependencies.toArray()));
+            throw new BadRequestException(Error.FEATURE_NOT_FOUND);
         }
         return dependencies;
     }
@@ -128,7 +125,7 @@ public class FeatureService {
     private Feature loadExistingFeature(String name) throws NotFoundException {
         final Feature existing = featureRepository.findByName(name);
         if (null == existing) {
-            throw new NotFoundException("not_found", "Feature with name " + name + " was not found");
+            throw new NotFoundException(Error.FEATURE_NOT_FOUND);
         }
         return existing;
     }
