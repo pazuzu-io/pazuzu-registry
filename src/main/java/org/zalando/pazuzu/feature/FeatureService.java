@@ -7,7 +7,7 @@ import org.springframework.util.StringUtils;
 import org.zalando.pazuzu.container.Container;
 import org.zalando.pazuzu.container.ContainerRepository;
 import org.zalando.pazuzu.docker.DockerfileUtil;
-import org.zalando.pazuzu.exception.FeatureNotExistingException;
+import org.zalando.pazuzu.exception.BadRequestException;
 import org.zalando.pazuzu.exception.NotFoundException;
 import org.zalando.pazuzu.exception.ServiceException;
 
@@ -115,7 +115,7 @@ public class FeatureService {
                 .collect(Collectors.toSet());
         if (dependencies.size() != uniqueDependencies.size()) {
             dependencies.forEach(f -> uniqueDependencies.remove(f.getName()));
-            throw new FeatureNotExistingException("features_not_present", "Failed to find features with names " +
+            throw new BadRequestException("features_not_present", "Failed to find features with names " +
                     Arrays.deepToString(uniqueDependencies.toArray()));
         }
         return dependencies;

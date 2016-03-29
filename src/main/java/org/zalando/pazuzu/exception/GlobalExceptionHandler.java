@@ -17,9 +17,9 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(FeatureNotExistingException.class)
+    @ExceptionHandler(BadRequestException.class)
     @ResponseBody
-    public ErrorDto featureNotExistingException(FeatureNotExistingException exception) {
+    public ErrorDto featureNotExistingException(BadRequestException exception) {
         return new ErrorDto(exception.getCode(), exception.getMessage());
     }
 
@@ -28,5 +28,12 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public ErrorDto notFoundException(NotFoundException exception) {
         return new ErrorDto(exception.getCode(), exception.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Exception.class)
+    @ResponseBody
+    public ErrorDto exception(Exception exception) {
+        return new ErrorDto("internal_error", "Something went wrong. Uppppss.");
     }
 }
