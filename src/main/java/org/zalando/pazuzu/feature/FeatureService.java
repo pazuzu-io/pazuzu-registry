@@ -75,7 +75,7 @@ public class FeatureService {
             final List<Feature> recursive = dependencies.stream()
                     .filter(f -> f.containsDependencyRecursively(existing)).collect(Collectors.toList());
             if (!recursive.isEmpty()) {
-                throw new BadRequestException(Error.FEATURE_HAS_RECURSIVE_DEPENDENCY);
+                throw new BadRequestException(Error.FEATURE_HAS_RECURSIVE_DEPENDENCY,  "Recursive dependencies found: " + recursive.stream().map(Feature::getName).collect(Collectors.joining(", ")));
             }
             existing.setDependencies(dependencies);
         }
@@ -96,11 +96,13 @@ public class FeatureService {
         }
         final List<Feature> referencing = featureRepository.findByDependenciesContaining(feature);
         if (!referencing.isEmpty()) {
-            throw new BadRequestException(Error.FEATURE_NOT_DELETABLE_DUE_TO_REFERENCES);
+            throw new BadRequestException(Error.FEATURE_NOT_DELETABLE_DUE_TO_REFERENCES,
+                    "Can't delete feature because it is referenced from other feature(s): " + referencing.stream().map(Feature::getName).collect(Collectors.joining(", ")));
         }
         final List<Container> referencingContainers = containerRepository.findByFeaturesContaining(feature);
         if (!referencingContainers.isEmpty()) {
-            throw new BadRequestException(Error.FEATURE_NOT_DELETABLE_DUE_TO_REFERENCES);
+            throw new BadRequestException(Error.FEATURE_NOT_DELETABLE_DUE_TO_REFERENCES,
+                    "Can't delete feature because it is referenced from other container(s): " + referencingContainers.stream().map(Container::getName).collect(Collectors.joining(", ")));
         }
         featureRepository.delete(feature);
     }

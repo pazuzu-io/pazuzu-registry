@@ -1,11 +1,6 @@
 package org.zalando.pazuzu;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import static org.assertj.core.api.Assertions.assertThat;
-import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +11,12 @@ import org.springframework.http.ResponseEntity;
 import org.zalando.pazuzu.container.ContainerFullDto;
 import org.zalando.pazuzu.exception.ErrorDto;
 import org.zalando.pazuzu.feature.FeatureDto;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ContainerApiTest extends AbstractComponentTest {
 
@@ -153,7 +154,7 @@ public class ContainerApiTest extends AbstractComponentTest {
         ResponseEntity<Map> error = template.postForEntity(url(containersUrl), new HttpEntity<>("{json crap}", headers), Map.class);
         assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 
-        assertThat(error.getBody().keySet()).containsExactly("code", "message");
+        assertThat(error.getBody().keySet()).containsExactly("code", "message", "detailed_message");
         assertThat(error.getBody().get("code")).isEqualTo("json_not_parsable");
     }
 }
