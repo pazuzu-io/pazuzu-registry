@@ -1,10 +1,7 @@
 package org.zalando.pazuzu;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -13,8 +10,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.zalando.pazuzu.container.ContainerFullDto;
-import org.zalando.pazuzu.exception.ErrorDto;
 import org.zalando.pazuzu.feature.FeatureDto;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ContainerApiTest extends AbstractComponentTest {
 
@@ -35,20 +37,6 @@ public class ContainerApiTest extends AbstractComponentTest {
 
         assertThat(resultContainer.getName()).isEqualTo("Container 1");
         assertThat(resultContainer.getFeatures()).extracting(FeatureDto::getName).containsOnly("Feature 1", "Feature 2", "Feature 3");
-    }
-
-    @Test
-    public void createContainerShouldFailOnWrongNameNull() throws Exception {
-        final ResponseEntity<ErrorDto> error = createContainerUnchecked(ErrorDto.class, null);
-        assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(error.getBody().getCode()).isEqualTo("name");
-    }
-
-    @Test
-    public void createContainerShouldFailOnWrongNameEmpty() throws Exception {
-        final ResponseEntity<ErrorDto> error = createContainerUnchecked(ErrorDto.class, "");
-        assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(error.getBody().getCode()).isEqualTo("name");
     }
 
     @Test
@@ -75,19 +63,26 @@ public class ContainerApiTest extends AbstractComponentTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        ResponseEntity<Map> response = template.postForEntity(url(containersUrl),
-                new HttpEntity<>(mapper.writeValueAsString(map), headers), Map.class);
+        ResponseEntity<ContainerFullDto> response = template.postForEntity(url(containersUrl),
+                new HttpEntity<>(mapper.writeValueAsString(map), headers), ContainerFullDto.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        final Map errorDto = response.getBody();
-        assertThat(errorDto.keySet()).containsExactly("code", "message");
-        assertThat(errorDto.get("code")).isEqualTo("json");
     }
 
     @Test
     public void badRequestWhenFeaturesAreNotExistingNewContainerIsReferencing() throws Exception {
-        ResponseEntity<ErrorDto> response = createContainerUnchecked(ErrorDto.class, "Container 2", "NotExistingFeature");
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", "Container 2");
+        map.put("features", Lists.newArrayList("NotExistingFeature"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        ResponseEntity<String> response = template.postForEntity(url(containersUrl),
+                new HttpEntity<>(mapper.writeValueAsString(map), headers), String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody().getCode()).isEqualTo("features_not_found");
+
+        Map json = mapper.readValue(response.getBody(), Map.class);
+        assertThat(json.get("code")).isEqualTo("feature_not_found");
     }
 
     @Test

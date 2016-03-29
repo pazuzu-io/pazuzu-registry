@@ -116,7 +116,7 @@ public class ContainerService {
         final Container container = getContainer(containerName);
         final Feature toDelete = container.getFeatures().stream().filter(f -> f.getName().equals(featureName)).findAny().orElse(null);
         if (toDelete == null) {
-            throw new NotFoundException("feature_not_present", "feature is not attached to this container");
+            throw new NotFoundException(Error.FEATURE_NOT_FOUND);
         }
         container.getFeatures().remove(toDelete);
         containerRepository.save(container);
