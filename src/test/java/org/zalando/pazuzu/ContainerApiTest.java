@@ -1,6 +1,7 @@
 package org.zalando.pazuzu;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.springframework.http.*;
 import org.zalando.pazuzu.container.ContainerFullDto;
@@ -49,10 +50,10 @@ public class ContainerApiTest extends AbstractComponentTest {
     }
 
     @Test
-    public void badRequestWhenFeaturesAreNotExistingNewContainerIsReferencing() throws Exception {
+    public void badRequestWhenJsonIsIncorrect() throws Exception {
         Map<String, Object> map = new HashMap<>();
         map.put("name", "Container 2");
-        map.put("features", "NotExistingFeature");
+        map.put("features", "StringInsteadOfList");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -60,6 +61,23 @@ public class ContainerApiTest extends AbstractComponentTest {
         ResponseEntity<ContainerFullDto> response = template.postForEntity(url(containersUrl),
                 new HttpEntity<>(mapper.writeValueAsString(map), headers), ContainerFullDto.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void badRequestWhenFeaturesAreNotExistingNewContainerIsReferencing() throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", "Container 2");
+        map.put("features", Lists.newArrayList("NotExistingFeature"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        ResponseEntity<String> response = template.postForEntity(url(containersUrl),
+                new HttpEntity<>(mapper.writeValueAsString(map), headers), String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        Map json = mapper.readValue(response.getBody(), Map.class);
+        assertThat(json.get("code")).isEqualTo("features_not_present");
     }
 
     @Test
