@@ -3,7 +3,11 @@ package org.zalando.pazuzu.docker;
 import org.zalando.pazuzu.feature.Feature;
 import org.zalando.pazuzu.sort.TopologicalSort;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public final class DockerfileUtil {
 
