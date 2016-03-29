@@ -1,7 +1,5 @@
 package org.zalando.pazuzu.exception;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.impl.SLF4JLogFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -35,7 +33,7 @@ public class GlobalExceptionHandler {
         return new ErrorDto(Error.BAD_JSON);
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ErrorDto exception(Exception exception) {
