@@ -43,29 +43,43 @@ public abstract class AbstractComponentTest {
     }
 
     protected ResponseEntity<FeatureFullDto> createFeature(String name, String dockerData, String... dependencies) throws JsonProcessingException {
+        final ResponseEntity<FeatureFullDto> response = createFeatureUnchecked(FeatureFullDto.class, name, dockerData, dependencies);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        return response;
+    }
+
+    protected <T> ResponseEntity<T> createFeatureUnchecked(Class<T> clazz, String name, String dockerData, String... dependencies) throws JsonProcessingException {
         Map<String, Object> map = new HashMap<>();
-        map.put("name", name);
-        map.put("docker_data", dockerData);
+        if (null != name) {
+            map.put("name", name);
+        }
+        if (null != dockerData) {
+            map.put("docker_data", dockerData);
+        }
         map.put("dependencies", Arrays.asList(dependencies));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        ResponseEntity<FeatureFullDto> response = template.postForEntity(url(featuresUrl), new HttpEntity<>(mapper.writeValueAsString(map), headers), FeatureFullDto.class);
+        return template.postForEntity(url(featuresUrl), new HttpEntity<>(mapper.writeValueAsString(map), headers), clazz);
+    }
+
+    protected ResponseEntity<ContainerFullDto> createContainer(String name, String... features) throws JsonProcessingException {
+        final ResponseEntity<ContainerFullDto> response = createContainerUnchecked(ContainerFullDto.class, name, features);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         return response;
     }
 
-    protected ResponseEntity<ContainerFullDto> createContainer(String name, String... features) throws JsonProcessingException {
+    protected <T> ResponseEntity<T> createContainerUnchecked(Class<T> clazz, String name, String... features) throws JsonProcessingException {
         Map<String, Object> map = new HashMap<>();
-        map.put("name", name);
+        if (null != name) {
+            map.put("name", name);
+        }
         map.put("features", features);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        ResponseEntity<ContainerFullDto> response = template.postForEntity(url(containersUrl), new HttpEntity<>(mapper.writeValueAsString(map), headers), ContainerFullDto.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        return response;
+        return template.postForEntity(url(containersUrl), new HttpEntity<>(mapper.writeValueAsString(map), headers), clazz);
     }
 }

@@ -3,9 +3,12 @@ package org.zalando.pazuzu;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.zalando.pazuzu.exception.ErrorDto;
 import org.zalando.pazuzu.feature.FeatureFullDto;
 
 import java.util.List;
@@ -30,6 +33,32 @@ public class FeatureApiTest extends AbstractComponentTest {
         assertThat(resultFeature.getName()).isEqualTo("Test");
         assertThat(resultFeature.getDockerData()).isEqualTo("Test Data");
         assertThat(resultFeature.getDependencies()).isEmpty();
+    }
+
+    @Test
+    public void createFeatureShouldFailOnWrongNameNull() throws Exception {
+        final ResponseEntity<ErrorDto> error = createFeatureUnchecked(ErrorDto.class, null, null);
+        assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(error.getBody().getCode()).isEqualTo("name");
+    }
+
+    @Test
+    public void createFeatureShouldFailOnWrongNameEmpty() throws Exception {
+        final ResponseEntity<ErrorDto> error = createFeatureUnchecked(ErrorDto.class, "", null);
+        assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(error.getBody().getCode()).isEqualTo("name");
+    }
+
+    @Test
+    public void testCrapShouldLeadToCorrectMessage() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        ResponseEntity<Map> error = template.postForEntity(url(featuresUrl), new HttpEntity<>("{json crap}", headers), Map.class);
+        assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        assertThat(error.getBody().keySet()).containsExactly("code", "message");
+        assertThat(error.getBody().get("code")).isEqualTo("json");
     }
 
     @Test
