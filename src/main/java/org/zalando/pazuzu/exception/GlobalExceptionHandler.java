@@ -1,5 +1,6 @@
 package org.zalando.pazuzu.exception;
 
+import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static Log _log = SLF4JLogFactory.getLog(GlobalExceptionHandler.class);
+    private static Logger _log = Logger.getLogger(GlobalExceptionHandler.class);
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BadRequestException.class)
