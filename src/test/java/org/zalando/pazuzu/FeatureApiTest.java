@@ -67,6 +67,12 @@ public class FeatureApiTest extends AbstractComponentTest {
     }
 
     @Test
+    public void notFoundWhenDeletingNotExistingFeature() throws JsonProcessingException {
+        ResponseEntity<Void> response = template.exchange(url(featuresUrl + "/NotExistingFeature"), HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
     public void badRequestWhenDeletingStillReferencedFeature() throws JsonProcessingException {
         createFeature("Feature", "some data");
         createContainer("Container", "Feature");

@@ -87,8 +87,8 @@ public class FeatureService {
     @Transactional(rollbackFor = ServiceException.class)
     public void deleteFeature(String featureName) throws ServiceException {
         final Feature feature = featureRepository.findByName(featureName);
-        if (null == feature) {
-            return; // idempotent call
+        if (feature == null) {
+            throw new NotFoundException("000", "feature is not existing");
         }
         final List<Feature> referencing = featureRepository.findByDependenciesContaining(feature);
         if (!referencing.isEmpty()) {
