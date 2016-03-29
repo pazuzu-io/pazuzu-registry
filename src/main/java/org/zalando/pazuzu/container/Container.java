@@ -11,18 +11,18 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.Table;
 import java.util.Set;
 
-@Entity(name = "Container")
-@Table(name = "container")
+@Entity
 public class Container {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "container_id", nullable = false, updatable = false)
     private Integer id;
-    @Column(name = "name", nullable = false, length = 32)
+
+    @Column(name = "container_name", nullable = false, length = 32)
     private String name;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "container_feature", joinColumns = @JoinColumn(name = "container_id"), inverseJoinColumns = @JoinColumn(name = "feature_id"))
     private Set<Feature> features;

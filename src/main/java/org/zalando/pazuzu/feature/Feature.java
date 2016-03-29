@@ -9,20 +9,17 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity(name = "Feature")
-@Table(name = "feature")
+@Entity
 public class Feature {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "feature_id", nullable = false, updatable = false)
     private Integer id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "feature_name", nullable = false, length = 256)
     private String name;
 
     @Column(name = "docker_data", nullable = false, length = 4096)

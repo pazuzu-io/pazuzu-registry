@@ -7,6 +7,16 @@ tokens:
    - token-id: kio
      scopes:
       - uid
+
 security:
   basic:
     enabled: false
+
+spring:
+  datasource:
+    url: jdbc:hsqldb:mem:pazuzudb;sql.syntax_pgs=true
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: validate

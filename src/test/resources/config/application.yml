@@ -7,10 +7,18 @@ tokens:
    - token-id: kio
      scopes:
       - uid
+
 security:
   basic:
     enabled: false
+
 spring:
   profiles:
     active: test
-    
+  datasource:
+    url: jdbc:hsqldb:mem:testdb;sql.syntax_pgs=true
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: validate
