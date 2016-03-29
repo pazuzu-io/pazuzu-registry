@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.zalando.pazuzu.exception.NotFoundException;
 import org.zalando.pazuzu.exception.ServiceException;
 import org.zalando.pazuzu.feature.FeatureDto;
 import org.zalando.pazuzu.feature.FeatureToAddDto;
@@ -54,7 +55,7 @@ public class ContainersResource {
     }
 
     @RequestMapping(value = "/{containerName}", method = RequestMethod.DELETE)
-    public void deleteContainer(@PathVariable String containerName) {
+    public void deleteContainer(@PathVariable String containerName) throws NotFoundException {
         containerService.deleteContainer(containerName);
     }
 

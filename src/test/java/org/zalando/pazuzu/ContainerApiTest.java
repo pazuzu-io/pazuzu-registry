@@ -3,7 +3,12 @@ package org.zalando.pazuzu;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.assertj.core.util.Lists;
 import org.junit.Test;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.zalando.pazuzu.container.ContainerFullDto;
 import org.zalando.pazuzu.feature.FeatureDto;
 
@@ -89,6 +94,12 @@ public class ContainerApiTest extends AbstractComponentTest {
 
         ResponseEntity<List> result = template.getForEntity(url(containersUrl), List.class);
         assertThat(result.getBody()).isEmpty();
+    }
+
+    @Test
+    public void notFoundWhenDeletingNotExistingContainer() throws JsonProcessingException {
+        ResponseEntity<Void> response = template.exchange(url(containersUrl + "/NotExistingContainer"), HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test

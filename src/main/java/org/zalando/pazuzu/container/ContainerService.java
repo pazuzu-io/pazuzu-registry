@@ -90,8 +90,12 @@ public class ContainerService {
     }
 
     @Transactional
-    public void deleteContainer(String containerName) {
-        Optional.ofNullable(containerRepository.findByName(containerName)).ifPresent(containerRepository::delete);
+    public void deleteContainer(String containerName) throws NotFoundException {
+        Container container = containerRepository.findByName(containerName);
+        if (container == null) {
+            throw new NotFoundException("container_not_present", "container is not existing");
+        }
+        containerRepository.delete(container);
     }
 
     @Transactional(rollbackFor = ServiceException.class)
