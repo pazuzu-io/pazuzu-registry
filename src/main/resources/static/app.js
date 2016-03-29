@@ -1,7 +1,7 @@
 'use strict';
 
 const React = require('react');
-const client = require('./client');
+const axios = require('axios');
 
 var data = [
 	{id: 0, text: "Create Container"},
@@ -12,19 +12,34 @@ var PazuzuApp = React.createClass({displayName: 'PazuzuApp',
 	getInitialState: function() {
 		return {menuOpen: true};
 	},
+	componentDidMount: function() {
+		axios.get('/api/features').then(response => {
+			this.setState({features: response.data});
+		});
+	},
 	onMenuOpened: function(newState) {
 	     this.setState({menuOpen: newState});
 	},
 	render: function() {
+		if(this.state.features){
+			return (React.createElement('div', {className: 'pazuzuApp'},
+			<div>
+			  <Header menuOpen={this.state.menuOpen} callbackParent={this.onMenuOpened} />	
+			  <Menu data={this.props.data} menuOpen={this.state.menuOpen} />
+			  <FeatureTable features={this.state.features}/>
+			</div>	
+			))
+			} else {
 		return (
 			React.createElement('div', {className: 'pazuzuApp'},
 			<div>
 			  <Header menuOpen={this.state.menuOpen} callbackParent={this.onMenuOpened} />	
 			  <Menu data={this.props.data} menuOpen={this.state.menuOpen} />
 			</div>		
-)
-		)
-}
+		))
+		}
+	
+		}
 })
 
 var HeaderMenu = React.createClass({displayName: 'HeaderMenu',
@@ -71,7 +86,7 @@ var Header = React.createClass({displayName: 'Header',
 
 var Menu = React.createClass({displayName: 'Menu',
 	render: function() {
-	var menuClass = this.props.menuOpen ? 'menuOpen' : 'menuClosed' ;
+	var menuClass = this.props.menuOpen ? 'menu menuOpen' : 'menu menuClosed' ;
 	var menuNodes = this.props.data.map(function(item) {
 		return (
 			<MenuItem key={item.id} text={item.text}> 
@@ -90,6 +105,15 @@ var Menu = React.createClass({displayName: 'Menu',
 var MenuItem = React.createClass({displayName: 'MenuItem',
 	render: function() {
 		return (<div className="menuItem">{this.props.text}</div>)
+	}
+});
+
+var FeatureTable = React.createClass({displayName: 'FeatureTable',
+	render: function() {
+                var features = this.props.features.map(feature =>
+			<tr><td>{feature.name}</td></tr>
+		);
+		return (<div className="featureTableContainer"><table><tr><th></th></tr>{features}</table></div>)
 	}
 })
 

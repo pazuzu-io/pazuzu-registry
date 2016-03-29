@@ -7,11 +7,13 @@ html, body, #react, .pazuzuApp {
 .pazuzuApp > div {
      height: 100%;
      width: 100%;
+     min-width: 400px;
 }
 
 .header {
     background-color: #eee;
     width: 100%;
+    min-width: 400px;
     height: 35px;
     font-size: 24px;
     text-align: center;
@@ -36,16 +38,20 @@ html, body, #react, .pazuzuApp {
     margin-right: 8px;
 }
 
-.menuOpen {
-    height: 100%;
+.menu {
+    height: calc(100% - 35px);
     width: 150px;
     background-color: lightcyan;
+    transition: margin-left 0.5s linear;
+    display: inline-block;
+}
+
+.menuOpen {
+    margin-left: 0;
 }
 
 .menuClosed {
-    height: 100%;
-    width: 150px;
-    background-color: red;
+    margin-left: -150px;
 }
 
 .menuItem {
@@ -53,4 +59,8 @@ html, body, #react, .pazuzuApp {
     padding-left: 14px;
     height: 30px;
     line-height: 30px;
+}
+
+.featureTableContainer {
+     display: inline-block;
 }
