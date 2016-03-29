@@ -36,11 +36,11 @@ public class FeatureService {
     @Transactional(rollbackFor = ServiceException.class)
     public <T> T createFeature(String name, String dockerData, List<String> dependencyNames, Function<Feature, T> converter) throws ServiceException {
         if (StringUtils.isEmpty(name)) {
-            throw new ServiceException("name", "Feature name is empty");
+            throw new BadRequestException("name", "Feature name is empty");
         }
         final Feature existing = featureRepository.findByName(name);
         if (null != existing) {
-            throw new ServiceException("duplicate", "Feature with name " + name + " already exists");
+            throw new BadRequestException("duplicate", "Feature with name " + name + " already exists");
         }
 
         final Set<Feature> dependencies = loadFeatures(dependencyNames);
@@ -59,7 +59,7 @@ public class FeatureService {
         if (null != newName && !newName.equals(existing.getName())) {
             final Feature newExisting = featureRepository.findByName(newName);
             if (null != newExisting) {
-                throw new ServiceException("duplicate", "Feature with name " + newName + " already exists");
+                throw new BadRequestException("duplicate", "Feature with name " + newName + " already exists");
             }
             existing.setName(newName);
         }
@@ -71,7 +71,7 @@ public class FeatureService {
             final List<Feature> recursive = dependencies.stream()
                     .filter(f -> f.containsDependencyRecursively(existing)).collect(Collectors.toList());
             if (!recursive.isEmpty()) {
-                throw new ServiceException("recursive", "Recursive dependencies found: " + recursive.stream().map(Feature::getName).collect(Collectors.joining(", ")));
+                throw new BadRequestException("recursive", "Recursive dependencies found: " + recursive.stream().map(Feature::getName).collect(Collectors.joining(", ")));
             }
             existing.setDependencies(dependencies);
         }
@@ -92,12 +92,12 @@ public class FeatureService {
         }
         final List<Feature> referencing = featureRepository.findByDependenciesContaining(feature);
         if (!referencing.isEmpty()) {
-            throw new ServiceException("references", "Can't delete feature " + feature.getName() +
+            throw new BadRequestException("references", "Can't delete feature " + feature.getName() +
                     ", references found: " + referencing.stream().map(Feature::getName).collect(Collectors.joining(", ")));
         }
         final List<Container> referencingContainers = containerRepository.findByFeaturesContaining(feature);
         if (!referencingContainers.isEmpty()) {
-            throw new ServiceException("references", "Can't delete feature " + feature.getName() +
+            throw new BadRequestException("references", "Can't delete feature " + feature.getName() +
                     ", references from containers found: " + referencingContainers.stream().map(Container::getName).collect(Collectors.joining(", ")));
         }
         featureRepository.delete(feature);

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.zalando.pazuzu.docker.DockerfileUtil;
+import org.zalando.pazuzu.exception.BadRequestException;
 import org.zalando.pazuzu.exception.NotFoundException;
 import org.zalando.pazuzu.exception.ServiceException;
 import org.zalando.pazuzu.feature.Feature;
@@ -39,7 +40,7 @@ public class ContainerService {
     @Transactional(rollbackFor = ServiceException.class)
     public <T> T createContainer(String name, List<String> features, Function<Container, T> converter) throws ServiceException {
         if (StringUtils.isEmpty(name)) {
-            throw new ServiceException("name", "Feature name is empty");
+            throw new BadRequestException("name", "Feature name is empty");
         }
         ensureNameFree(name);
         final Container container = new Container();
@@ -52,7 +53,7 @@ public class ContainerService {
     private void ensureNameFree(String name) throws ServiceException {
         final Container existing = containerRepository.findByName(name);
         if (null != existing) {
-            throw new ServiceException("duplicate", "Feature with name " + name + " already exists");
+            throw new BadRequestException("duplicate", "Feature with name " + name + " already exists");
         }
     }
 
@@ -98,7 +99,7 @@ public class ContainerService {
         final Container container = getContainer(containerName);
         final Feature feature = featureRepository.findByName(featureName);
         if (null == feature) {
-            throw new ServiceException("bad_feature", "Feature with name " + featureName + " is not found");
+            throw new BadRequestException("bad_feature", "Feature with name " + featureName + " is not found");
         }
         container.getFeatures().add(feature);
         containerRepository.save(container);
