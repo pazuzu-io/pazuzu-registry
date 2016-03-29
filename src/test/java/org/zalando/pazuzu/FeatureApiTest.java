@@ -39,14 +39,14 @@ public class FeatureApiTest extends AbstractComponentTest {
     public void createFeatureShouldFailOnWrongNameNull() throws Exception {
         final ResponseEntity<ErrorDto> error = createFeatureUnchecked(ErrorDto.class, null, null);
         assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(error.getBody().getCode()).isEqualTo("name");
+        assertThat(error.getBody().getCode()).isEqualTo("feature_name_empty");
     }
 
     @Test
     public void createFeatureShouldFailOnWrongNameEmpty() throws Exception {
         final ResponseEntity<ErrorDto> error = createFeatureUnchecked(ErrorDto.class, "", null);
         assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(error.getBody().getCode()).isEqualTo("name");
+        assertThat(error.getBody().getCode()).isEqualTo("feature_name_empty");
     }
 
     @Test
@@ -58,7 +58,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 
         assertThat(error.getBody().keySet()).containsExactly("code", "message");
-        assertThat(error.getBody().get("code")).isEqualTo("json");
+        assertThat(error.getBody().get("code")).isEqualTo("json_not_passable");
     }
 
     @Test

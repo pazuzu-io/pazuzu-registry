@@ -2,6 +2,7 @@ package org.zalando.pazuzu.exception;
 
 
 public enum Error {
+    BAD_JSON("json_not_passable", "Failed to parse incoming json"),
     CONTAINER_NOT_FOUND("container_not_found", "Container was not found"),
     FEATURE_DUPLICATE("feature_duplicate", "Feature with this name already exists"),
     FEATURE_NAME_EMPTY("feature_name_empty", "Feature name is empty"),
@@ -10,8 +11,8 @@ public enum Error {
     FEATURE_HAS_RECURSIVE_DEPENDENCY("feature_has_recursive_dependency", "Recursive dependencies found");
 
 
-    private String code;
-    private String message;
+    private final String code;
+    private final String message;
 
     Error(String code, String message) {
         this.code = code;
