@@ -400,4 +400,6 @@ definitions:
         type: string
       message:
         type: string
+      detailed_message:
+        type: string
         

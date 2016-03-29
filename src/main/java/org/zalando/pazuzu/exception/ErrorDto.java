@@ -10,9 +10,18 @@ public class ErrorDto {
     @JsonProperty("message")
     private String message;
 
+    @JsonProperty("detailed_message")
+    private String detailedMessage;
+
     public ErrorDto(Error error) {
         this.code = error.getCode();
         this.message = error.getMessage();
+    }
+
+    public ErrorDto(Error error, String detailedMessage) {
+        this.code = error.getCode();
+        this.message = error.getMessage();
+        this.detailedMessage = detailedMessage;
     }
 
     public ErrorDto() {
@@ -32,5 +41,13 @@ public class ErrorDto {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getDetailedMessage() {
+        return detailedMessage;
+    }
+
+    public void setDetailedMessage(String detailedMessage) {
+        this.detailedMessage = detailedMessage;
     }
 }

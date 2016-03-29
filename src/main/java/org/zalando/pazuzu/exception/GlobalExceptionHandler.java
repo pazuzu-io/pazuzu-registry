@@ -18,14 +18,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     @ResponseBody
     public ErrorDto featureNotExistingException(BadRequestException exception) {
-        return new ErrorDto(exception.getError());
+        return new ErrorDto(exception.getError(), exception.getDetailedMessage());
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundException.class)
     @ResponseBody
     public ErrorDto notFoundException(NotFoundException exception) {
-        return new ErrorDto(exception.getError());
+        return new ErrorDto(exception.getError(), exception.getDetailedMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

@@ -57,7 +57,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         ResponseEntity<Map> error = template.postForEntity(url(featuresUrl), new HttpEntity<>("{json crap}", headers), Map.class);
         assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 
-        assertThat(error.getBody().keySet()).containsExactly("code", "message");
+        assertThat(error.getBody().keySet()).containsExactly("code", "message", "detailed_message");
         assertThat(error.getBody().get("code")).isEqualTo("json_not_parsable");
     }
 
