@@ -146,7 +146,7 @@ public class ContainerApiTest extends AbstractComponentTest {
     }
 
     @Test
-    public void testCrapShouldLeadToCorrectMessage() {
+    public void badRequestForInvalidJson() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -154,6 +154,6 @@ public class ContainerApiTest extends AbstractComponentTest {
         assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 
         assertThat(error.getBody().keySet()).containsExactly("code", "message");
-        assertThat(error.getBody().get("code")).isEqualTo("json_not_passable");
+        assertThat(error.getBody().get("code")).isEqualTo("json_not_parsable");
     }
 }
