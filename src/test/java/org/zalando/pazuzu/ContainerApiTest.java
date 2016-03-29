@@ -121,4 +121,24 @@ public class ContainerApiTest extends AbstractComponentTest {
         assertThat(response.getBody().getName()).isEqualTo("Container");
         assertThat(response.getBody().getFeatures()).extracting(FeatureDto::getName).containsOnly("Feature", "Other Feature");
     }
+
+    @Test
+    public void notFoundWhenDeletingFeatureOnNotExistingContainer() throws JsonProcessingException {
+        createFeature("Feature", "some data");
+        createContainer("Container", "Feature");
+
+        ResponseEntity<Void> response = template.exchange(url(containersUrl + "/NotExistingContainer/features/Feature"),
+                HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void notFoundWhenDeletingNotExistingFeatureOnContainer() throws JsonProcessingException {
+        createFeature("Feature", "some data");
+        createContainer("Container", "Feature");
+
+        ResponseEntity<Void> response = template.exchange(url(containersUrl + "/Container/features/NotExistingFeature"),
+                HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
 }

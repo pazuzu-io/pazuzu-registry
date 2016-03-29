@@ -114,10 +114,11 @@ public class ContainerService {
     public void deleteFeature(String containerName, String featureName) throws ServiceException {
         final Container container = getContainer(containerName);
         final Feature toDelete = container.getFeatures().stream().filter(f -> f.getName().equals(featureName)).findAny().orElse(null);
-        if (null != toDelete) {
-            container.getFeatures().remove(toDelete);
-            containerRepository.save(container);
+        if (toDelete == null) {
+            throw new NotFoundException("feature_not_present", "feature is not attached to this container");
         }
+        container.getFeatures().remove(toDelete);
+        containerRepository.save(container);
     }
 
     @Transactional(rollbackFor = ServiceException.class)
