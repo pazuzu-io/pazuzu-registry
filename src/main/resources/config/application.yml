@@ -17,3 +17,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+
+endpoints:
+  enabled: false
+  health:
+    enabled: true
+    path: /api/health
