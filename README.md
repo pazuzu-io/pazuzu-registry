@@ -5,30 +5,26 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/018a3e5ab4bc4888aa785aa736e0aa6e)](https://www.codacy.com/app/pgronkiewicz/pazuzu-registry)
 [![Codacy Badge](https://api.codacy.com/project/badge/coverage/018a3e5ab4bc4888aa785aa736e0aa6e)](https://www.codacy.com/app/Pazuzu/pazuzu-registry)
 
-What is Pazuzu
-------------------------------------------------------------
+What is Pazuzu?
+---------------
 Pazuzu is a tool that builds Docker images from feature snippets, while 
 resolving all dependencies between them. One of the common use cases is 
 Continuous Integration environment, where jobs require specific tooling present 
-to build and test. Pazuzu can significantly ease that process, by letting user 
+for building and testing. Pazuzu can significantly ease that process, by letting user 
 choose from a wide selection of predefined Dockerfile snippets that represent 
-those dependencies (e.x. golang, python, Android SDK). 
+those dependencies (e.g. Golang, Python, Android SDK, customized NPM installs). 
 
-What is Pazuzu Registry
-------------------------------------------------------------
+What is Pazuzu Registry?
+------------------------
 Pazuzu Registry is a central storage of features, together with their 
-dependencies and test cases. Pazuzu client can access it for building Docker 
-images with a specified set of features. 
+dependencies and test cases. You can access it by command line and
+request your custom Dockerfile which you can pipe to Docker build
+command.
 
 What is current stage?
 ------------------------------------------------------------
 Project is still in early stages - this file will be updated to reflect the 
 progress and document usage and functionality
-
-What are the current libraries/Frameworks used?
-------------------------------------------------------------
-For the API documentation and specs we are using [swagger.io](http://swagger.io/)
-
 
 License
 ------------------------------------------------------------
