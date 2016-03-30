@@ -30,7 +30,7 @@ SenzaComponents:
         application_version: "{{Arguments.ImageVersion}}"
         runtime: Docker
         source: "{{Arguments.ImageSource}}:{{Arguments.ImageVersion}}"
-        health_check_path: /api/features
+        health_check_path: /api/health
         ports:
           8080: 8080
         mint_bucket: "{{Arguments.MintBucket}}"
