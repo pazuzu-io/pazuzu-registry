@@ -10,12 +10,16 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.zalando.stups.oauth2.spring.security.expression.ExtendedOAuth2WebSecurityExpressionHandler;
 import org.zalando.stups.oauth2.spring.server.DefaultAuthenticationExtractor;
 import org.zalando.stups.oauth2.spring.server.DefaultTokenInfoRequestExecutor;
 import org.zalando.stups.oauth2.spring.server.ExecutorWrappers;
 import org.zalando.stups.oauth2.spring.server.TokenInfoResourceServerTokenServices;
 import org.zalando.stups.tokens.config.AccessTokensBeanProperties;
+
+import java.util.ArrayList;
 
 @Configuration
 @EnableResourceServer
@@ -36,11 +40,14 @@ public class OAuthConfiguration extends ResourceServerConfigurerAdapter {
 
         // @formatter:off
         http
+            .httpBasic().disable()
+            .requestMatchers().antMatchers("/api/**")
+        .and()
             .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.NEVER)
-            .and()
-                .authorizeRequests()
-                    .antMatchers("/api/**").access("#oauth2.hasScope('uid')");
+        .and()
+            .authorizeRequests()
+                .antMatchers("/api/**").access("#oauth2.hasScope('uid')");
         // @formatter:on
     }
 

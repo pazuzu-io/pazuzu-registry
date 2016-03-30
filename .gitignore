@@ -90,3 +90,4 @@ src/main/resources/static/node_modules/
 scm-source.json
 
 node/
+src/main/resources/static/built
