@@ -22,12 +22,19 @@ request your custom Dockerfile which you can pipe to Docker build
 command.
 
 What is current stage?
-------------------------------------------------------------
+----------------------
 Project is still in early stages - this file will be updated to reflect the 
 progress and document usage and functionality
 
+How to start the server locally (without OAuth)
+-----------------------------------------------
+```bash
+mvn clean install
+java -jar target/pazuzu-registry.jar --spring.profiles.active=dev
+```
+
 License
-------------------------------------------------------------
+-------
 
 The MIT License (MIT)
 Copyright © 2016 Zalando SE, https://tech.zalando.com
