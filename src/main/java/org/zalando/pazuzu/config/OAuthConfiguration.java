@@ -43,6 +43,7 @@ public class OAuthConfiguration extends ResourceServerConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.NEVER)
         .and()
             .authorizeRequests()
+                .antMatchers("/api/health").permitAll()
                 .antMatchers("/api/**").access("#oauth2.hasScope('uid')");
         // @formatter:on
     }
