@@ -111,9 +111,21 @@ var MenuItem = React.createClass({displayName: 'MenuItem',
 var FeatureTable = React.createClass({displayName: 'FeatureTable',
 	render: function() {
                 var features = this.props.features.map(feature =>
-			<tr><td>{feature.name}</td></tr>
+			<tr><td className="featureTableCell">{feature.name}</td><td className="featureTableCell">{feature.dependencies}</td><td className="featureTableCell featureTableCellInclude"><input type="checkbox" /></td></tr>
 		);
-		return (<div className="featureTableContainer"><table><tr><th></th></tr>{features}</table></div>)
+		return (
+            <div className="featureTableContainer">
+                <table>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Dependencies</th>
+                        <th>Include?</th>
+                    </tr>
+                {features}
+                </table>
+                <div className="createButton">Create</div>
+            </div>
+            )
 	}
 })
 

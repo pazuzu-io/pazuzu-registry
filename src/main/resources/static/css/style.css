@@ -10,6 +10,10 @@ html, body, #react, .pazuzuApp {
      min-width: 400px;
 }
 
+table, th, td {
+    border: 1px solid black;
+}
+
 .header {
     background-color: #eee;
     width: 100%;
@@ -24,11 +28,12 @@ html, body, #react, .pazuzuApp {
 .headerMenu {
     height: 20px;
     width: 20px;
-    background-color: orange;
+    background-image: url('../menu-icon.png');
     display: inline-block;
     float: left;
-    margin-left: 5px;
+    margin-left: 10px;
     margin-top: 3px;
+    cursor: pointer;
 }
 
 .headerZalando {
@@ -41,9 +46,10 @@ html, body, #react, .pazuzuApp {
 .menu {
     height: calc(100% - 35px);
     width: 150px;
-    background-color: lightcyan;
-    transition: margin-left 0.5s linear;
+    background-color: lightyellow;
+    transition: margin-left 0.4s ease-out;
     display: inline-block;
+    box-shadow: 5px 0 5px -2px #ccc;
 }
 
 .menuOpen {
@@ -59,8 +65,43 @@ html, body, #react, .pazuzuApp {
     padding-left: 14px;
     height: 30px;
     line-height: 30px;
+    cursor: pointer;
+    border-bottom: 1px solid #bbbbbb;
 }
 
 .featureTableContainer {
-     display: inline-block;
+    display: inline-table;
+    margin-left: 100px;
+}
+
+.featureTableContainer > table {
+    border-collapse: collapse;
+}
+
+.featureTableHeader {
+    width: 150px;
+    text-align: center;
+}
+
+.featureTableCell {
+    width: 150px;
+    text-align: left;
+    height: 30px;
+}
+
+.featureTableCell.featureTableCellInclude {
+    text-align: center;
+}
+
+.createButton {
+    height: 36px;
+    width: 80px;
+    border-radius: 4px;
+    background-color: orange;
+    color: white;
+    margin-top: 10px;
+    float: right;
+    text-align: center;
+    line-height: 36px;
+    cursor: pointer;
 }
