@@ -1,6 +1,5 @@
 package org.zalando.pazuzu.oauth2;
 
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -8,8 +7,6 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.social.security.SocialUser;
 import org.springframework.social.security.SocialUserDetails;
 import org.springframework.social.security.SocialUserDetailsService;
-
-import java.util.Collections;
 
 /**
  * Created by mdasilvatrov on 29/03/16.

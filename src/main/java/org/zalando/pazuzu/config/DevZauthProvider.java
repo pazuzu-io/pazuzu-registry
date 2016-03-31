@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.social.zauth.api.ZAuth;
-import org.springframework.social.zauth.api.impl.ZAuthTemplate;
 import org.zalando.zauth.teams.TeamsOperations;
 import org.zalando.zauth.users.UsersOperations;
 

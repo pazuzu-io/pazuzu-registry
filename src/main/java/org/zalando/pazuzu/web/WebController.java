@@ -6,8 +6,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 @Controller
@@ -21,8 +19,7 @@ public class WebController {
     }
 
     @RequestMapping("/home")
-    public String pazuzuHome(@RequestParam String username, Map<String, Object> model) {
-        model.put("username", username);
+    public String pazuzuHome(Map<String, Object> model) {
         return "home";
     }
 
