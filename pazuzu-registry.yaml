@@ -39,7 +39,7 @@ SenzaComponents:
   - AppLoadBalancer:
       Type: Senza::WeightedDnsElasticLoadBalancer
       HTTPPort: 8080
-      HealthCheckPath: /api/features
+      HealthCheckPath: /api/health
       SecurityGroups:
         - app-pazuzu-registry-lb
       Scheme: internet-facing

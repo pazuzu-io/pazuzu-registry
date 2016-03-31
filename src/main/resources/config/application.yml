@@ -23,3 +23,6 @@ endpoints:
   health:
     enabled: true
     path: /api/health
+
+server:
+  use-forward-headers: true
