@@ -33,6 +33,13 @@ mvn clean install
 java -jar target/pazuzu-registry.jar --spring.profiles.active=dev
 ```
 
+How to build Docker image for Stups infrastructure (Zalando related)
+--------------------------------------------------------------------
+```bash
+scm-source
+docker build --tag <pierone_related_address>
+```
+
 License
 -------
 
