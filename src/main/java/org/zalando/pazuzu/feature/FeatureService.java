@@ -38,7 +38,7 @@ public class FeatureService {
     }
 
     @Transactional(rollbackFor = ServiceException.class)
-    public <T> T createFeature(String name, String dockerData, List<String> dependencyNames, Function<Feature, T> converter) throws ServiceException {
+    public <T> T createFeature(String name, String dockerData, String testInstruction, List<String> dependencyNames, Function<Feature, T> converter) throws ServiceException {
         if (StringUtils.isEmpty(name)) {
             throw new BadRequestException(Error.FEATURE_NAME_EMPTY);
         }
@@ -52,6 +52,9 @@ public class FeatureService {
         final Feature newFeature = new Feature();
         newFeature.setName(name);
         newFeature.setDockerData(null == dockerData ? "" : dockerData);
+        if (null != testInstruction) {
+            newFeature.setTestInstruction(testInstruction);
+        }
         newFeature.setDependencies(dependencies);
         featureRepository.save(newFeature);
         return converter.apply(newFeature);

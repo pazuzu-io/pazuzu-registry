@@ -27,24 +27,25 @@ public class FeatureApiTest extends AbstractComponentTest {
 
     @Test
     public void createFeatureShouldReturnCreatedFeature() throws Exception {
-        ResponseEntity<FeatureFullDto> result = createFeature("Test", "Test Data");
+        ResponseEntity<FeatureFullDto> result = createFeature("Test", "Test Data", "test something");
 
         FeatureFullDto resultFeature = result.getBody();
         assertThat(resultFeature.getName()).isEqualTo("Test");
+        assertThat(resultFeature.getTestInstruction()).isEqualTo("test something");
         assertThat(resultFeature.getDockerData()).isEqualTo("Test Data");
         assertThat(resultFeature.getDependencies()).isEmpty();
     }
 
     @Test
     public void createFeatureShouldFailOnWrongNameNull() throws Exception {
-        final ResponseEntity<ErrorDto> error = createFeatureUnchecked(ErrorDto.class, null, null);
+        final ResponseEntity<ErrorDto> error = createFeatureUnchecked(ErrorDto.class, null, null, null);
         assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(error.getBody().getCode()).isEqualTo("feature_name_empty");
     }
 
     @Test
     public void createFeatureShouldFailOnWrongNameEmpty() throws Exception {
-        final ResponseEntity<ErrorDto> error = createFeatureUnchecked(ErrorDto.class, "", null);
+        final ResponseEntity<ErrorDto> error = createFeatureUnchecked(ErrorDto.class, "", null, null);
         assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(error.getBody().getCode()).isEqualTo("feature_name_empty");
     }
@@ -63,7 +64,7 @@ public class FeatureApiTest extends AbstractComponentTest {
 
     @Test
     public void createdFeatureShouldBeRetrievableAfterwards() throws Exception {
-        ResponseEntity<FeatureFullDto> createdResult = createFeature("Test 2", "Test Data 2");
+        ResponseEntity<FeatureFullDto> createdResult = createFeature("Test 2", "Test Data 2", "something to test2");
 
         ResponseEntity<FeatureFullDto> result = template.getForEntity(createdResult.getHeaders().getLocation(), FeatureFullDto.class);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -71,6 +72,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         FeatureFullDto resultFeature = result.getBody();
         assertThat(resultFeature.getName()).isEqualTo("Test 2");
         assertThat(resultFeature.getDockerData()).isEqualTo("Test Data 2");
+        assertThat(resultFeature.getTestInstruction()).isEqualTo("something to test2");
         assertThat(resultFeature.getDependencies()).isEmpty();
     }
 
@@ -87,7 +89,7 @@ public class FeatureApiTest extends AbstractComponentTest {
 
     @Test
     public void deleteFeatureProperly() throws JsonProcessingException {
-        createFeature("Feature", "some data");
+        createFeature("Feature", "some data", "something to test2");
 
         ResponseEntity<Void> response = template.exchange(url(featuresUrl + "/Feature"), HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
@@ -104,7 +106,7 @@ public class FeatureApiTest extends AbstractComponentTest {
 
     @Test
     public void badRequestWhenDeletingStillReferencedFeature() throws JsonProcessingException {
-        createFeature("Feature", "some data");
+        createFeature("Feature", "some data", "something to test2");
         createContainer("Container", "Feature");
 
         ResponseEntity<Void> response = template.exchange(url(featuresUrl + "/Feature"), HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
