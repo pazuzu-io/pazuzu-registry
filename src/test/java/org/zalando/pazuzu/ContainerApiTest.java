@@ -29,9 +29,9 @@ public class ContainerApiTest extends AbstractComponentTest {
 
     @Test
     public void createContainerShouldReturnCreatedContainer() throws Exception {
-        createFeature("Feature 1", "some data");
-        createFeature("Feature 2", "some data");
-        createFeature("Feature 3", "some data");
+        createFeature("Feature 1", "some data", "test instruction 1");
+        createFeature("Feature 2", "some data", "test instruction 2");
+        createFeature("Feature 3", "some data", "test instruction 3");
 
         ContainerFullDto resultContainer = createContainer("Container 1", "Feature 1", "Feature 2", "Feature 3").getBody();
 
@@ -55,9 +55,9 @@ public class ContainerApiTest extends AbstractComponentTest {
 
     @Test
     public void createdContainerShouldBeRetrievableAfterwards() throws Exception {
-        createFeature("Feature 4", "some data");
-        createFeature("Feature 5", "some data");
-        createFeature("Feature 6", "some data");
+        createFeature("Feature 4", "some data", "test instruction 1");
+        createFeature("Feature 5", "some data", "test instruction 1");
+        createFeature("Feature 6", "some data", "test instruction 1");
 
         ResponseEntity<ContainerFullDto> createdResult = createContainer("Container 2", "Feature 4", "Feature 5", "Feature 6");
 
@@ -91,7 +91,7 @@ public class ContainerApiTest extends AbstractComponentTest {
 
     @Test
     public void deleteContainerProperly() throws JsonProcessingException {
-        createFeature("Feature", "some data");
+        createFeature("Feature", "some data", "test instruction 1");
         createContainer("Container", "Feature");
 
         ResponseEntity<Void> response = template.exchange(url(containersUrl + "/Container"), HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
@@ -109,9 +109,9 @@ public class ContainerApiTest extends AbstractComponentTest {
 
     @Test
     public void addFeatureToExistingContainer() throws JsonProcessingException {
-        createFeature("Feature", "some data");
+        createFeature("Feature", "some data", "test instruction 1");
         createContainer("Container", "Feature");
-        createFeature("Other Feature", "some data");
+        createFeature("Other Feature", "some data", "test instruction 1");
 
         Map<String, Object> map = new HashMap<>();
         map.put("name", "Other Feature");
@@ -129,7 +129,7 @@ public class ContainerApiTest extends AbstractComponentTest {
 
     @Test
     public void deleteFeatureFromContainerProperly() throws JsonProcessingException {
-        createFeature("Feature", "some data");
+        createFeature("Feature", "some data", "test instruction 1");
         createContainer("Container", "Feature");
 
         ResponseEntity<Void> response = template.exchange(url(containersUrl + "/Container/features/Feature"),
@@ -142,7 +142,7 @@ public class ContainerApiTest extends AbstractComponentTest {
 
     @Test
     public void notFoundWhenDeletingFeatureOnNotExistingContainer() throws JsonProcessingException {
-        createFeature("Feature", "some data");
+        createFeature("Feature", "some data", "test instruction 1");
         createContainer("Container", "Feature");
 
         ResponseEntity<Void> response = template.exchange(url(containersUrl + "/NotExistingContainer/features/Feature"),
@@ -152,7 +152,7 @@ public class ContainerApiTest extends AbstractComponentTest {
 
     @Test
     public void notFoundWhenDeletingNotExistingFeatureOnContainer() throws JsonProcessingException {
-        createFeature("Feature", "some data");
+        createFeature("Feature", "some data", "test instruction 1");
         createContainer("Container", "Feature");
 
         ResponseEntity<Void> response = template.exchange(url(containersUrl + "/Container/features/NotExistingFeature"),

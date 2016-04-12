@@ -14,9 +14,9 @@ public class DockerfileApiTest extends AbstractComponentTest {
     public void dockerfileIsCreatedCorrectly() throws Exception {
 
         // given
-        createFeature("feature1", "sudo apt-get feature1");
-        createFeature("feature2", "sudo apt-get feature2");
-        createFeature("feature3", "sudo apt-get feature3");
+        createFeature("feature1", "sudo apt-get feature1", "test instruction 1");
+        createFeature("feature2", "sudo apt-get feature2", "test instruction 2");
+        createFeature("feature3", "sudo apt-get feature3", "test instruction 3");
 
         // when
         ResponseEntity<String> response = template.getForEntity(url("/api/dockerfile") + "?features=feature1&features=feature3", String.class);
@@ -33,12 +33,12 @@ public class DockerfileApiTest extends AbstractComponentTest {
     @Test
     public void dockerfileWithFeaturesWithDependenciesIsCreatedCorrectly() throws Exception {
         // given
-        createFeature("1st_level_feature_1", "sudo apt-get 1st_level_feature_1");
-        createFeature("1st_level_feature_2", "sudo apt-get 1st_level_feature_2");
-        createFeature("2nd_level_feature_1", "sudo apt-get 2nd_level_feature_1", "1st_level_feature_1");
-        createFeature("2nd_level_feature_2", "sudo apt-get 2nd_level_feature_2", "1st_level_feature_2");
-        createFeature("3rd_level_feature_1", "sudo apt-get 3rd_level_feature_1", "2nd_level_feature_1");
-        createFeature("3rd_level_feature_2", "sudo apt-get 3rd_level_feature_2", "1st_level_feature_2", "2nd_level_feature_2");
+        createFeature("1st_level_feature_1", "sudo apt-get 1st_level_feature_1", "test instruction 1");
+        createFeature("1st_level_feature_2", "sudo apt-get 1st_level_feature_2", "test instruction 2");
+        createFeature("2nd_level_feature_1", "sudo apt-get 2nd_level_feature_1", "test instruction 2", "1st_level_feature_1");
+        createFeature("2nd_level_feature_2", "sudo apt-get 2nd_level_feature_2", "test instruction 3", "1st_level_feature_2");
+        createFeature("3rd_level_feature_1", "sudo apt-get 3rd_level_feature_1", "test instruction 4", "2nd_level_feature_1");
+        createFeature("3rd_level_feature_2", "sudo apt-get 3rd_level_feature_2", "test instruction 5", "1st_level_feature_2", "2nd_level_feature_2");
 
         // when
         ResponseEntity<String> response = template.getForEntity(url("/api/dockerfile") + "?features=3rd_level_feature_2&features=2nd_level_feature_1", String.class);

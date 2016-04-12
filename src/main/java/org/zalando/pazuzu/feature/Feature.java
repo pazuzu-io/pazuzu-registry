@@ -25,6 +25,9 @@ public class Feature {
     @Column(name = "docker_data", nullable = false, length = 4096)
     private String dockerData;
 
+    @Column(name = "test_instruction", nullable = true, length = 4096)
+    private String testInstruction;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "feature_dependency",
@@ -72,5 +75,13 @@ public class Feature {
             return true;
         }
         return getDependencies().stream().filter(item -> item.containsDependencyRecursively(f)).findAny().isPresent();
+    }
+
+    public String getTestInstruction() {
+        return testInstruction;
+    }
+
+    public void setTestInstruction(String testInstruction) {
+        this.testInstruction = testInstruction;
     }
 }
