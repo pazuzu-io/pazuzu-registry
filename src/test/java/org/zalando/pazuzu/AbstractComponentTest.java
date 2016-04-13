@@ -42,13 +42,13 @@ public abstract class AbstractComponentTest {
         return "http://127.0.0.1:" + port + path;
     }
 
-    protected ResponseEntity<FeatureFullDto> createFeature(String name, String dockerData, String... dependencies) throws JsonProcessingException {
-        final ResponseEntity<FeatureFullDto> response = createFeatureUnchecked(FeatureFullDto.class, name, dockerData, dependencies);
+    protected ResponseEntity<FeatureFullDto> createFeature(String name, String dockerData, String testInstruction, String... dependencies) throws JsonProcessingException {
+        final ResponseEntity<FeatureFullDto> response = createFeatureUnchecked(FeatureFullDto.class, name, dockerData, testInstruction, dependencies);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         return response;
     }
 
-    protected <T> ResponseEntity<T> createFeatureUnchecked(Class<T> clazz, String name, String dockerData, String... dependencies) throws JsonProcessingException {
+    protected <T> ResponseEntity<T> createFeatureUnchecked(Class<T> clazz, String name, String dockerData, String testInstruction, String... dependencies) throws JsonProcessingException {
         Map<String, Object> map = new HashMap<>();
         if (null != name) {
             map.put("name", name);
@@ -56,7 +56,11 @@ public abstract class AbstractComponentTest {
         if (null != dockerData) {
             map.put("docker_data", dockerData);
         }
+        if (null != testInstruction) {
+            map.put("test_instruction", testInstruction);
+        }
         map.put("dependencies", Arrays.asList(dependencies));
+
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
