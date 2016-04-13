@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; Pazuzu Registry 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pazuzu Registry 1.0 documentation" href="index.html" />
+    <link rel="next" title="API Reference" href="api.html" />
+    <link rel="prev" title="Pazuzu Registry Documentation" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-pazuzu">
+<h2>What is Pazuzu?<a class="headerlink" href="#what-is-pazuzu" title="Permalink to this headline">¶</a></h2>
+<p>Pazuzu is a tool that builds Docker images from feature snippets, while resolving all dependencies between them.
+One of the common use cases is Continuous Integration environment, where jobs require specific tooling present for building and testing. Pazuzu can significantly ease that process, by letting user choose from a wide selection of predefined Dockerfile snippets that represent those dependencies (e.g. Golang, Python, Android SDK, customized NPM installs).</p>
+</div>
+<div class="section" id="what-is-pazuzu-registry">
+<h2>What is Pazuzu Registry?<a class="headerlink" href="#what-is-pazuzu-registry" title="Permalink to this headline">¶</a></h2>
+<p>Pazuzu Registry is a central storage of features, together with their dependencies and test cases. You can access it by command line and request your custom Dockerfile which you can pipe to Docker build command.</p>
+</div>
+<div class="section" id="how-to-start-the-server-locally-without-oauth">
+<h2>How to start the server locally (without OAuth)<a class="headerlink" href="#how-to-start-the-server-locally-without-oauth" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mvn</span> <span class="n">clean</span> <span class="n">install</span>
+<span class="n">java</span> <span class="o">-</span><span class="n">jar</span> <span class="n">target</span><span class="o">/</span><span class="n">pazuzu</span><span class="o">-</span><span class="n">registry</span><span class="o">.</span><span class="n">jar</span> <span class="o">--</span><span class="n">spring</span><span class="o">.</span><span class="n">profiles</span><span class="o">.</span><span class="n">active</span><span class="o">=</span><span class="n">dev</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-to-build-docker-image-for-stups-infrastructure-zalando-related">
+<h2>How to build Docker image for Stups infrastructure (Zalando related)<a class="headerlink" href="#how-to-build-docker-image-for-stups-infrastructure-zalando-related" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">scm</span><span class="o">-</span><span class="n">source</span>
+<span class="n">docker</span> <span class="n">build</span> <span class="o">--</span><span class="n">tag</span> <span class="o">&lt;</span><span class="n">pierone_related_address</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#what-is-pazuzu">What is Pazuzu?</a></li>
+<li><a class="reference internal" href="#what-is-pazuzu-registry">What is Pazuzu Registry?</a></li>
+<li><a class="reference internal" href="#how-to-start-the-server-locally-without-oauth">How to start the server locally (without OAuth)</a></li>
+<li><a class="reference internal" href="#how-to-build-docker-image-for-stups-infrastructure-zalando-related">How to build Docker image for Stups infrastructure (Zalando related)</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Pazuzu Registry Documentation</a></li>
+      <li>Next: <a href="api.html" title="next chapter">API Reference</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/intro.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Elena Kovalenko.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/intro.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
