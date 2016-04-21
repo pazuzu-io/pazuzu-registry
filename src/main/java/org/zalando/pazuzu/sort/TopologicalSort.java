@@ -30,7 +30,6 @@ public class TopologicalSort {
      * @return Topologically sorted list
      * @throws IllegalStateException in case of recursive dependencies
      */
-    @SuppressWarnings("unused")
     public static <T> List<T> sort(Collection<T> items, BiFunction<T, T, Boolean> containsFunc) {
         final List<Node<T>> nodes = items.stream().map(Node::new).collect(Collectors.toList());
         for (int i = 0; i < nodes.size(); ++i) {

@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.zalando.pazuzu.docker.DockerfileUtil;
 import org.zalando.pazuzu.exception.BadRequestException;
 import org.zalando.pazuzu.exception.Error;
 import org.zalando.pazuzu.exception.NotFoundException;
@@ -13,8 +12,9 @@ import org.zalando.pazuzu.feature.Feature;
 import org.zalando.pazuzu.feature.FeatureRepository;
 import org.zalando.pazuzu.feature.FeatureService;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -83,9 +83,13 @@ public class ContainerService {
 
     @Transactional(rollbackFor = ServiceException.class)
     public Container getContainer(String containerName) throws ServiceException {
-        final Container container = containerRepository.findByName(containerName);
+        Container container = containerRepository.findByName(containerName);
         if (null == container) {
             throw new NotFoundException(Error.CONTAINER_NOT_FOUND);
+        }
+        List<Feature> sortedFeatures = featureService.getSortedFeatures(container.getFeatures());
+        if(null != sortedFeatures) {
+            container.setFeatures(new HashSet<>(sortedFeatures));
         }
         return container;
     }
@@ -120,11 +124,5 @@ public class ContainerService {
         }
         container.getFeatures().remove(toDelete);
         containerRepository.save(container);
-    }
-
-    @Transactional(rollbackFor = ServiceException.class)
-    public String generateDockerfile(String containerName) throws ServiceException {
-        Container container = getContainer(containerName);
-        return DockerfileUtil.generateDockerfile(Optional.of(container.getName()), container.getFeatures());
     }
 }

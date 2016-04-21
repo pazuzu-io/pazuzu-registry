@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.zalando.pazuzu.exception.ServiceException;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @CrossOrigin
 @RestController
@@ -56,5 +57,12 @@ public class FeaturesResource {
     public ResponseEntity<Void> deleteFeature(@PathVariable String featureName) throws ServiceException {
         featureService.deleteFeature(featureName);
         return ResponseEntity.noContent().build();
+    }
+
+    @RequestMapping(value = "sorted", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<FeatureDto> getSortedFeatures(@RequestParam("name") String[] featureNames) throws ServiceException {
+        Set<Feature> featureSet = featureService.loadFeatures(Arrays.stream(featureNames).collect(Collectors.toList()));
+        List<Feature> features = featureService.getSortedFeatures(featureSet);
+        return features.stream().map(FeatureDto::ofShort).collect(Collectors.toList());
     }
 }
