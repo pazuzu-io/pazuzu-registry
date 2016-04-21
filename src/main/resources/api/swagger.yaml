@@ -336,6 +336,9 @@ definitions:
       docker_data:
         type: string
         description: Docker file part to be used with that feature.
+      test_instruction:
+        type: string
+        description: how to test that feature is working
   FeatureToCreate:
     type: object
     properties:
@@ -345,6 +348,9 @@ definitions:
       docker_data:
         type: string
         description: Docker file part to be used with that feature.
+      test_instruction:
+        type: string
+        description: how to test that feature is working
       dependencies:
         type: array
         items: 
@@ -364,6 +370,9 @@ definitions:
       docker_data:
         type: string
         description: Docker file part to be used with that feature.
+      test_instruction:
+        type: string
+        description: how to test that feature is working
       dependencies:
         type: array
         items:
