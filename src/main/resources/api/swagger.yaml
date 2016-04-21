@@ -113,6 +113,30 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /api/features/sorted:
+    get:
+      summary: Get sorted feature elements by name
+        description: |
+          Returns sorted features by name.
+        parameters:
+          - name: name
+            in: query
+            description: feature names
+            required: false
+            type: array
+        tags:
+           - Features
+        responses:
+          200:
+            description: An array of sorted features
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/Feature'
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
   /api/containers:
     get:
       summary: List of containers
@@ -281,51 +305,6 @@ paths:
           description: Unexpected exception
           schema:
             $ref: '#/definitions/Error'
-  /api/dockerfile:
-    get:
-      summary: Generates docker file
-      description: Generates docker file using features from request
-      tags:
-        - Dockerfile
-      parameters:
-        - name: features
-          required: true
-          in: query
-          type: string
-          description: |
-            Features to include in resulting docker file. To include several features just pass list
-            of features separated by comma
-      responses:
-        200:
-          description: String with docker file
-          schema:
-            type: string
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /api/containers/{id}/dockerfile:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        type: string
-        description: id of container to generate docker file for.
-    get:
-      summary: Generates docker file
-      description: Generates docker file using stored container information
-      tags:
-        - Dockerfile
-        - Containers
-      responses:
-        200:
-          description: String with docker file
-          schema:
-            type: string
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
 definitions:
   Feature:
     type: object
@@ -411,4 +390,3 @@ definitions:
         type: string
       detailed_message:
         type: string
-        
