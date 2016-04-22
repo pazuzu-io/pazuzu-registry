@@ -4,4 +4,4 @@ COPY ./target/pazuzu-registry.jar /usr/pazuzu
 COPY scm-source.json /
 WORKDIR /usr/pazuzu
 EXPOSE 8080
-CMD ["java", "-jar", "pazuzu-registry.jar", "--spring.profiles.active=dev"]
+CMD ["java", "-jar", "pazuzu-registry.jar"]
