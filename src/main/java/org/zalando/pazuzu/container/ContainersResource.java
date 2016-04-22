@@ -76,9 +76,4 @@ public class ContainersResource {
         containerService.deleteFeature(containerName, featureName);
         return ResponseEntity.noContent().build();
     }
-
-    @RequestMapping(value = "/{containerName}/dockerfile", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
-    public String getDockerFile(@PathVariable String containerName) throws ServiceException {
-        return containerService.generateDockerfile(containerName);
-    }
 }

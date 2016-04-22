@@ -20,7 +20,14 @@ paths:
           in: query
           description: value, that must present in feature name.
           required: false
-          type: string
+          type: array
+          items:
+            type: string
+        - name: sorted
+          in: query
+          description: flag to indicate if output should be sorted
+          required: false
+          type: integer
       tags:
         - Features
       responses:
@@ -281,51 +288,6 @@ paths:
           description: Unexpected exception
           schema:
             $ref: '#/definitions/Error'
-  /api/dockerfile:
-    get:
-      summary: Generates docker file
-      description: Generates docker file using features from request
-      tags:
-        - Dockerfile
-      parameters:
-        - name: features
-          required: true
-          in: query
-          type: string
-          description: |
-            Features to include in resulting docker file. To include several features just pass list
-            of features separated by comma
-      responses:
-        200:
-          description: String with docker file
-          schema:
-            type: string
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /api/containers/{id}/dockerfile:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        type: string
-        description: id of container to generate docker file for.
-    get:
-      summary: Generates docker file
-      description: Generates docker file using stored container information
-      tags:
-        - Dockerfile
-        - Containers
-      responses:
-        200:
-          description: String with docker file
-          schema:
-            type: string
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
 definitions:
   Feature:
     type: object
@@ -411,4 +373,3 @@ definitions:
         type: string
       detailed_message:
         type: string
-        

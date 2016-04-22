@@ -6,16 +6,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.zalando.pazuzu.container.Container;
 import org.zalando.pazuzu.container.ContainerRepository;
-import org.zalando.pazuzu.docker.DockerfileUtil;
 import org.zalando.pazuzu.exception.BadRequestException;
 import org.zalando.pazuzu.exception.Error;
 import org.zalando.pazuzu.exception.NotFoundException;
 import org.zalando.pazuzu.exception.ServiceException;
+import org.zalando.pazuzu.sort.TopologicalSort;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -34,7 +31,7 @@ public class FeatureService {
 
     @Transactional
     public <T> List<T> listFeatures(String name, Function<Feature, T> converter) {
-        return featureRepository.findByNameIgnoreCaseContaining(name).stream().map(converter).collect(Collectors.toList());
+        return this.featureRepository.findByNameIgnoreCaseContaining(name).stream().map(converter).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = ServiceException.class)
@@ -110,11 +107,6 @@ public class FeatureService {
         featureRepository.delete(feature);
     }
 
-    @Transactional(rollbackFor = ServiceException.class)
-    public String generateDockerfile(List<String> features) throws ServiceException {
-        return DockerfileUtil.generateDockerfile(Optional.empty(), loadFeatures(features));
-    }
-
     public Set<Feature> loadFeatures(List<String> dependencyNames) throws ServiceException {
         final Set<String> uniqueDependencies = null == dependencyNames ? new HashSet<>() : new HashSet<>(dependencyNames);
         final Set<Feature> dependencies = uniqueDependencies.stream()
@@ -127,11 +119,22 @@ public class FeatureService {
         return dependencies;
     }
 
+    public List<Feature> getSortedFeatures(Collection<Feature> features) {
+        final Set<Feature> expandedList = new HashSet<>();
+        features.forEach(f -> collectRecursively(expandedList, f));
+        return TopologicalSort.sort(expandedList, (a, b) -> a.getDependencies().contains(b));
+    }
+
     private Feature loadExistingFeature(String name) throws NotFoundException {
         final Feature existing = featureRepository.findByName(name);
         if (null == existing) {
             throw new NotFoundException(Error.FEATURE_NOT_FOUND);
         }
         return existing;
+    }
+
+    private static void collectRecursively(Collection<Feature> result, Feature f) {
+        result.add(f);
+        f.getDependencies().forEach(item -> collectRecursively(result, item));
     }
 }

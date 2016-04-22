@@ -112,4 +112,14 @@ public class FeatureApiTest extends AbstractComponentTest {
         ResponseEntity<Void> response = template.exchange(url(featuresUrl + "/Feature"), HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
+
+    /*@Test
+    public void testGetSortedFeaturesSuccess() throws JsonProcessingException {
+        createFeature("test-feature-1", "docker-data-1", "test-instruction-1");
+        createFeature("test-feature-2", "docker-data-2", "test-instruction-2");
+        createFeature("test-feature-3", "docker-data-3", "test-instruction-3", "test-feature-2");
+
+        ResponseEntity<List> result = template.getForEntity(url("/api/features/sorted?name=test-feature-1,test-feature-3"), List.class);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }*/
 }
