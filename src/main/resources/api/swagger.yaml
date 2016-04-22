@@ -20,7 +20,14 @@ paths:
           in: query
           description: value, that must present in feature name.
           required: false
-          type: string
+          type: array
+          items:
+            type: string
+        - name: sorted
+          in: query
+          description: flag to indicate if output should be sorted
+          required: false
+          type: integer
       tags:
         - Features
       responses:
@@ -113,30 +120,6 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /api/features/sorted:
-    get:
-      summary: Get sorted feature elements by name
-        description: |
-          Returns sorted features by name.
-        parameters:
-          - name: name
-            in: query
-            description: feature names
-            required: false
-            type: array
-        tags:
-           - Features
-        responses:
-          200:
-            description: An array of sorted features
-            schema:
-              type: array
-              items:
-                $ref: '#/definitions/Feature'
-          default:
-            description: Unexpected error
-            schema:
-              $ref: '#/definitions/Error'
   /api/containers:
     get:
       summary: List of containers

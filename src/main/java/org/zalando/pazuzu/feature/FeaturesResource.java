@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/features")
 public class FeaturesResource {
 
+    private static final Integer TOPOLOGICAL_SORT = 1;
     private final FeatureService featureService;
 
     @Autowired
@@ -29,8 +30,19 @@ public class FeaturesResource {
     }
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<FeatureDto> listFeatures(@RequestParam(required = false, defaultValue = "") String name) {
-        return featureService.listFeatures(name, FeatureDto::ofShort);
+    public List<FeatureDto> listFeatures(
+            @RequestParam(required = false, name = "name") String[] featureNames,
+            @RequestParam(required = false, name = "sorted") Integer sorting)
+            throws ServiceException {
+        if (featureNames == null) {
+            return featureService.listFeatures("", FeatureDto::ofShort);
+        }
+        Set<Feature> featureSet = featureService.loadFeatures(Arrays.stream(featureNames).collect(Collectors.toList()));
+        if (sorting != null && sorting.equals(TOPOLOGICAL_SORT)) {
+            List<Feature> features = featureService.getSortedFeatures(featureSet);
+            return features.stream().map(FeatureDto::ofShort).collect(Collectors.toList());
+        }
+        return featureSet.stream().map(FeatureDto::ofShort).collect(Collectors.toList());
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -57,12 +69,5 @@ public class FeaturesResource {
     public ResponseEntity<Void> deleteFeature(@PathVariable String featureName) throws ServiceException {
         featureService.deleteFeature(featureName);
         return ResponseEntity.noContent().build();
-    }
-
-    @RequestMapping(value = "sorted", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<FeatureDto> getSortedFeatures(@RequestParam("name") String[] featureNames) throws ServiceException {
-        Set<Feature> featureSet = featureService.loadFeatures(Arrays.stream(featureNames).collect(Collectors.toList()));
-        List<Feature> features = featureService.getSortedFeatures(featureSet);
-        return features.stream().map(FeatureDto::ofShort).collect(Collectors.toList());
     }
 }
