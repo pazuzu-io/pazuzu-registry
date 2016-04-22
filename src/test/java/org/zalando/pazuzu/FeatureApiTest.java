@@ -9,10 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.zalando.pazuzu.exception.ErrorDto;
-import org.zalando.pazuzu.feature.FeatureDto;
 import org.zalando.pazuzu.feature.FeatureFullDto;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
