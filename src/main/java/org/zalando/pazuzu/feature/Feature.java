@@ -1,5 +1,8 @@
 package org.zalando.pazuzu.feature;
 
+import com.sun.xml.internal.ws.binding.FeatureListUtil;
+import org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -83,5 +86,20 @@ public class Feature {
 
     public void setTestInstruction(String testInstruction) {
         this.testInstruction = testInstruction;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.getId().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (this == obj) return true;
+        if (!(obj instanceof Feature)) return false;
+
+        Feature other = (Feature)obj;
+        return this.getId() == other.getId();
     }
 }
