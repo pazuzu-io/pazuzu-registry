@@ -123,7 +123,6 @@ public class FeatureService {
     public List<Feature> getSortedFeatures(Collection<Feature> features) {
         final Set<Feature> expandedList = new HashSet<>();
         features.forEach(f -> collectRecursively(expandedList, f));
-        //return TopologicalSort.sort(expandedList, (a, b) -> a.getDependencies().contains(b));
         return new TopologicalSortLinear<>(expandedList, Feature::getDependencies).getTopSorted();
     }
 

@@ -1,8 +1,5 @@
 package org.zalando.pazuzu.feature;
 
-import com.sun.xml.internal.ws.binding.FeatureListUtil;
-import org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;

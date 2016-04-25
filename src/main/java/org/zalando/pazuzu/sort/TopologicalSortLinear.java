@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.function.Function;
 
 /**
- * Created by dimangaliyev on 25/04/16.
  * Topological sort algorithm
  * Running time complexity O(n + m)
  * where n - number of vertices, m - number of edges
@@ -12,13 +11,13 @@ import java.util.function.Function;
 public class TopologicalSortLinear<T> {
 
     /**
-     * Color enum for vertex
+     * VisitState enum for vertex
      * WHITE - not visited
      * GREY - visited in process of traversal
      * BLACK - visited
      */
-    private enum Color {
-        WHITE, GREY, BLACK
+    private enum VisitState {
+        NOT_VISITED, BEING_VISITED, VISITED
     }
 
     // List of all vertices
@@ -28,7 +27,7 @@ public class TopologicalSortLinear<T> {
     private Function<T, Set<T>> getChildren;
 
     // Visited indicator for vertex
-    private Map<T, Color> color;
+    private Map<T, VisitState> color;
 
     // Parent of vertex
     // key - vertex, value - parent of vertex
@@ -40,31 +39,11 @@ public class TopologicalSortLinear<T> {
 
         this.color = new HashMap<>(vertices.size());
         // mark all vertices as not visited
-        for(T v : vertices) color.put(v, Color.WHITE);
+        for(T v : vertices) {
+            color.put(v, VisitState.NOT_VISITED);
+        }
 
         this.parent = new HashMap<>();
-    }
-
-    /**
-     * @return List of all vertices
-     */
-    private Collection<T> getVertices() {
-        return this.vertices;
-    }
-
-    /**
-     * @return Color of v
-     */
-    private Color getColor(T v) {
-        return color.get(v);
-    }
-
-    /**
-     * @param v Vertex to be colored
-     * @param clr Color of vertex v
-     */
-    private void setColor(T v, Color clr) {
-        color.put(v, clr);
     }
 
     /**
@@ -75,8 +54,8 @@ public class TopologicalSortLinear<T> {
         List<T> topSort = new LinkedList<>();
 
         getVertices().forEach(v -> {
-            Color clr = getColor(v);
-            if (clr.equals(Color.WHITE)) {
+            VisitState clr = getColor(v);
+            if (clr.equals(VisitState.NOT_VISITED)) {
                 dfs(v, null, topSort);
             }
         });
@@ -95,18 +74,18 @@ public class TopologicalSortLinear<T> {
         if (parent != null) {
             parent.put(v, ancestor);
         }
-        setColor(v, Color.GREY);
+        setColor(v, VisitState.BEING_VISITED);
 
         getChildren.apply(v).forEach(child -> {
-            Color clr = getColor(child);
-            if (clr.equals(Color.WHITE)) {
+            VisitState clr = getColor(child);
+            if (clr.equals(VisitState.NOT_VISITED)) {
                 dfs(child, v, topSort);
-            } else if (clr.equals(Color.GREY)) {
+            } else if (clr.equals(VisitState.BEING_VISITED)) {
                 throw new IllegalStateException("Cycle found in dependencies! " + getCycle(v));
             }
         });
 
-        setColor(v, Color.BLACK);
+        setColor(v, VisitState.VISITED);
         topSort.add(v);
     }
 
@@ -125,5 +104,27 @@ public class TopologicalSortLinear<T> {
             }
         }
         return cycle;
+    }
+
+    /**
+     * @return List of all vertices
+     */
+    private Collection<T> getVertices() {
+        return this.vertices;
+    }
+
+    /**
+     * @return VisitState of v
+     */
+    private VisitState getColor(T v) {
+        return color.get(v);
+    }
+
+    /**
+     * @param v Vertex to be colored
+     * @param clr VisitState of vertex v
+     */
+    private void setColor(T v, VisitState clr) {
+        color.put(v, clr);
     }
 }

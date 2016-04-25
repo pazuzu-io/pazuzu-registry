@@ -5,9 +5,6 @@ import java.util.*;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
-/**
- * Created by dimangaliyev on 25/04/16.
- */
 public class TopologicalSortLinearTest {
 
     // Initialize vertices
@@ -117,7 +114,7 @@ public class TopologicalSortLinearTest {
         TopologicalSortLinear<Integer> sorted = new TopologicalSortLinear<>(vertices, (v) -> graph[v]);
         try {
             sorted.getTopSorted();
-        }catch (IllegalStateException e) {
+        } catch (IllegalStateException e) {
             assertEquals(e.getMessage(), "Cycle found in dependencies! " + cycle);
         }
     }
