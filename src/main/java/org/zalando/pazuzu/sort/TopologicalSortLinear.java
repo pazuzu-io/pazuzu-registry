@@ -95,12 +95,13 @@ public class TopologicalSortLinear<T> {
      */
     private List<T> getCycle(T v) {
         List<T> cycle = new LinkedList<>();
-        while(v != null) {
-            cycle.add(v);
-            if (parent.containsKey(v)) {
-                v = parent.get(v);
+        T current = v;
+        while(current != null) {
+            cycle.add(current);
+            if (parent.containsKey(current)) {
+                current = parent.get(current);
             } else {
-                v = null;
+                current = null;
             }
         }
         return cycle;
