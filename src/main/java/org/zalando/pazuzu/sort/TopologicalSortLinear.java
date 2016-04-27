@@ -26,8 +26,8 @@ public class TopologicalSortLinear<T> {
     // Function for returning all children of vertex
     private Function<T, Set<T>> getChildren;
 
-    // Visited indicator for vertex
-    private Map<T, VisitState> color;
+    // Visit state indicator for vertex
+    private Map<T, VisitState> vertexState;
 
     // Parent of vertex
     // key - vertex, value - parent of vertex
@@ -37,10 +37,10 @@ public class TopologicalSortLinear<T> {
         this.vertices = vertices;
         this.getChildren = getChildren;
 
-        this.color = new HashMap<>(vertices.size());
+        this.vertexState = new HashMap<>(vertices.size());
         // mark all vertices as not visited
-        for(T v : vertices) {
-            color.put(v, VisitState.NOT_VISITED);
+        for (T v : vertices) {
+            vertexState.put(v, VisitState.NOT_VISITED);
         }
 
         this.parent = new HashMap<>();
@@ -54,7 +54,7 @@ public class TopologicalSortLinear<T> {
         List<T> topSort = new LinkedList<>();
 
         getVertices().forEach(v -> {
-            VisitState clr = getColor(v);
+            VisitState clr = getVisitState(v);
             if (clr.equals(VisitState.NOT_VISITED)) {
                 dfs(v, null, topSort);
             }
@@ -74,10 +74,10 @@ public class TopologicalSortLinear<T> {
         if (parent != null) {
             parent.put(v, ancestor);
         }
-        setColor(v, VisitState.BEING_VISITED);
+        setVisitState(v, VisitState.BEING_VISITED);
 
         getChildren.apply(v).forEach(child -> {
-            VisitState clr = getColor(child);
+            VisitState clr = getVisitState(child);
             if (clr.equals(VisitState.NOT_VISITED)) {
                 dfs(child, v, topSort);
             } else if (clr.equals(VisitState.BEING_VISITED)) {
@@ -85,7 +85,7 @@ public class TopologicalSortLinear<T> {
             }
         });
 
-        setColor(v, VisitState.VISITED);
+        setVisitState(v, VisitState.VISITED);
         topSort.add(v);
     }
 
@@ -117,15 +117,15 @@ public class TopologicalSortLinear<T> {
     /**
      * @return VisitState of v
      */
-    private VisitState getColor(T v) {
-        return color.get(v);
+    private VisitState getVisitState(T v) {
+        return vertexState.get(v);
     }
 
     /**
      * @param v Vertex to be colored
      * @param clr VisitState of vertex v
      */
-    private void setColor(T v, VisitState clr) {
-        color.put(v, clr);
+    private void setVisitState(T v, VisitState clr) {
+        vertexState.put(v, clr);
     }
 }
