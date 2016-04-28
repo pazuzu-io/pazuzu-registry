@@ -33,6 +33,12 @@ mvn clean install
 java -jar target/pazuzu-registry.jar --spring.profiles.active=dev
 ```
 
+How a start the server locally in a container with Postgres storage
+-----------------------------------------------------------
+```
+docker-compose up -d
+```
+
 How to build Docker image for Stups infrastructure (Zalando related)
 --------------------------------------------------------------------
 ```bash
