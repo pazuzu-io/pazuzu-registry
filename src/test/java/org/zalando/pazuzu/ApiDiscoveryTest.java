@@ -10,10 +10,8 @@ public class ApiDiscoveryTest extends AbstractComponentTest {
 
     @Test
     public void swaggerApiDesciptionShouldBeAccessible() {
-        ResponseEntity<String> response = template.getForEntity(url("/api/swagger.yaml"), String.class);
+        ResponseEntity<String> response = template.getForEntity(url("/api"), String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getHeaders().getContentType().getType()).isEqualTo("text");
-        assertThat(response.getHeaders().getContentType().getSubtype()).isEqualTo("x-yaml");
-        assertThat(response.getBody()).contains("/api/features:");
+        assertThat(response.getBody()).contains("/api/features");
     }
 }

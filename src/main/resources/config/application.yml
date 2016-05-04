@@ -7,6 +7,10 @@ tokens:
      scopes:
       - uid
 
+twintip:
+  mapping: /api
+  yaml: classpath:/api/swagger.yaml
+
 spring:
   profiles:
     active: production

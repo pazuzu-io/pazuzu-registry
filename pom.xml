@@ -110,6 +110,16 @@
             <artifactId>spring-social-zauth</artifactId>
             <version>0.10.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.zalando</groupId>
+            <artifactId>twintip-spring-web</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.4-1206-jdbc42</version>
+        </dependency>
 
 
         <dependency>
@@ -123,11 +133,6 @@
             <artifactId>assertj-core</artifactId>
             <version>3.3.0</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>9.4-1206-jdbc42</version>
         </dependency>
     </dependencies>
 
