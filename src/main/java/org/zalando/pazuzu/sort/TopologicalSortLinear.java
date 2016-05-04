@@ -1,26 +1,20 @@
 package org.zalando.pazuzu.sort;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
-/**
- * Topological sort algorithm
- * Running time complexity O(n + m)
- * where n - number of vertices, m - number of edges
- */
 public class TopologicalSortLinear<T> {
 
-    /**
-     * VisitState enum for vertex
-     * WHITE - not visited
-     * GREY - visited in process of traversal
-     * BLACK - visited
-     */
     private enum VisitState {
         NOT_VISITED, BEING_VISITED, VISITED
     }
 
-    // List of all vertices
     private Collection<T> vertices;
 
     // Function for returning all children of vertex
@@ -56,7 +50,7 @@ public class TopologicalSortLinear<T> {
         getVertices().forEach(v -> {
             VisitState clr = getVisitState(v);
             if (clr.equals(VisitState.NOT_VISITED)) {
-                dfs(v, null, topSort);
+                depthFirstSearch(v, null, topSort);
             }
         });
 
@@ -66,11 +60,12 @@ public class TopologicalSortLinear<T> {
 
     /**
      * Depth first search algorithm
-     * @param v Current vertex in graph traversal
+     *
+     * @param v        Current vertex in graph traversal
      * @param ancestor Parent of v (null if v is root)
-     * @param topSort Topologically sorted vertices so far
+     * @param topSort  Topologically sorted vertices so far
      */
-    private void dfs(T v, T ancestor, List<T> topSort) {
+    private void depthFirstSearch(T v, T ancestor, List<T> topSort) {
         if (parent != null) {
             parent.put(v, ancestor);
         }
@@ -79,7 +74,7 @@ public class TopologicalSortLinear<T> {
         getChildren.apply(v).forEach(child -> {
             VisitState clr = getVisitState(child);
             if (clr.equals(VisitState.NOT_VISITED)) {
-                dfs(child, v, topSort);
+                depthFirstSearch(child, v, topSort);
             } else if (clr.equals(VisitState.BEING_VISITED)) {
                 throw new IllegalStateException("Cycle found in dependencies! " + getCycle(v));
             }
@@ -96,7 +91,7 @@ public class TopologicalSortLinear<T> {
     private List<T> getCycle(T v) {
         List<T> cycle = new LinkedList<>();
         T current = v;
-        while(current != null) {
+        while (current != null) {
             cycle.add(current);
             if (parent.containsKey(current)) {
                 current = parent.get(current);
@@ -107,24 +102,14 @@ public class TopologicalSortLinear<T> {
         return cycle;
     }
 
-    /**
-     * @return List of all vertices
-     */
     private Collection<T> getVertices() {
         return this.vertices;
     }
 
-    /**
-     * @return VisitState of v
-     */
     private VisitState getVisitState(T v) {
         return vertexState.get(v);
     }
 
-    /**
-     * @param v Vertex to be colored
-     * @param clr VisitState of vertex v
-     */
     private void setVisitState(T v, VisitState clr) {
         vertexState.put(v, clr);
     }

@@ -10,10 +10,12 @@ import org.zalando.pazuzu.exception.BadRequestException;
 import org.zalando.pazuzu.exception.Error;
 import org.zalando.pazuzu.exception.NotFoundException;
 import org.zalando.pazuzu.exception.ServiceException;
-import org.zalando.pazuzu.sort.TopologicalSort;
 import org.zalando.pazuzu.sort.TopologicalSortLinear;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -76,7 +78,7 @@ public class FeatureService {
             final List<Feature> recursive = dependencies.stream()
                     .filter(f -> f.containsDependencyRecursively(existing)).collect(Collectors.toList());
             if (!recursive.isEmpty()) {
-                throw new BadRequestException(Error.FEATURE_HAS_RECURSIVE_DEPENDENCY,  "Recursive dependencies found: " + recursive.stream().map(Feature::getName).collect(Collectors.joining(", ")));
+                throw new BadRequestException(Error.FEATURE_HAS_RECURSIVE_DEPENDENCY, "Recursive dependencies found: " + recursive.stream().map(Feature::getName).collect(Collectors.joining(", ")));
             }
             existing.setDependencies(dependencies);
         }
