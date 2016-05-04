@@ -84,4 +84,19 @@ public class Feature {
     public void setTestInstruction(String testInstruction) {
         this.testInstruction = testInstruction;
     }
+
+    @Override
+    public int hashCode() {
+        return this.getId().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (this == obj) return true;
+        if (!(obj instanceof Feature)) return false;
+
+        Feature other = (Feature)obj;
+        return this.getId() == other.getId();
+    }
 }

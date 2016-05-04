@@ -11,6 +11,7 @@ import org.zalando.pazuzu.exception.Error;
 import org.zalando.pazuzu.exception.NotFoundException;
 import org.zalando.pazuzu.exception.ServiceException;
 import org.zalando.pazuzu.sort.TopologicalSort;
+import org.zalando.pazuzu.sort.TopologicalSortLinear;
 
 import java.util.*;
 import java.util.function.Function;
@@ -122,7 +123,7 @@ public class FeatureService {
     public List<Feature> getSortedFeatures(Collection<Feature> features) {
         final Set<Feature> expandedList = new HashSet<>();
         features.forEach(f -> collectRecursively(expandedList, f));
-        return TopologicalSort.sort(expandedList, (a, b) -> a.getDependencies().contains(b));
+        return new TopologicalSortLinear<>(expandedList, Feature::getDependencies).getTopSorted();
     }
 
     private Feature loadExistingFeature(String name) throws NotFoundException {
