@@ -17,9 +17,11 @@ security:
     enabled: false
 
 spring:
+  profiles:
+    active: dev
   datasource:
-    url: jdbc:hsqldb:mem:pazuzudb;sql.syntax_pgs=true
-    username: sa
+    url: jdbc:postgresql://postgres-db:5432/postgres
+    username: postgres
     password:
   jpa:
     hibernate:
