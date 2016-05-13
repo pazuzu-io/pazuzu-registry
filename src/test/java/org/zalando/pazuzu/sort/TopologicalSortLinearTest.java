@@ -33,7 +33,7 @@ public class TopologicalSortLinearTest {
         TopologicalSortLinear<Integer> sorted = new TopologicalSortLinear<>(vertices, (v) -> graph[v]);
         List<Integer> actual = sorted.getTopSorted();
 
-        List<Integer> expected = Arrays.asList(0, 1, 2, 3, 4);
+        List<Integer> expected = Arrays.asList(4, 3, 2, 1, 0);
         assertThat(actual, is(expected));
     }
 
@@ -64,7 +64,7 @@ public class TopologicalSortLinearTest {
         TopologicalSortLinear<Integer> sorted = new TopologicalSortLinear<>(vertices, (v) -> graph[v]);
         List<Integer> actual = sorted.getTopSorted();
         // Both [1, 3, 2, 4, 0], [1, 3, 2, 0, 4] are valid
-        List<Integer> expected = Arrays.asList(1, 3, 2, 4, 0);
+        List<Integer> expected = Arrays.asList(0, 4, 2, 3, 1);
         assertThat(actual, is(expected));
     }
 

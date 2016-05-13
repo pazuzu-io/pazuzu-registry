@@ -54,7 +54,6 @@ public class TopologicalSortLinear<T> {
             }
         });
 
-        Collections.reverse(topSort);
         return topSort;
     }
 
