@@ -2,13 +2,9 @@ package org.zalando.pazuzu;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.zalando.pazuzu.exception.ErrorDto;
+import org.zalando.pazuzu.feature.FeatureDto;
 import org.zalando.pazuzu.feature.FeatureFullDto;
 
 import java.util.List;
@@ -99,6 +95,31 @@ public class FeatureApiTest extends AbstractComponentTest {
     }
 
     @Test
+    public void updateFeature() throws JsonProcessingException {
+        createFeature("Feature1", "dockerData Feature1", "testInstruction Feature1");
+        createFeature("Feature2", "dockerData Feature2", "testInstruction Feature2");
+        createFeature("Feature3", null, null);
+
+        final Map<String, Object> updateRequest = getFeaturePropertiesMap(null, "dockerData Feature3", "testInstruction Feature3", "Feature1", "Feature2");
+        ResponseEntity<FeatureFullDto> putResponse = template.exchange(url(featuresUrl + "/Feature3"), HttpMethod.PUT,
+                new HttpEntity<>(mapper.writeValueAsString(updateRequest), contentType(MediaType.APPLICATION_JSON)), FeatureFullDto.class);
+        assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        FeatureFullDto expectedResponse = new FeatureFullDto();
+        expectedResponse.setDockerData("dockerData Feature3");
+        expectedResponse.setTestInstruction("testInstruction Feature3");
+        expectedResponse.setName("Feature3");
+        expectedResponse.getDependencies().add(FeatureDto.populate("Feature1", "dockerData Feature1", "testInstruction Feature1"));
+        expectedResponse.getDependencies().add(FeatureDto.populate("Feature2", "dockerData Feature2", "testInstruction Feature2"));
+
+        assertThat(putResponse.getBody()).isEqualToComparingFieldByField(expectedResponse);
+
+        ResponseEntity<FeatureFullDto> getResponse = template.getForEntity(url(featuresUrl + "/Feature3"), FeatureFullDto.class);
+        assertThat(getResponse.getBody()).isEqualToComparingFieldByField(expectedResponse);
+
+    }
+
+    @Test
     public void notFoundWhenDeletingNotExistingFeature() throws JsonProcessingException {
         ResponseEntity<Void> response = template.exchange(url(featuresUrl + "/NotExistingFeature"), HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -113,13 +134,14 @@ public class FeatureApiTest extends AbstractComponentTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
-    /*@Test
+    @Test
     public void testGetSortedFeaturesSuccess() throws JsonProcessingException {
         createFeature("test-feature-1", "docker-data-1", "test-instruction-1");
         createFeature("test-feature-2", "docker-data-2", "test-instruction-2");
         createFeature("test-feature-3", "docker-data-3", "test-instruction-3", "test-feature-2");
 
-        ResponseEntity<List> result = template.getForEntity(url("/api/features/sorted?name=test-feature-1,test-feature-3"), List.class);
+        ResponseEntity<List> result = template.getForEntity(url(featuresUrl), List.class, "sorted", 1, "name", "test-feature-1,test-feature2");
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }*/
+        assertThat(result.getBody()).hasSize(3);
+    }
 }
