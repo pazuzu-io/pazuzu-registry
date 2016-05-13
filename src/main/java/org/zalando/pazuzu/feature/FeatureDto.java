@@ -48,7 +48,7 @@ public class FeatureDto {
     protected static void fillShort(Feature feature, FeatureDto result) {
         result.name = feature.getName();
         result.dockerData = feature.getDockerData();
-        result.testInstruction =  feature.getTestInstruction();
+        result.testInstruction = feature.getTestInstruction();
     }
 
     public String getTestInstruction() {
@@ -61,8 +61,12 @@ public class FeatureDto {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         FeatureDto that = (FeatureDto) o;
         return Objects.equals(name, that.name) &&
                 Objects.equals(dockerData, that.dockerData) &&
