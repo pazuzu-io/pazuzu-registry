@@ -91,3 +91,6 @@ scm-source.json
 
 node/
 src/main/resources/static/built
+
+# OS X
+*.DS_Store

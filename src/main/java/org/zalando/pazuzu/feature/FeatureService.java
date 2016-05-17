@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.zalando.pazuzu.container.Container;
-import org.zalando.pazuzu.container.ContainerRepository;
 import org.zalando.pazuzu.exception.BadRequestException;
 import org.zalando.pazuzu.exception.Error;
 import org.zalando.pazuzu.exception.NotFoundException;
@@ -23,13 +21,10 @@ import java.util.stream.Collectors;
 public class FeatureService {
 
     private final FeatureRepository featureRepository;
-    private final ContainerRepository containerRepository;
 
     @Autowired
-    public FeatureService(FeatureRepository featureRepository,
-                          ContainerRepository containerRepository) {
+    public FeatureService(FeatureRepository featureRepository) {
         this.featureRepository = featureRepository;
-        this.containerRepository = containerRepository;
     }
 
     @Transactional
@@ -101,11 +96,6 @@ public class FeatureService {
         if (!referencing.isEmpty()) {
             throw new BadRequestException(Error.FEATURE_NOT_DELETABLE_DUE_TO_REFERENCES,
                     "Can't delete feature because it is referenced from other feature(s): " + referencing.stream().map(Feature::getName).collect(Collectors.joining(", ")));
-        }
-        final List<Container> referencingContainers = containerRepository.findByFeaturesContaining(feature);
-        if (!referencingContainers.isEmpty()) {
-            throw new BadRequestException(Error.FEATURE_NOT_DELETABLE_DUE_TO_REFERENCES,
-                    "Can't delete feature because it is referenced from other container(s): " + referencingContainers.stream().map(Container::getName).collect(Collectors.joining(", ")));
         }
         featureRepository.delete(feature);
     }

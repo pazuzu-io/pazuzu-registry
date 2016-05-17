@@ -14,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.zalando.pazuzu.container.ContainerFullDto;
 import org.zalando.pazuzu.feature.FeatureFullDto;
 
 import java.util.Arrays;
@@ -33,7 +32,6 @@ public abstract class AbstractComponentTest {
     private int port;
 
     protected final String featuresUrl = "/api/features";
-    protected final String containersUrl = "/api/containers";
 
     protected final TestRestTemplate template = new TestRestTemplate();
     protected final ObjectMapper mapper = new ObjectMapper();
@@ -61,29 +59,9 @@ public abstract class AbstractComponentTest {
         }
         map.put("dependencies", Arrays.asList(dependencies));
 
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         return template.postForEntity(url(featuresUrl), new HttpEntity<>(mapper.writeValueAsString(map), headers), clazz);
-    }
-
-    protected ResponseEntity<ContainerFullDto> createContainer(String name, String... features) throws JsonProcessingException {
-        final ResponseEntity<ContainerFullDto> response = createContainerUnchecked(ContainerFullDto.class, name, features);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        return response;
-    }
-
-    protected <T> ResponseEntity<T> createContainerUnchecked(Class<T> clazz, String name, String... features) throws JsonProcessingException {
-        Map<String, Object> map = new HashMap<>();
-        if (null != name) {
-            map.put("name", name);
-        }
-        map.put("features", features);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        return template.postForEntity(url(containersUrl), new HttpEntity<>(mapper.writeValueAsString(map), headers), clazz);
     }
 }
