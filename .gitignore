@@ -81,16 +81,9 @@ local.properties
 # sbteclipse plugin
 .target
 
-#npm dependencies
-src/main/resources/static/node_modules/
-*/built
-
 # STS (Spring Tool Suite)
 .springBeans
 scm-source.json
-
-node/
-src/main/resources/static/built
 
 # OS X
 *.DS_Store
