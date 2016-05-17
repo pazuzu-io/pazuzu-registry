@@ -107,7 +107,7 @@ public class FeatureApiTest extends AbstractComponentTest {
     @Test
     public void badRequestWhenDeletingStillReferencedFeature() throws JsonProcessingException {
         createFeature("Feature", "some data", "something to test2");
-        createContainer("Container", "Feature");
+        createFeature("FeatureWithDependency", "some data", "something to test2", "Feature");
 
         ResponseEntity<Void> response = template.exchange(url(featuresUrl + "/Feature"), HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
