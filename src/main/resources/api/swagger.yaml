@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   title: Pazuzu registry
   description: Generating Dockerfiles by sets of required functions
-  version: "0.0.2"
+  version: "0.0.3"
 host: pazuzu.zalando.net
 schemes:
   - http
@@ -120,174 +120,6 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /api/containers:
-    get:
-      summary: List of containers
-      description: List all the containers present in the registry
-      parameters:
-        - name: name
-          description: filter for container name (container name must contain this parameter)
-          required: false
-          type: string
-          in: query
-      tags: 
-        - Containers
-      responses:
-        200:
-          description: An array of containers
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Container'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-    post:
-      summary: Create new container 
-      description: Creates new container with name and features
-      parameters:
-        - name: container
-          required: true
-          in: body
-          schema:
-            $ref: '#/definitions/ContainerToCreate'
-          description: Container information
-      tags:
-        - Containers
-      responses:
-        201:
-          description: Newly created container information
-          schema:
-            $ref: "#/definitions/ContainerFull"
-        default:
-          description: Unexpected error
-          schema:
-            $ref: "#/definitions/Error"
-  /api/containers/{id}:
-    parameters:
-      - name: id
-        required: true
-        type: string
-        in: path
-        description: Container name
-    get:
-      tags:
-        - Containers
-      summary: Get container information
-      description: Get container information
-      responses:
-        200:
-          description: Container information
-          schema:
-            $ref: "#/definitions/ContainerFull"
-        default:
-          description: Unexpected exception
-          schema:
-            $ref: '#/definitions/Error'
-    put:
-      tags:
-        - Containers
-      summary: Update container information
-      description: Updates container information.
-      parameters:
-        - name: container
-          required: true
-          in: body
-          schema:
-            $ref: '#/definitions/ContainerToCreate'
-          description: Container information
-      responses:
-        200:
-          description: Container successfully updated
-          schema:
-            $ref: '#/definitions/ContainerFull'
-        default:
-          description: Unexpected error
-          schema: 
-            $ref: '#/definitions/Error'
-
-    delete:
-      tags:
-        - Containers
-      summary: Delete container
-      description: Deletes container
-      responses:
-        204:
-          description: Successfully deleted container
-        default:
-          description: Unexpected exception
-          schema:
-            $ref: '#/definitions/Error'
-  /api/containers/{id}/features:
-    parameters:
-      - name: id
-        required: true
-        type: string
-        in: path
-        description: container name
-    get:
-      tags:
-        - Containers
-      summary: get features in container
-      description: get fetures in container
-      responses:
-        200:
-          description: OK
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Feature'
-        default:
-          description: Unexpected exception
-          schema:
-            $ref: '#/definitions/Error'
-    post:
-      summary: Add feature to container
-      tags:
-        - Containers
-      description: Add existing feature to container. Warning REST problem inside.
-      parameters:
-        - name: feature
-          schema:
-            $ref: '#/definitions/FeatureToAdd'
-          in: body
-          required: true
-      responses:
-        200:
-          description: Feature was added to container
-          schema:
-            $ref: '#/definitions/ContainerFull'
-        default:
-          description: Unexpected exception
-          schema:
-            $ref: '#/definitions/Error'
-  /api/containers/{container_id}/features/{feature}:
-    parameters:
-      - name: container_id
-        required: true
-        type: string
-        in: path
-        description: container name
-      - name: feature
-        required: true
-        type: string
-        in: path
-        description: feature name
-    delete:
-      summary: Delete feature from container 
-      description: |
-        Delete specified feature from container. Feature is not deleted by itself, instead only reference 
-        to that feature is removed
-      tags:
-        - Containers
-      responses:
-        204:
-          description: Features successfully deleted from container
-        default:
-          description: Unexpected exception
-          schema:
-            $ref: '#/definitions/Error'
 definitions:
   Feature:
     type: object
@@ -317,12 +149,6 @@ definitions:
         type: array
         items: 
           type: string
-  FeatureToAdd:
-    type: object
-    properties:
-      name:
-        type: string
-        description: Feature name
   FeatureFull:
     type: object
     properties:
@@ -340,30 +166,6 @@ definitions:
         items:
           $ref: '#/definitions/Feature'
         description: List of dependencies for this feature
-  Container:
-    type: object
-    properties:
-      name: 
-        type: string
-        description: Name of container
-  ContainerToCreate:
-    type: object
-    properties:
-      name: 
-        type: string
-        description: Name of container
-      features:
-        type: array
-        items:
-          type: string
-  ContainerFull:
-    type: object
-    properties:
-      name: 
-        type: string
-        description: Name of container
-      features:
-        $ref: '#/definitions/Feature'
   Error:
     type: object
     properties:
