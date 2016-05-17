@@ -47,6 +47,19 @@ public abstract class AbstractComponentTest {
     }
 
     protected <T> ResponseEntity<T> createFeatureUnchecked(Class<T> clazz, String name, String dockerData, String testInstruction, String... dependencies) throws JsonProcessingException {
+        Map<String, Object> map = getFeaturePropertiesMap(name, dockerData, testInstruction, dependencies);
+
+        return template.postForEntity(url(featuresUrl), new HttpEntity<>(mapper.writeValueAsString(map),
+                contentType(MediaType.APPLICATION_JSON)), clazz);
+    }
+
+    protected HttpHeaders contentType(MediaType contentType) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(contentType);
+        return headers;
+    }
+
+    protected Map<String, Object> getFeaturePropertiesMap(String name, String dockerData, String testInstruction, String ... dependencies) {
         Map<String, Object> map = new HashMap<>();
         if (null != name) {
             map.put("name", name);
@@ -59,9 +72,6 @@ public abstract class AbstractComponentTest {
         }
         map.put("dependencies", Arrays.asList(dependencies));
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        return template.postForEntity(url(featuresUrl), new HttpEntity<>(mapper.writeValueAsString(map), headers), clazz);
+        return map;
     }
 }

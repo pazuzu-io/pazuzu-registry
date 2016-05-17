@@ -56,8 +56,8 @@ public class FeaturesResource {
     }
 
     @RequestMapping(value = "/{featureName}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public FeatureFullDto updateFeature(@PathVariable String featureName, FeatureToCreateDto value) throws ServiceException {
-        return featureService.updateFeature(featureName, value.getName(), value.getDockerData(), value.getDependencies(), FeatureFullDto::makeFull);
+    public FeatureFullDto updateFeature(@PathVariable String featureName, @RequestBody FeatureToCreateDto value) throws ServiceException {
+        return featureService.updateFeature(featureName, value.getName(), value.getDockerData(), value.getTestInstruction(), value.getDependencies(), FeatureFullDto::makeFull);
     }
 
     @RequestMapping(value = "/{featureName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

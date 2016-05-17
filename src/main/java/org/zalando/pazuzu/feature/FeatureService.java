@@ -56,7 +56,7 @@ public class FeatureService {
     }
 
     @Transactional(rollbackFor = ServiceException.class)
-    public <T> T updateFeature(String name, String newName, String dockerData, List<String> dependencyNames, Function<Feature, T> converter) throws ServiceException {
+    public <T> T updateFeature(String name, String newName, String dockerData, String testInstruction, List<String> dependencyNames, Function<Feature, T> converter) throws ServiceException {
         final Feature existing = loadExistingFeature(name);
         if (null != newName && !newName.equals(existing.getName())) {
             final Feature newExisting = featureRepository.findByName(newName);
@@ -67,6 +67,9 @@ public class FeatureService {
         }
         if (null != dockerData) {
             existing.setDockerData(dockerData);
+        }
+        if (null != testInstruction) {
+            existing.setTestInstruction(testInstruction);
         }
         if (null != dependencyNames) {
             final Set<Feature> dependencies = loadFeatures(dependencyNames);
