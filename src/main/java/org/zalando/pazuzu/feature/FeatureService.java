@@ -21,12 +21,10 @@ import java.util.stream.Collectors;
 public class FeatureService {
 
     private final FeatureRepository featureRepository;
-    private final FeatureDao featureDao;
 
     @Autowired
-    public FeatureService(FeatureRepository featureRepository, FeatureDao featureDao) {
+    public FeatureService(FeatureRepository featureRepository) {
         this.featureRepository = featureRepository;
-        this.featureDao = featureDao;
     }
 
     @Transactional
@@ -36,7 +34,7 @@ public class FeatureService {
 
     @Transactional
     public <T> List<T> listFeatures(int offset, int limit, Function<Feature, T> converter) {
-        return this.featureDao.getFeatures(offset, limit).stream().map(converter).collect(Collectors.toList());
+        return this.featureRepository.getFeatures(offset, limit).stream().map(converter).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = ServiceException.class)
