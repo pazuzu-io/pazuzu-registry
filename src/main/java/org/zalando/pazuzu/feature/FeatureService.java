@@ -21,15 +21,22 @@ import java.util.stream.Collectors;
 public class FeatureService {
 
     private final FeatureRepository featureRepository;
+    private final FeatureDao featureDao;
 
     @Autowired
-    public FeatureService(FeatureRepository featureRepository) {
+    public FeatureService(FeatureRepository featureRepository, FeatureDao featureDao) {
         this.featureRepository = featureRepository;
+        this.featureDao = featureDao;
     }
 
     @Transactional
     public <T> List<T> listFeatures(String name, Function<Feature, T> converter) {
         return this.featureRepository.findByNameIgnoreCaseContaining(name).stream().map(converter).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public <T> List<T> listFeatures(int offset, int limit, Function<Feature, T> converter) {
+        return this.featureDao.getFeatures(offset, limit).stream().map(converter).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = ServiceException.class)
