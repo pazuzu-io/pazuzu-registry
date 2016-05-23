@@ -4,7 +4,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface FeatureRepository extends CrudRepository<Feature, Integer> {
+public interface FeatureRepository extends CrudRepository<Feature, Integer>, FeatureRepositoryCustom {
 
     List<Feature> findByNameIgnoreCaseContaining(String name);
 

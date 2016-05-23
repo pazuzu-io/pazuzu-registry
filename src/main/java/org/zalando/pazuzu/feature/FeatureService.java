@@ -32,6 +32,11 @@ public class FeatureService {
         return this.featureRepository.findByNameIgnoreCaseContaining(name).stream().map(converter).collect(Collectors.toList());
     }
 
+    @Transactional
+    public <T> List<T> listFeatures(int offset, int limit, Function<Feature, T> converter) {
+        return this.featureRepository.getFeatures(offset, limit).stream().map(converter).collect(Collectors.toList());
+    }
+
     @Transactional(rollbackFor = ServiceException.class)
     public <T> T createFeature(String name, String dockerData, String testInstruction, List<String> dependencyNames, Function<Feature, T> converter) throws ServiceException {
         if (StringUtils.isEmpty(name)) {
