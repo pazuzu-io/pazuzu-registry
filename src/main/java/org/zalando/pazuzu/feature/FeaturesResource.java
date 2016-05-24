@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.zalando.pazuzu.exception.ServiceException;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/features")
 public class FeaturesResource {
 
+    private static final String X_TOTAL_COUNT = "X-Total-Count";
     private static final Integer TOPOLOGICAL_SORT = 1;
     private final FeatureService featureService;
 
@@ -34,11 +36,15 @@ public class FeaturesResource {
             @RequestParam(required = false, name = "name") String[] featureNames,
             @RequestParam(required = false, name = "sorted") Integer sorting,
             @RequestParam(required = false, name = "offset") Integer offset,
-            @RequestParam(required = false, name = "limit") Integer limit)
+            @RequestParam(required = false, name = "limit") Integer limit,
+            HttpServletResponse response)
             throws ServiceException {
         if (featureNames == null) {
             if (offset != null && limit != null) {
-                return featureService.listFeatures(offset, limit, FeatureDto::ofShort);
+                FeaturesWithTotalCount<FeatureDto> featuresTotalCount =
+                        featureService.getFeaturesWithTotalCount(offset, limit, FeatureDto::ofShort);
+                response.setHeader(X_TOTAL_COUNT, Long.toString(featuresTotalCount.getTotalCount()));
+                return featuresTotalCount.getFeatures();
             } else {
                 return featureService.listFeatures("", FeatureDto::ofShort);
             }
