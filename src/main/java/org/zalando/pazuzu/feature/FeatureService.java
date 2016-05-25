@@ -33,8 +33,10 @@ public class FeatureService {
     }
 
     @Transactional
-    public <T> List<T> listFeatures(int offset, int limit, Function<Feature, T> converter) {
-        return this.featureRepository.getFeatures(offset, limit).stream().map(converter).collect(Collectors.toList());
+    public <T> FeaturesWithTotalCount<T> getFeaturesWithTotalCount(int offset, int limit, Function<Feature, T> converter) {
+        List<T> features = this.featureRepository.getFeatures(offset, limit).stream().map(converter).collect(Collectors.toList());
+        long count = this.featureRepository.count();
+        return new FeaturesWithTotalCount<>(features, count);
     }
 
     @Transactional(rollbackFor = ServiceException.class)
