@@ -46,6 +46,7 @@ public class FeaturesResource {
                 FeaturesWithTotalCount<FeatureDto> featuresTotalCount =
                         featureService.getFeaturesWithTotalCount(offset, limit, FeatureDto::ofShort);
                 response.setHeader(X_TOTAL_COUNT, Long.toString(featuresTotalCount.getTotalCount()));
+                response.setHeader("Access-Control-Expose-Headers", X_TOTAL_COUNT);
                 return featuresTotalCount.getFeatures();
             } else {
                 return featureService.listFeatures("", FeatureDto::ofShort);
