@@ -33,6 +33,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         FeatureFullDto resultFeature = result.getBody();
         assertThat(resultFeature.getName()).isEqualTo("Test");
         assertThat(resultFeature.getTestInstruction()).isEqualTo("test something");
+        assertThat(resultFeature.getDescription()).isEqualTo("The test feature");
         assertThat(resultFeature.getDockerData()).isEqualTo("Test Data");
         assertThat(resultFeature.getDependencies()).isEmpty();
     }
