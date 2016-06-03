@@ -40,14 +40,14 @@ public abstract class AbstractComponentTest {
         return "http://127.0.0.1:" + port + path;
     }
 
-    protected ResponseEntity<FeatureFullDto> createFeature(String name, String dockerData, String testInstruction, String... dependencies) throws JsonProcessingException {
-        final ResponseEntity<FeatureFullDto> response = createFeatureUnchecked(FeatureFullDto.class, name, dockerData, testInstruction, dependencies);
+    protected ResponseEntity<FeatureFullDto> createFeature(String name, String dockerData, String testInstruction, String description, String... dependencies) throws JsonProcessingException {
+        final ResponseEntity<FeatureFullDto> response = createFeatureUnchecked(FeatureFullDto.class, name, dockerData, testInstruction, description, dependencies);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         return response;
     }
 
-    protected <T> ResponseEntity<T> createFeatureUnchecked(Class<T> clazz, String name, String dockerData, String testInstruction, String... dependencies) throws JsonProcessingException {
-        Map<String, Object> map = getFeaturePropertiesMap(name, dockerData, testInstruction, dependencies);
+    protected <T> ResponseEntity<T> createFeatureUnchecked(Class<T> clazz, String name, String dockerData, String testInstruction, String description, String... dependencies) throws JsonProcessingException {
+        Map<String, Object> map = getFeaturePropertiesMap(name, dockerData, testInstruction, description, dependencies);
 
         return template.postForEntity(url(featuresUrl), new HttpEntity<>(mapper.writeValueAsString(map),
                 contentType(MediaType.APPLICATION_JSON)), clazz);
@@ -59,7 +59,7 @@ public abstract class AbstractComponentTest {
         return headers;
     }
 
-    protected Map<String, Object> getFeaturePropertiesMap(String name, String dockerData, String testInstruction, String ... dependencies) {
+    protected Map<String, Object> getFeaturePropertiesMap(String name, String dockerData, String testInstruction, String description, String ... dependencies) {
         Map<String, Object> map = new HashMap<>();
         if (null != name) {
             map.put("name", name);
@@ -69,6 +69,9 @@ public abstract class AbstractComponentTest {
         }
         if (null != testInstruction) {
             map.put("test_instruction", testInstruction);
+        }
+        if (null != description) {
+            map.put("description", description);
         }
         map.put("dependencies", Arrays.asList(dependencies));
 
