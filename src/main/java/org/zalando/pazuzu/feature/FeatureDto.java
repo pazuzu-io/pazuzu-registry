@@ -11,6 +11,8 @@ public class FeatureDto {
     private String dockerData;
     @JsonProperty("test_instruction")
     private String testInstruction;
+    @JsonProperty("description")
+    private String description;
 
     public String getName() {
         return name;
@@ -37,11 +39,12 @@ public class FeatureDto {
         return result;
     }
 
-    public static FeatureDto populate(String name, String dockerData, String testInstruction) {
+    public static FeatureDto populate(String name, String dockerData, String testInstruction, String description) {
         final FeatureDto result = new FeatureDto();
         result.name = name;
         result.dockerData = dockerData;
         result.testInstruction = testInstruction;
+        result.description = description;
         return result;
     }
 
@@ -49,6 +52,7 @@ public class FeatureDto {
         result.name = feature.getName();
         result.dockerData = feature.getDockerData();
         result.testInstruction = feature.getTestInstruction();
+        result.description = feature.getDescription();
     }
 
     public String getTestInstruction() {
@@ -57,6 +61,14 @@ public class FeatureDto {
 
     public void setTestInstruction(String testInstruction) {
         this.testInstruction = testInstruction;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
@@ -70,7 +82,8 @@ public class FeatureDto {
         FeatureDto that = (FeatureDto) o;
         return Objects.equals(name, that.name) &&
                 Objects.equals(dockerData, that.dockerData) &&
-                Objects.equals(testInstruction, that.testInstruction);
+                Objects.equals(testInstruction, that.testInstruction) &&
+                Objects.equals(description, that.description);
     }
 
     @Override

@@ -63,7 +63,7 @@ public class FeaturesResource {
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FeatureFullDto> createFeature(@RequestBody FeatureToCreateDto value, UriComponentsBuilder uriBuilder) throws ServiceException {
         FeatureFullDto feature = featureService.createFeature(
-                value.getName(), value.getDockerData(), value.getTestInstruction(), value.getDependencies(), FeatureFullDto::makeFull);
+                value.getName(), value.getDockerData(), value.getTestInstruction(), value.getDescription(), value.getDependencies(), FeatureFullDto::makeFull);
 
         return ResponseEntity
                 .created(uriBuilder.path("/api/features/{featureName}").buildAndExpand(feature.getName()).toUri())
@@ -72,7 +72,7 @@ public class FeaturesResource {
 
     @RequestMapping(value = "/{featureName}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public FeatureFullDto updateFeature(@PathVariable String featureName, @RequestBody FeatureToCreateDto value) throws ServiceException {
-        return featureService.updateFeature(featureName, value.getName(), value.getDockerData(), value.getTestInstruction(), value.getDependencies(), FeatureFullDto::makeFull);
+        return featureService.updateFeature(featureName, value.getName(), value.getDockerData(), value.getTestInstruction(), value.getDescription(), value.getDependencies(), FeatureFullDto::makeFull);
     }
 
     @RequestMapping(value = "/{featureName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

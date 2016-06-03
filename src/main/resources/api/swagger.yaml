@@ -133,6 +133,9 @@ definitions:
       test_instruction:
         type: string
         description: how to test that feature is working
+      description:
+        type: string
+        description: description of the feature
   FeatureToCreate:
     type: object
     properties:
@@ -145,6 +148,9 @@ definitions:
       test_instruction:
         type: string
         description: how to test that feature is working
+      description:
+        type: string
+        description: description of the feature
       dependencies:
         type: array
         items: 
@@ -161,6 +167,9 @@ definitions:
       test_instruction:
         type: string
         description: how to test that feature is working
+      description:
+        type: string
+        description: description of the feature
       dependencies:
         type: array
         items:

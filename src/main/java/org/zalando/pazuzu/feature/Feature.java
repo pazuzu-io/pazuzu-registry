@@ -28,6 +28,9 @@ public class Feature {
     @Column(name = "test_instruction", nullable = true, length = 4096)
     private String testInstruction;
 
+    @Column(name = "description", nullable = true, length = 4096)
+    private String description;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "feature_dependency",
@@ -83,6 +86,14 @@ public class Feature {
 
     public void setTestInstruction(String testInstruction) {
         this.testInstruction = testInstruction;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
