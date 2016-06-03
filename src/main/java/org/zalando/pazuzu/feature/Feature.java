@@ -88,7 +88,9 @@ public class Feature {
         this.testInstruction = testInstruction;
     }
 
-    public String getDescription() { return description; }
+    public String getDescription() {
+        return description;
+    }
 
     public void setDescription(String description) {
         this.description = description;
