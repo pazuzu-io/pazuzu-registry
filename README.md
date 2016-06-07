@@ -49,7 +49,7 @@ How a start the server locally in a container with Postgres storage
 ```
 docker-compose up -d
 ```
-
+OSX devs : Note your host ip is on DOCKER_HOST env variable
 How to build Docker image for Stups infrastructure (Zalando related)
 --------------------------------------------------------------------
 ```bash
