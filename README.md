@@ -34,6 +34,16 @@ mvn clean install
 java -jar target/pazuzu-registry.jar --spring.profiles.active=dev
 ```
 
+How a setup OSX environment
+ * Install [docker toolbox| https://www.docker.com/products/docker-toolbox]
+ * docker-machine start
+ * docker-machine env default
+ * eval or export result of env command to your .bashrc or .zshrc
+ * brew install python3 # in case if you have no python installed
+ * sudo pip3 install --upgrade scm-source
+ * run scm_source
+
+
 How a start the server locally in a container with Postgres storage
 -----------------------------------------------------------
 ```
