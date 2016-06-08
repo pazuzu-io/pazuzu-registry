@@ -152,4 +152,23 @@ public class FeatureApiTest extends AbstractComponentTest {
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(result.getBody()).hasSize(3);
     }
+
+    @Test
+    public void testFeatureSearchSuccess() throws JsonProcessingException {
+        createFeature("test-feature-1", "docker-data-1", "test-instruction-1", "desc-1");
+        createFeature("test-feature-2", "docker-data-2", "test-instruction-2", "desc-2");
+        createFeature("feature-3", "docker-data-3", "test-instruction-3", "desc-3");
+        ResponseEntity<List> result = template.getForEntity(url(featuresUrl + "/search/test"), List.class);
+        assertThat(result.getStatusCode().is2xxSuccessful());
+        assertThat(result.getBody()).hasSize(2);
+    }
+
+    @Test
+    public void testFeatureSearchEmptyResult() throws JsonProcessingException {
+        createFeature("test-feature-1", "docker-data-1", "test-instruction-1", "desc-1");
+        createFeature("test-feature-2", "docker-data-2", "test-instruction-2", "desc-2");
+        ResponseEntity<List> result = template.getForEntity(url(featuresUrl + "/search/foo"), List.class);
+        assertThat(result.getStatusCode().is2xxSuccessful());
+        assertThat(result.getBody()).hasSize(0);
+    }
 }
