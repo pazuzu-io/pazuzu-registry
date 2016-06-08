@@ -1,9 +1,11 @@
 package org.zalando.pazuzu.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
@@ -17,13 +19,22 @@ import org.zalando.stups.oauth2.spring.server.ExecutorWrappers;
 import org.zalando.stups.oauth2.spring.server.TokenInfoResourceServerTokenServices;
 import org.zalando.stups.tokens.config.AccessTokensBeanProperties;
 
+import java.util.Iterator;
+import java.util.List;
+
 @Configuration
 @EnableResourceServer
-@Profile(value = "production")
+@Profile(value = {"production", "test_oauth"})
 public class OAuthConfiguration extends ResourceServerConfigurerAdapter {
 
     @Autowired
     private AccessTokensBeanProperties accessTokensBeanProperties;
+
+    private static final String scopeMatcher = "#oauth2.hasScope('uid')";
+    private String adminMatcher;
+
+    @Value("#{'${pazuzu-registry.admins}'.split(',')}")
+    private List<String> adminList;
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
@@ -31,20 +42,51 @@ public class OAuthConfiguration extends ResourceServerConfigurerAdapter {
         resources.expressionHandler(new ExtendedOAuth2WebSecurityExpressionHandler());
     }
 
+    private String buildAdminUserMatcher() {
+        Iterator<String> iterator = adminList.iterator();
+        StringBuilder result = new StringBuilder();
+
+        result.append(scopeMatcher);
+
+        if (adminList != null && !adminList.isEmpty()) {
+            result.append(" and (");
+
+            while (iterator.hasNext()) {
+                result.append("authentication.name.equals('");
+                result.append(iterator.next());
+                result.append("')");
+
+                if (iterator.hasNext()) {
+                    result.append(" or ");
+                }
+            }
+            result.append(")");
+        }
+
+        return result.toString();
+    }
+
     @Override
     public void configure(final HttpSecurity http) throws Exception {
+
+        if (adminMatcher == null || adminMatcher.isEmpty()) {
+            adminMatcher = buildAdminUserMatcher();
+        }
 
         // @formatter:off
         http
             .httpBasic().disable()
-            .requestMatchers().antMatchers("/api/**")
+                .requestMatchers().antMatchers("/**")
         .and()
             .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.NEVER)
         .and()
             .authorizeRequests()
                 .antMatchers("/api/health").permitAll()
-                .antMatchers("/api/**").access("#oauth2.hasScope('uid')");
+                .antMatchers(HttpMethod.POST, "/api/**").access(scopeMatcher)
+                .antMatchers(HttpMethod.PUT, "/api/**").access(adminMatcher)
+                .antMatchers(HttpMethod.DELETE, "/api/**").access(adminMatcher)
+                .antMatchers(HttpMethod.GET, "/api/**").permitAll();
         // @formatter:on
     }
 
