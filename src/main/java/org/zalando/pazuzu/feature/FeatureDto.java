@@ -3,6 +3,7 @@ package org.zalando.pazuzu.feature;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
+import java.util.Set;
 
 public class FeatureDto {
     @JsonProperty("name")
@@ -13,6 +14,8 @@ public class FeatureDto {
     private String testInstruction;
     @JsonProperty("description")
     private String description;
+    @JsonProperty("TAGS")
+    private Set<Tag> tags;
 
     public String getName() {
         return name;
@@ -53,6 +56,7 @@ public class FeatureDto {
         result.dockerData = feature.getDockerData();
         result.testInstruction = feature.getTestInstruction();
         result.description = feature.getDescription();
+        result.tags = feature.getTags();
     }
 
     public String getTestInstruction() {

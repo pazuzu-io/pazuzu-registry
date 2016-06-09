@@ -38,6 +38,20 @@ public class Feature {
             inverseJoinColumns = @JoinColumn(name = "dependency_feature_id", nullable = false))
     public Set<Feature> dependencies;
 
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
+    }
+
+    @ManyToMany(fetch = FetchType.LAZY)
+//    @JoinTable(
+//            name = "feature_tag",
+//            joinColumns = @JoinColumn(name = "feature_id", nullable = false))
+    public Set<Tag> tags;
+
     public Integer getId() {
         return id;
     }
@@ -103,9 +117,15 @@ public class Feature {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (this == obj) return true;
-        if (!(obj instanceof Feature)) return false;
+        if (obj == null) {
+            return false;
+        }
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Feature)) {
+            return false;
+        }
 
         Feature other = (Feature)obj;
         return this.getId() == other.getId();
