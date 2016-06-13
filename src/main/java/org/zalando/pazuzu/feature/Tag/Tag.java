@@ -1,4 +1,4 @@
-package org.zalando.pazuzu.feature;
+package org.zalando.pazuzu.feature.tag;
 
 import javax.persistence.*;
 
@@ -7,6 +7,13 @@ import javax.persistence.*;
  */
 @Entity
 public class Tag {
+    public Tag(String name) {
+        this.name = name;
+    }
+    public Tag() {
+        this.name = "";
+    }
+
     public Integer getId() {
         return id;
     }
@@ -27,11 +34,12 @@ public class Tag {
         this.name = name;
     }
 
-    @Column(name = "tag_name", nullable = false, length = 256)
+    @Column(name = "tag_name", nullable = false, length = 256, unique = true)
+
     private String name;
     @Override
     public int hashCode() {
-        return this.getId().hashCode();
+        return this.getName().hashCode();
     }
 
     @Override
@@ -47,6 +55,6 @@ public class Tag {
         }
 
         Tag other = (Tag)obj;
-        return this.getId() == other.getId();
+        return this.getName() == other.getName();
     }
 }

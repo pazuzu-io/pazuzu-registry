@@ -1,5 +1,7 @@
 package org.zalando.pazuzu.feature;
 
+import org.zalando.pazuzu.feature.tag.Tag;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -38,11 +41,11 @@ public class Feature {
             inverseJoinColumns = @JoinColumn(name = "dependency_feature_id", nullable = false))
     public Set<Feature> dependencies;
 
-    public Set<Tag> getTags() {
+    public List<Tag> getTags() {
         return tags;
     }
 
-    public void setTags(Set<Tag> tags) {
+    public void setTags(List<Tag> tags) {
         this.tags = tags;
     }
 
@@ -50,7 +53,7 @@ public class Feature {
 //    @JoinTable(
 //            name = "feature_tag",
 //            joinColumns = @JoinColumn(name = "feature_id", nullable = false))
-    public Set<Tag> tags;
+    public List<Tag> tags;
 
     public Integer getId() {
         return id;

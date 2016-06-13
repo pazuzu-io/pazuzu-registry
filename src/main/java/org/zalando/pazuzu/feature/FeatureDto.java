@@ -1,9 +1,11 @@
 package org.zalando.pazuzu.feature;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.zalando.pazuzu.feature.tag.Tag;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 public class FeatureDto {
     @JsonProperty("name")
@@ -14,8 +16,17 @@ public class FeatureDto {
     private String testInstruction;
     @JsonProperty("description")
     private String description;
-    @JsonProperty("TAGS")
-    private Set<Tag> tags;
+
+    public List<Tag> getTags() {
+        return (null != tags) ? tags : Collections.emptyList();
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
+
+    @JsonProperty("tags")
+    private List<Tag> tags;
 
     public String getName() {
         return name;
@@ -42,13 +53,18 @@ public class FeatureDto {
         return result;
     }
 
-    public static FeatureDto populate(String name, String dockerData, String testInstruction, String description) {
+    public static FeatureDto populate(String name, String dockerData, String testInstruction, String description , List<Tag> tags) {
         final FeatureDto result = new FeatureDto();
         result.name = name;
         result.dockerData = dockerData;
         result.testInstruction = testInstruction;
         result.description = description;
+        result.tags = tags;
         return result;
+    }
+
+    public static FeatureDto populate(String name, String dockerData, String testInstruction, String description) {
+        return populate(name,dockerData,testInstruction,description, Collections.emptyList());
     }
 
     protected static void fillShort(Feature feature, FeatureDto result) {

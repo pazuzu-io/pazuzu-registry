@@ -8,6 +8,8 @@ import org.zalando.pazuzu.exception.BadRequestException;
 import org.zalando.pazuzu.exception.Error;
 import org.zalando.pazuzu.exception.NotFoundException;
 import org.zalando.pazuzu.exception.ServiceException;
+import org.zalando.pazuzu.feature.tag.Tag;
+import org.zalando.pazuzu.feature.tag.TagService;
 import org.zalando.pazuzu.sort.TopologicalSortLinear;
 
 import java.util.Collection;
@@ -21,10 +23,13 @@ import java.util.stream.Collectors;
 public class FeatureService {
 
     private final FeatureRepository featureRepository;
+    private final TagService tagService;
+
 
     @Autowired
-    public FeatureService(FeatureRepository featureRepository) {
+    public FeatureService(FeatureRepository featureRepository, TagService tagService) {
         this.featureRepository = featureRepository;
+        this.tagService = tagService;
     }
 
     @Transactional
@@ -40,7 +45,8 @@ public class FeatureService {
     }
 
     @Transactional(rollbackFor = ServiceException.class)
-    public <T> T createFeature(String name, String dockerData, String testInstruction, String description, List<String> dependencyNames, Function<Feature, T> converter) throws ServiceException {
+    public <T> T createFeature(String name, String dockerData, String testInstruction, String description,
+                               List<String> dependencyNames, List<Tag> tags, Function<Feature, T> converter) throws ServiceException {
         if (StringUtils.isEmpty(name)) {
             throw new BadRequestException(Error.FEATURE_NAME_EMPTY);
         }
@@ -60,7 +66,11 @@ public class FeatureService {
         if (description != null) {
             newFeature.setDescription(description);
         }
+
+        tagService.upsertTags(tags);
+
         newFeature.setDependencies(dependencies);
+
         featureRepository.save(newFeature);
         return converter.apply(newFeature);
     }
