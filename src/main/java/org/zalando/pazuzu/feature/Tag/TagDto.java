@@ -25,6 +25,11 @@ public class TagDto {
         fillShort(tag, result);
         return result;
     }
+    public static TagDto ofName(String name) {
+        TagDto result = new TagDto();
+        result.setName(name);
+        return  result;
+    }
 
     private static void fillShort(Tag featureTag, TagDto result) {
         result.setName(featureTag.getName());

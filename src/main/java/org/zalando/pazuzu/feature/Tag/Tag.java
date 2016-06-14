@@ -7,12 +7,16 @@ import javax.persistence.*;
  */
 @Entity
 public class Tag {
-    public Tag(String name) {
-        this.name = name;
-    }
     public Tag() {
         this.name = "";
     }
+
+    public Tag(String name) {
+        this.name = name;
+    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     public Integer getId() {
         return id;
@@ -21,10 +25,6 @@ public class Tag {
     public void setId(Integer id) {
         this.id = id;
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
 
     public String getName() {
         return name;
@@ -37,6 +37,7 @@ public class Tag {
     @Column(name = "tag_name", nullable = false, length = 256, unique = true)
 
     private String name;
+
     @Override
     public int hashCode() {
         return this.getName().hashCode();
@@ -54,7 +55,7 @@ public class Tag {
             return false;
         }
 
-        Tag other = (Tag)obj;
+        Tag other = (Tag) obj;
         return this.getName() == other.getName();
     }
 }
