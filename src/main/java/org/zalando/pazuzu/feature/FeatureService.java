@@ -8,9 +8,8 @@ import org.zalando.pazuzu.exception.BadRequestException;
 import org.zalando.pazuzu.exception.Error;
 import org.zalando.pazuzu.exception.NotFoundException;
 import org.zalando.pazuzu.exception.ServiceException;
-import org.zalando.pazuzu.feature.tag.Tag;
-import org.zalando.pazuzu.feature.tag.TagDto;
 import org.zalando.pazuzu.feature.tag.TagService;
+import org.zalando.pazuzu.feature.tag.TagDto;
 import org.zalando.pazuzu.sort.TopologicalSortLinear;
 
 import java.util.Collection;

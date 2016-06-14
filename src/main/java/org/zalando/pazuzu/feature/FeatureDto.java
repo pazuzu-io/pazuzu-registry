@@ -18,14 +18,6 @@ public class FeatureDto {
     private String testInstruction;
     @JsonProperty("description")
     private String description;
-
-    public List<TagDto> getTags() {
-        return (null != tags) ? tags : Collections.emptyList();
-    }
-    public void setTags(List<TagDto> tags) {
-        this.tags = tags;
-    }
-
     @JsonProperty("tags")
     private List<TagDto> tags;
 
@@ -92,6 +84,14 @@ public class FeatureDto {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<TagDto> getTags() {
+        return (null != tags) ? tags : Collections.emptyList();
+    }
+
+    public void setTags(List<TagDto> tags) {
+        this.tags = tags;
     }
 
     @Override

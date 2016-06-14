@@ -50,9 +50,6 @@ public class Feature {
     }
 
     @ManyToMany(fetch = FetchType.EAGER)
-//    @JoinTable(
-//            name = "feature_tag",
-//            joinColumns = @JoinColumn(name = "feature_id", nullable = false))
     public List<Tag> tags;
 
     public Integer getId() {
