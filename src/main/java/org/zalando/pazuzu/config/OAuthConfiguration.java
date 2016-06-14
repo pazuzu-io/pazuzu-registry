@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
+import org.zalando.pazuzu.api.ApiUrls;
 import org.zalando.stups.oauth2.spring.security.expression.ExtendedOAuth2WebSecurityExpressionHandler;
 import org.zalando.stups.oauth2.spring.server.DefaultAuthenticationExtractor;
 import org.zalando.stups.oauth2.spring.server.DefaultTokenInfoRequestExecutor;
@@ -82,11 +83,11 @@ public class OAuthConfiguration extends ResourceServerConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.NEVER)
         .and()
             .authorizeRequests()
-                .antMatchers("/api/health").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/**").access(scopeMatcher)
-                .antMatchers(HttpMethod.PUT, "/api/**").access(adminMatcher)
-                .antMatchers(HttpMethod.DELETE, "/api/**").access(adminMatcher)
-                .antMatchers(HttpMethod.GET, "/api/**").permitAll();
+                .antMatchers(ApiUrls.HEALTH).permitAll()
+                .antMatchers(HttpMethod.POST, ApiUrls.BASE_API_ANT_MATCHER).access(scopeMatcher)
+                .antMatchers(HttpMethod.PUT, ApiUrls.BASE_API_ANT_MATCHER).access(adminMatcher)
+                .antMatchers(HttpMethod.DELETE, ApiUrls.BASE_API_ANT_MATCHER).access(adminMatcher)
+                .antMatchers(HttpMethod.GET, ApiUrls.BASE_API_ANT_MATCHER).permitAll();
         // @formatter:on
     }
 
