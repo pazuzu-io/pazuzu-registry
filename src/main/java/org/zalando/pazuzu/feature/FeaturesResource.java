@@ -85,4 +85,10 @@ public class FeaturesResource {
         featureService.deleteFeature(featureName);
         return ResponseEntity.noContent().build();
     }
+
+    @RequestMapping(value = "/search/{featureName}", method = RequestMethod.GET)
+    public List<FeatureDto> searchFeature(@PathVariable String featureName) throws ServiceException {
+        return featureService.listFeatures(featureName, FeatureDto::ofShort);
+    }
+
 }
