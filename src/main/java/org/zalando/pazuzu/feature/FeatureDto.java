@@ -2,10 +2,12 @@ package org.zalando.pazuzu.feature;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.zalando.pazuzu.feature.tag.Tag;
+import org.zalando.pazuzu.feature.tag.TagDto;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class FeatureDto {
     @JsonProperty("name")
@@ -17,16 +19,15 @@ public class FeatureDto {
     @JsonProperty("description")
     private String description;
 
-    public List<Tag> getTags() {
+    public List<TagDto> getTags() {
         return (null != tags) ? tags : Collections.emptyList();
     }
-
-    public void setTags(List<Tag> tags) {
+    public void setTags(List<TagDto> tags) {
         this.tags = tags;
     }
 
     @JsonProperty("tags")
-    private List<Tag> tags;
+    private List<TagDto> tags;
 
     public String getName() {
         return name;
@@ -53,7 +54,7 @@ public class FeatureDto {
         return result;
     }
 
-    public static FeatureDto populate(String name, String dockerData, String testInstruction, String description , List<Tag> tags) {
+    public static FeatureDto populate(String name, String dockerData, String testInstruction, String description , List<TagDto> tags) {
         final FeatureDto result = new FeatureDto();
         result.name = name;
         result.dockerData = dockerData;
@@ -72,7 +73,9 @@ public class FeatureDto {
         result.dockerData = feature.getDockerData();
         result.testInstruction = feature.getTestInstruction();
         result.description = feature.getDescription();
-        result.tags = feature.getTags();
+        if (null != feature.getTags() && !feature.getTags().isEmpty()) {
+            result.tags = feature.getTags().stream().map(TagDto::ofShort).collect(Collectors.toList());
+        }
     }
 
     public String getTestInstruction() {

@@ -9,6 +9,7 @@ import org.zalando.pazuzu.exception.Error;
 import org.zalando.pazuzu.exception.NotFoundException;
 import org.zalando.pazuzu.exception.ServiceException;
 import org.zalando.pazuzu.feature.tag.Tag;
+import org.zalando.pazuzu.feature.tag.TagDto;
 import org.zalando.pazuzu.feature.tag.TagService;
 import org.zalando.pazuzu.sort.TopologicalSortLinear;
 
@@ -46,7 +47,7 @@ public class FeatureService {
 
     @Transactional(rollbackFor = ServiceException.class)
     public <T> T createFeature(String name, String dockerData, String testInstruction, String description,
-                               List<String> dependencyNames, List<Tag> tags, Function<Feature, T> converter) throws ServiceException {
+                               List<String> dependencyNames, List<TagDto> tags, Function<Feature, T> converter) throws ServiceException {
         if (StringUtils.isEmpty(name)) {
             throw new BadRequestException(Error.FEATURE_NAME_EMPTY);
         }
@@ -67,7 +68,7 @@ public class FeatureService {
             newFeature.setDescription(description);
         }
 
-        tagService.upsertTags(tags);
+        newFeature.setTags(tagService.upsertTagDtos(tags));
 
         newFeature.setDependencies(dependencies);
 

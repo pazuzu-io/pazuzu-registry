@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.zalando.pazuzu.exception.ServiceException;
+import org.zalando.pazuzu.feature.tag.TagDto;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;

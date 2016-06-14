@@ -49,7 +49,7 @@ public class Feature {
         this.tags = tags;
     }
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
 //    @JoinTable(
 //            name = "feature_tag",
 //            joinColumns = @JoinColumn(name = "feature_id", nullable = false))

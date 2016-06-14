@@ -12,9 +12,6 @@ public class FeatureFullDto extends FeatureDto {
 
     @JsonProperty("dependencies")
     private List<FeatureDto> dependencies;
-    @JsonProperty("tags")
-    private List<TagDto> tags;
-
     public List<FeatureDto> getDependencies() {
         if (null == dependencies) {
             dependencies = new ArrayList<>();
@@ -30,7 +27,7 @@ public class FeatureFullDto extends FeatureDto {
         fillShort(feature, result);
         result.dependencies = feature.getDependencies().stream().map(FeatureDto::ofShort).collect(Collectors.toList());
         if (feature.getTags() != null && !feature.getTags().isEmpty()) {
-            result.tags = feature.getTags().stream().map(TagDto::ofShort).collect(Collectors.toList());
+            result.setTags( feature.getTags().stream().map(TagDto::ofShort).collect(Collectors.toList()));
         }
         return result;
     }
