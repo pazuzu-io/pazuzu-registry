@@ -49,7 +49,7 @@ public class Feature {
         this.tags = tags;
     }
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     public List<Tag> tags;
 
     public Integer getId() {

@@ -60,14 +60,17 @@ public class FeatureService {
         final Feature newFeature = new Feature();
         newFeature.setName(name);
         newFeature.setDockerData(null == dockerData ? "" : dockerData);
+
         if (null != testInstruction) {
             newFeature.setTestInstruction(testInstruction);
         }
-        if (description != null) {
+        if ( null != description && !description.isEmpty()) {
             newFeature.setDescription(description);
         }
 
-        newFeature.setTags(tagService.upsertTagDtos(tags));
+        if(null != tags && !tags.isEmpty()) {
+            newFeature.setTags(tagService.upsertTagDtos(tags));
+        }
 
         newFeature.setDependencies(dependencies);
 

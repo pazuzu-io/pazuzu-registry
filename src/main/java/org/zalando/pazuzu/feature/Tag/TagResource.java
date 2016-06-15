@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/tags")
 public class TagResource {
     private final TagService tagService;
+
     @Autowired
     public TagResource(TagService tagService) {
         this.tagService = tagService;
@@ -26,12 +27,12 @@ public class TagResource {
         return tagService.searchTags(queryString).stream().map(TagDto::ofShort).collect(Collectors.toList());
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<org.zalando.pazuzu.feature.tag.TagDto> upsert(@RequestBody List<TagDto> tags) throws ServiceException {
         return tagService.upsertTagDtos(tags).stream().map(TagDto::ofShort).collect(Collectors.toList());
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<TagDto> listTags() {
         return tagService.listTags().stream().map(TagDto::ofShort).collect(Collectors.toList());
     }

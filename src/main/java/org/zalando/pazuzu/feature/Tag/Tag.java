@@ -7,6 +7,13 @@ import javax.persistence.*;
  */
 @Entity
 public class Tag {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    @Column(name = "tag_name", nullable = false, length = 256, unique = true)
+
+    private String name;
+
     public Tag() {
         this.name = "";
     }
@@ -14,9 +21,6 @@ public class Tag {
     public Tag(String name) {
         this.name = name;
     }
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
 
     public Integer getId() {
         return id;
@@ -33,10 +37,6 @@ public class Tag {
     public void setName(String name) {
         this.name = name;
     }
-
-    @Column(name = "tag_name", nullable = false, length = 256, unique = true)
-
-    private String name;
 
     @Override
     public int hashCode() {

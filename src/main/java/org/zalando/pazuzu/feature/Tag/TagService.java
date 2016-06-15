@@ -21,6 +21,15 @@ public class TagService {
         this.tagRepository = tagRepository;
     }
 
+    private static <T> Stream<T> toStream(Iterable<T> iterable) {
+        return StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(
+                        iterable.iterator(),
+                        Spliterator.ORDERED
+                ),
+                false
+        );
+    }
 
     @Transactional
     public List<Tag> upsertTagDtos(List<TagDto> tags) {
@@ -30,20 +39,10 @@ public class TagService {
     }
 
     public List<Tag> searchTags(String queryString) {
-        if (null == queryString  || queryString.isEmpty()) {
-           return Collections.emptyList();
+        if (null == queryString || queryString.isEmpty()) {
+            return Collections.emptyList();
         }
         return tagRepository.searchByName(queryString);
-    }
-
-    private static <T> Stream<T> toStream(Iterable<T> iterable) {
-        return StreamSupport.stream(
-                Spliterators.spliteratorUnknownSize(
-                        iterable.iterator(),
-                        Spliterator.ORDERED
-                ),
-                false
-        );
     }
 
     public List<Tag> listTags() {
