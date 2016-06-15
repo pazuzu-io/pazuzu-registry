@@ -10,7 +10,7 @@ import org.springframework.social.connect.UserProfile;
 
 import java.util.Collections;
 
-public class ApplicationConnectionSignUp implements ConnectionSignUp{
+public class ApplicationConnectionSignUp implements ConnectionSignUp {
 
     private static final Logger logger = LoggerFactory.getLogger(ApplicationConnectionSignUp.class);
 

@@ -8,8 +8,8 @@ import org.zalando.pazuzu.exception.BadRequestException;
 import org.zalando.pazuzu.exception.Error;
 import org.zalando.pazuzu.exception.NotFoundException;
 import org.zalando.pazuzu.exception.ServiceException;
-import org.zalando.pazuzu.feature.tag.TagService;
 import org.zalando.pazuzu.feature.tag.TagDto;
+import org.zalando.pazuzu.feature.tag.TagService;
 import org.zalando.pazuzu.sort.TopologicalSortLinear;
 
 import java.util.Collection;
@@ -32,6 +32,11 @@ public class FeatureService {
         this.tagService = tagService;
     }
 
+    private static void collectRecursively(Collection<Feature> result, Feature f) {
+        result.add(f);
+        f.getDependencies().forEach(item -> collectRecursively(result, item));
+    }
+
     @Transactional
     public <T> List<T> listFeatures(String name, Function<Feature, T> converter) {
         return this.featureRepository.findByNameIgnoreCaseContaining(name).stream().map(converter).collect(Collectors.toList());
@@ -47,6 +52,38 @@ public class FeatureService {
     @Transactional(rollbackFor = ServiceException.class)
     public <T> T createFeature(String name, String dockerData, String testInstruction, String description,
                                List<String> dependencyNames, List<TagDto> tags, Function<Feature, T> converter) throws ServiceException {
+        final Feature newFeature = new Feature();
+        createName(name, newFeature);
+        createDependencies(dependencyNames, newFeature);
+
+        newFeature.setDockerData(null == dockerData ? "" : dockerData);
+
+        if (null != testInstruction) {
+            newFeature.setTestInstruction(testInstruction);
+        }
+        if (null != description && !description.isEmpty()) {
+            newFeature.setDescription(description);
+        }
+
+        if (null != tags && !tags.isEmpty()) {
+            newFeature.setTags(tagService.upsertTagDtos(tags));
+        }
+        featureRepository.save(newFeature);
+        return converter.apply(newFeature);
+    }
+
+    private void createName(String name, Feature newFeature) throws BadRequestException {
+        nameGuardCheck(name);
+        newFeature.setName(name);
+    }
+
+    private void createDependencies(List<String> dependencyNames, Feature newFeature) throws ServiceException {
+        final Set<Feature> dependencies = loadFeatures(dependencyNames);
+
+        newFeature.setDependencies(dependencies);
+    }
+
+    private void nameGuardCheck(String name) throws BadRequestException {
         if (StringUtils.isEmpty(name)) {
             throw new BadRequestException(Error.FEATURE_NAME_EMPTY);
         }
@@ -54,28 +91,6 @@ public class FeatureService {
         if (null != existing) {
             throw new BadRequestException(Error.FEATURE_DUPLICATE);
         }
-
-        final Set<Feature> dependencies = loadFeatures(dependencyNames);
-
-        final Feature newFeature = new Feature();
-        newFeature.setName(name);
-        newFeature.setDockerData(null == dockerData ? "" : dockerData);
-
-        if (null != testInstruction) {
-            newFeature.setTestInstruction(testInstruction);
-        }
-        if ( null != description && !description.isEmpty()) {
-            newFeature.setDescription(description);
-        }
-
-        if(null != tags && !tags.isEmpty()) {
-            newFeature.setTags(tagService.upsertTagDtos(tags));
-        }
-
-        newFeature.setDependencies(dependencies);
-
-        featureRepository.save(newFeature);
-        return converter.apply(newFeature);
     }
 
     @Transactional(rollbackFor = ServiceException.class)
@@ -153,10 +168,5 @@ public class FeatureService {
             throw new NotFoundException(Error.FEATURE_NOT_FOUND);
         }
         return existing;
-    }
-
-    private static void collectRecursively(Collection<Feature> result, Feature f) {
-        result.add(f);
-        f.getDependencies().forEach(item -> collectRecursively(result, item));
     }
 }

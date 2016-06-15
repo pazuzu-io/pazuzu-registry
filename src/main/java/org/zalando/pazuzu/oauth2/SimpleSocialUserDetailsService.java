@@ -11,7 +11,7 @@ import org.springframework.social.security.SocialUserDetailsService;
 /**
  * Created by mdasilvatrov on 29/03/16.
  */
-public class SimpleSocialUserDetailsService implements SocialUserDetailsService{
+public class SimpleSocialUserDetailsService implements SocialUserDetailsService {
 
     private final UserDetailsManager userDetailsManager;
 

@@ -1,7 +1,6 @@
 package org.zalando.pazuzu.feature;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.zalando.pazuzu.feature.tag.Tag;
 import org.zalando.pazuzu.feature.tag.TagDto;
 
 import java.util.Collections;
@@ -21,22 +20,6 @@ public class FeatureDto {
     @JsonProperty("tags")
     private List<TagDto> tags;
 
-    public String getName() {
-        return name;
-    }
-
-    public String getDockerData() {
-        return dockerData;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDockerData(String dockerData) {
-        this.dockerData = dockerData;
-    }
-
     public static FeatureDto ofShort(Feature feature) {
         if (null == feature) {
             return null;
@@ -46,7 +29,7 @@ public class FeatureDto {
         return result;
     }
 
-    public static FeatureDto populate(String name, String dockerData, String testInstruction, String description , List<TagDto> tags) {
+    public static FeatureDto populate(String name, String dockerData, String testInstruction, String description, List<TagDto> tags) {
         final FeatureDto result = new FeatureDto();
         result.name = name;
         result.dockerData = dockerData;
@@ -57,7 +40,7 @@ public class FeatureDto {
     }
 
     public static FeatureDto populate(String name, String dockerData, String testInstruction, String description) {
-        return populate(name,dockerData,testInstruction,description, Collections.emptyList());
+        return populate(name, dockerData, testInstruction, description, Collections.emptyList());
     }
 
     protected static void fillShort(Feature feature, FeatureDto result) {
@@ -68,6 +51,22 @@ public class FeatureDto {
         if (null != feature.getTags() && !feature.getTags().isEmpty()) {
             result.tags = feature.getTags().stream().map(TagDto::ofShort).collect(Collectors.toList());
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDockerData() {
+        return dockerData;
+    }
+
+    public void setDockerData(String dockerData) {
+        this.dockerData = dockerData;
     }
 
     public String getTestInstruction() {

@@ -1,28 +1,15 @@
 package org.zalando.pazuzu.sort;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 public class TopologicalSortLinear<T> {
 
-    private enum VisitState {
-        NOT_VISITED, BEING_VISITED, VISITED
-    }
-
     private Collection<T> vertices;
-
     // Function for returning all children of vertex
     private Function<T, Set<T>> getChildren;
-
     // Visit state indicator for vertex
     private Map<T, VisitState> vertexState;
-
     // Parent of vertex
     // key - vertex, value - parent of vertex
     private Map<T, T> parent;
@@ -111,5 +98,9 @@ public class TopologicalSortLinear<T> {
 
     private void setVisitState(T v, VisitState clr) {
         vertexState.put(v, clr);
+    }
+
+    private enum VisitState {
+        NOT_VISITED, BEING_VISITED, VISITED
     }
 }

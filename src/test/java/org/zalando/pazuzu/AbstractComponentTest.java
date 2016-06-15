@@ -7,11 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.boot.test.WebIntegrationTest;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.zalando.pazuzu.feature.FeatureFullDto;
@@ -28,13 +24,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:cleanDatabase.sql")
 public abstract class AbstractComponentTest {
 
-    @Value("${local.server.port}")
-    private int port;
-
     protected final String featuresUrl = "/api/features";
-
     protected final TestRestTemplate template = new TestRestTemplate();
     protected final ObjectMapper mapper = new ObjectMapper();
+    @Value("${local.server.port}")
+    private int port;
 
     protected String url(String path) {
         return "http://127.0.0.1:" + port + path;
@@ -59,7 +53,7 @@ public abstract class AbstractComponentTest {
         return headers;
     }
 
-    protected Map<String, Object> getFeaturePropertiesMap(String name, String dockerData, String testInstruction, String description, String ... dependencies) {
+    protected Map<String, Object> getFeaturePropertiesMap(String name, String dockerData, String testInstruction, String description, String... dependencies) {
         Map<String, Object> map = new HashMap<>();
         if (null != name) {
             map.put("name", name);
