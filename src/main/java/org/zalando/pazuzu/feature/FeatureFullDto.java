@@ -1,6 +1,7 @@
 package org.zalando.pazuzu.feature;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.zalando.pazuzu.feature.tag.TagDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +13,6 @@ public class FeatureFullDto extends FeatureDto {
     @JsonProperty("dependencies")
     private List<FeatureDto> dependencies;
 
-    public List<FeatureDto> getDependencies() {
-        if (null == dependencies) {
-            dependencies = new ArrayList<>();
-        }
-        return dependencies;
-    }
-
     public static FeatureFullDto makeFull(Feature feature) {
         if (null == feature) {
             return null;
@@ -26,7 +20,17 @@ public class FeatureFullDto extends FeatureDto {
         final FeatureFullDto result = new FeatureFullDto();
         fillShort(feature, result);
         result.dependencies = feature.getDependencies().stream().map(FeatureDto::ofShort).collect(Collectors.toList());
+        if (feature.getTags() != null && !feature.getTags().isEmpty()) {
+            result.setTags(feature.getTags().stream().map(TagDto::ofShort).collect(Collectors.toList()));
+        }
         return result;
+    }
+
+    public List<FeatureDto> getDependencies() {
+        if (null == dependencies) {
+            dependencies = new ArrayList<>();
+        }
+        return dependencies;
     }
 
     @Override

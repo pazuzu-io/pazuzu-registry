@@ -1,35 +1,14 @@
 package org.zalando.pazuzu.feature;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import org.zalando.pazuzu.feature.tag.Tag;
+
+import javax.persistence.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 public class Feature {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
-    @Column(name = "feature_name", nullable = false, length = 256)
-    private String name;
-
-    @Column(name = "docker_data", nullable = false, length = 4096)
-    private String dockerData;
-
-    @Column(name = "test_instruction", nullable = true, length = 4096)
-    private String testInstruction;
-
-    @Column(name = "description", nullable = true, length = 4096)
-    private String description;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -37,6 +16,27 @@ public class Feature {
             joinColumns = @JoinColumn(name = "feature_id", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "dependency_feature_id", nullable = false))
     public Set<Feature> dependencies;
+    @ManyToMany(fetch = FetchType.LAZY)
+    public List<Tag> tags;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    @Column(name = "feature_name", nullable = false, length = 256)
+    private String name;
+    @Column(name = "docker_data", nullable = false, length = 4096)
+    private String dockerData;
+    @Column(name = "test_instruction", nullable = true, length = 4096)
+    private String testInstruction;
+    @Column(name = "description", nullable = true, length = 4096)
+    private String description;
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
 
     public Integer getId() {
         return id;
@@ -103,11 +103,17 @@ public class Feature {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (this == obj) return true;
-        if (!(obj instanceof Feature)) return false;
+        if (obj == null) {
+            return false;
+        }
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Feature)) {
+            return false;
+        }
 
-        Feature other = (Feature)obj;
+        Feature other = (Feature) obj;
         return this.getId() == other.getId();
     }
 }

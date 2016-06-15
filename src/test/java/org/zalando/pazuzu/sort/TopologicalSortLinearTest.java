@@ -1,16 +1,19 @@
 package org.zalando.pazuzu.sort;
 
 import org.junit.Test;
+
 import java.util.*;
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class TopologicalSortLinearTest {
 
     // Initialize vertices
     private Collection<Integer> initVertices(int n) {
         List<Integer> vertices = new LinkedList<>();
-        for(int i = 0; i < n; ++i) vertices.add(i);
+        for (int i = 0; i < n; ++i) vertices.add(i);
 
         return vertices;
     }
@@ -18,7 +21,7 @@ public class TopologicalSortLinearTest {
     // Initialize adjacency matrix for graph
     private Set<Integer>[] initGraph(int n) {
         Set<Integer> graph[] = new HashSet[n];
-        for(int i = 0; i < n; ++i) graph[i] = new HashSet<>();
+        for (int i = 0; i < n; ++i) graph[i] = new HashSet<>();
 
         return graph;
     }
@@ -28,7 +31,7 @@ public class TopologicalSortLinearTest {
         int n = 5;
         Collection<Integer> vertices = initVertices(n);
         Set<Integer>[] graph = initGraph(n);
-        for(int i = 0; i + 1 < n; ++i) graph[i].add(i + 1);
+        for (int i = 0; i + 1 < n; ++i) graph[i].add(i + 1);
 
         TopologicalSortLinear<Integer> sorted = new TopologicalSortLinear<>(vertices, (v) -> graph[v]);
         List<Integer> actual = sorted.getTopSorted();
