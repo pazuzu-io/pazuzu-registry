@@ -1,4 +1,4 @@
-package org.zalando.pazuzu.feature;
+package org.zalando.pazuzu.infrastructure.dto;
 
 import java.util.List;
 

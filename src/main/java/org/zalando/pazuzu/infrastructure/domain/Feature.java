@@ -1,23 +1,14 @@
-package org.zalando.pazuzu.feature;
-
-import org.zalando.pazuzu.feature.tag.Tag;
+package org.zalando.pazuzu.infrastructure.domain;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
 public class Feature {
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "feature_dependency",
-            joinColumns = @JoinColumn(name = "feature_id", nullable = false),
-            inverseJoinColumns = @JoinColumn(name = "dependency_feature_id", nullable = false))
-    public Set<Feature> dependencies;
-    @ManyToMany(fetch = FetchType.LAZY)
-    public List<Tag> tags;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -29,6 +20,14 @@ public class Feature {
     private String testInstruction;
     @Column(name = "description", nullable = true, length = 4096)
     private String description;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "feature_dependency",
+            joinColumns = @JoinColumn(name = "feature_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "dependency_feature_id", nullable = false))
+    public Set<Feature> dependencies;
+    @ManyToMany(fetch = FetchType.LAZY)
+    public List<Tag> tags;
 
     public List<Tag> getTags() {
         return tags;
@@ -112,8 +111,7 @@ public class Feature {
         if (!(obj instanceof Feature)) {
             return false;
         }
-
         Feature other = (Feature) obj;
-        return this.getId() == other.getId();
+        return Objects.equals(getId(), other.getId());
     }
 }

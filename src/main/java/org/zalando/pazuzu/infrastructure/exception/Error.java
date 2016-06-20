@@ -1,4 +1,4 @@
-package org.zalando.pazuzu.exception;
+package org.zalando.pazuzu.infrastructure.exception;
 
 
 public enum Error {

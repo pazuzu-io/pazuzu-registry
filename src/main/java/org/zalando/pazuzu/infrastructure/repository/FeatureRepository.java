@@ -1,6 +1,7 @@
-package org.zalando.pazuzu.feature;
+package org.zalando.pazuzu.infrastructure.repository;
 
 import org.springframework.data.repository.CrudRepository;
+import org.zalando.pazuzu.infrastructure.domain.Feature;
 
 import java.util.List;
 

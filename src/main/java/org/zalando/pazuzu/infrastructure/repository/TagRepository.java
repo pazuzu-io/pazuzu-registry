@@ -1,14 +1,12 @@
-package org.zalando.pazuzu.feature.tag;
+package org.zalando.pazuzu.infrastructure.repository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.zalando.pazuzu.infrastructure.domain.Tag;
 
 import java.util.List;
 
-/**
- * Created by vpavlyshyn on 10/06/16.
- */
 public interface TagRepository extends CrudRepository<Tag, Integer> {
 
     @Query(value = "SELECT t FROM Tag t WHERE t.name IN :names")

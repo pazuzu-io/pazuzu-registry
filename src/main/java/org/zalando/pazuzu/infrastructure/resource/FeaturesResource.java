@@ -1,12 +1,18 @@
-package org.zalando.pazuzu.feature;
+package org.zalando.pazuzu.infrastructure.resource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.zalando.pazuzu.exception.ServiceException;
+import org.zalando.pazuzu.infrastructure.exception.ServiceException;
+import org.zalando.pazuzu.infrastructure.domain.Feature;
+import org.zalando.pazuzu.infrastructure.dto.FeatureDto;
+import org.zalando.pazuzu.infrastructure.dto.FeatureFullDto;
+import org.zalando.pazuzu.infrastructure.dto.FeatureToCreateDto;
+import org.zalando.pazuzu.infrastructure.dto.FeaturesWithTotalCount;
+import org.zalando.pazuzu.infrastructure.service.FeatureService;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +28,7 @@ public class FeaturesResource {
     private static final Integer TOPOLOGICAL_SORT = 1;
     private final FeatureService featureService;
 
-    @Autowired
+    @Inject
     public FeaturesResource(FeatureService featureService) {
         this.featureService = featureService;
     }
@@ -85,5 +91,4 @@ public class FeaturesResource {
     public List<FeatureDto> searchFeature(@PathVariable String featureName) throws ServiceException {
         return featureService.listFeatures(featureName, FeatureDto::ofShort);
     }
-
 }

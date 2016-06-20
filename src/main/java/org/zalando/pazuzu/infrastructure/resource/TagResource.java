@@ -1,16 +1,15 @@
-package org.zalando.pazuzu.feature.tag;
+package org.zalando.pazuzu.infrastructure.resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.zalando.pazuzu.exception.ServiceException;
+import org.zalando.pazuzu.infrastructure.exception.ServiceException;
+import org.zalando.pazuzu.infrastructure.dto.TagDto;
+import org.zalando.pazuzu.infrastructure.service.TagService;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Created by vpavlyshyn on 13/06/16.
- */
 @CrossOrigin
 @RestController
 @RequestMapping(value = "/api/tags")
@@ -28,7 +27,7 @@ public class TagResource {
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<org.zalando.pazuzu.feature.tag.TagDto> upsert(@RequestBody List<TagDto> tags) throws ServiceException {
+    public List<TagDto> upsert(@RequestBody List<TagDto> tags) throws ServiceException {
         return tagService.upsertTagDtos(tags).stream().map(TagDto::ofShort).collect(Collectors.toList());
     }
 

@@ -1,8 +1,11 @@
-package org.zalando.pazuzu.feature.tag;
+package org.zalando.pazuzu.infrastructure.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.zalando.pazuzu.infrastructure.domain.Tag;
+import org.zalando.pazuzu.infrastructure.dto.TagDto;
+import org.zalando.pazuzu.infrastructure.repository.TagRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;

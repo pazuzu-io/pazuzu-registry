@@ -1,4 +1,4 @@
-package org.zalando.pazuzu.feature.tag;
+package org.zalando.pazuzu.infrastructure.service;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -9,6 +9,9 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.zalando.pazuzu.PazuzuAppLauncher;
+import org.zalando.pazuzu.infrastructure.domain.Tag;
+import org.zalando.pazuzu.infrastructure.dto.TagDto;
+import org.zalando.pazuzu.infrastructure.service.TagService;
 
 import java.util.Arrays;
 import java.util.HashSet;

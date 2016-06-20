@@ -10,7 +10,7 @@ import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.http.*;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.zalando.pazuzu.feature.FeatureFullDto;
+import org.zalando.pazuzu.infrastructure.dto.FeatureFullDto;
 
 import java.util.Arrays;
 import java.util.HashMap;

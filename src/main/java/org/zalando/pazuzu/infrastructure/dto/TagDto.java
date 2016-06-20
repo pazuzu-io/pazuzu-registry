@@ -1,12 +1,11 @@
-package org.zalando.pazuzu.feature.tag;
+package org.zalando.pazuzu.infrastructure.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.zalando.pazuzu.infrastructure.domain.Tag;
 
-/**
- * Created by vpavlyshyn on 09/06/16.
- */
 public class TagDto {
+
     @JsonProperty("name")
     private String name;
 

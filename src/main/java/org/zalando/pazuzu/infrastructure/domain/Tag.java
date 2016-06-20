@@ -1,10 +1,8 @@
-package org.zalando.pazuzu.feature.tag;
+package org.zalando.pazuzu.infrastructure.domain;
 
 import javax.persistence.*;
+import java.util.Objects;
 
-/**
- * Created by vpavlyshyn on 09/06/16.
- */
 @Entity
 public class Tag {
     @Id
@@ -56,6 +54,6 @@ public class Tag {
         }
 
         Tag other = (Tag) obj;
-        return this.getName() == other.getName();
+        return Objects.equals(getName(), other.getName());
     }
 }

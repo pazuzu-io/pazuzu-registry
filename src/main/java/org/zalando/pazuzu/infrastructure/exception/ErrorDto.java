@@ -1,4 +1,4 @@
-package org.zalando.pazuzu.exception;
+package org.zalando.pazuzu.infrastructure.exception;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
