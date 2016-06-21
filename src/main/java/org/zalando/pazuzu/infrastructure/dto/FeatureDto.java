@@ -1,7 +1,7 @@
-package org.zalando.pazuzu.feature;
+package org.zalando.pazuzu.infrastructure.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.zalando.pazuzu.feature.tag.TagDto;
+import org.zalando.pazuzu.infrastructure.domain.Feature;
 
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class FeatureDto {
+
     @JsonProperty("name")
     private String name;
     @JsonProperty("docker_data")

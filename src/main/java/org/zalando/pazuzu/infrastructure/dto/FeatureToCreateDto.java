@@ -1,4 +1,4 @@
-package org.zalando.pazuzu.feature;
+package org.zalando.pazuzu.infrastructure.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class FeatureToCreateDto extends FeatureDto {
+
     @JsonProperty("dependencies")
     private List<String> dependencies;
 

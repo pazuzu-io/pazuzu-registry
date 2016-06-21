@@ -1,6 +1,7 @@
-package org.zalando.pazuzu.feature;
+package org.zalando.pazuzu.infrastructure.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.zalando.pazuzu.infrastructure.domain.Feature;
 
 import javax.persistence.EntityManager;
 import java.util.List;

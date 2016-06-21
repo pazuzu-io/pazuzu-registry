@@ -1,4 +1,4 @@
-package org.zalando.pazuzu.feature.tag;
+package org.zalando.pazuzu.infrastructure.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
@@ -13,6 +13,7 @@ import org.springframework.http.*;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.zalando.pazuzu.PazuzuAppLauncher;
+import org.zalando.pazuzu.infrastructure.dto.TagDto;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

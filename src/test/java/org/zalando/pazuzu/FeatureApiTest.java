@@ -3,9 +3,9 @@ package org.zalando.pazuzu;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
 import org.springframework.http.*;
-import org.zalando.pazuzu.exception.ErrorDto;
-import org.zalando.pazuzu.feature.FeatureDto;
-import org.zalando.pazuzu.feature.FeatureFullDto;
+import org.zalando.pazuzu.infrastructure.exception.ErrorDto;
+import org.zalando.pazuzu.infrastructure.dto.FeatureDto;
+import org.zalando.pazuzu.infrastructure.dto.FeatureFullDto;
 
 import java.util.List;
 import java.util.Map;

@@ -1,17 +1,19 @@
-package org.zalando.pazuzu.feature;
+package org.zalando.pazuzu.infrastructure.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.zalando.pazuzu.exception.BadRequestException;
-import org.zalando.pazuzu.exception.Error;
-import org.zalando.pazuzu.exception.NotFoundException;
-import org.zalando.pazuzu.exception.ServiceException;
-import org.zalando.pazuzu.feature.tag.TagDto;
-import org.zalando.pazuzu.feature.tag.TagService;
+import org.zalando.pazuzu.infrastructure.exception.BadRequestException;
+import org.zalando.pazuzu.infrastructure.exception.Error;
+import org.zalando.pazuzu.infrastructure.exception.NotFoundException;
+import org.zalando.pazuzu.infrastructure.exception.ServiceException;
+import org.zalando.pazuzu.infrastructure.domain.Feature;
+import org.zalando.pazuzu.infrastructure.dto.FeaturesWithTotalCount;
+import org.zalando.pazuzu.infrastructure.dto.TagDto;
+import org.zalando.pazuzu.infrastructure.repository.FeatureRepository;
 import org.zalando.pazuzu.sort.TopologicalSortLinear;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -25,16 +27,10 @@ public class FeatureService {
     private final FeatureRepository featureRepository;
     private final TagService tagService;
 
-
-    @Autowired
+    @Inject
     public FeatureService(FeatureRepository featureRepository, TagService tagService) {
         this.featureRepository = featureRepository;
         this.tagService = tagService;
-    }
-
-    private static void collectRecursively(Collection<Feature> result, Feature f) {
-        result.add(f);
-        f.getDependencies().forEach(item -> collectRecursively(result, item));
     }
 
     @Transactional
@@ -72,27 +68,6 @@ public class FeatureService {
         return converter.apply(newFeature);
     }
 
-    private void createName(String name, Feature newFeature) throws BadRequestException {
-        nameGuardCheck(name);
-        newFeature.setName(name);
-    }
-
-    private void createDependencies(List<String> dependencyNames, Feature newFeature) throws ServiceException {
-        final Set<Feature> dependencies = loadFeatures(dependencyNames);
-
-        newFeature.setDependencies(dependencies);
-    }
-
-    private void nameGuardCheck(String name) throws BadRequestException {
-        if (StringUtils.isEmpty(name)) {
-            throw new BadRequestException(Error.FEATURE_NAME_EMPTY);
-        }
-        final Feature existing = featureRepository.findByName(name);
-        if (null != existing) {
-            throw new BadRequestException(Error.FEATURE_DUPLICATE);
-        }
-    }
-
     @Transactional(rollbackFor = ServiceException.class)
     public <T> T updateFeature(String name, String newName, String dockerData, String testInstruction, String description, List<String> dependencyNames, Function<Feature, T> converter) throws ServiceException {
         final Feature existing = loadExistingFeature(name);
@@ -123,6 +98,32 @@ public class FeatureService {
         }
         featureRepository.save(existing);
         return converter.apply(existing);
+    }
+
+    private static void collectRecursively(Collection<Feature> result, Feature f) {
+        result.add(f);
+        f.getDependencies().forEach(item -> collectRecursively(result, item));
+    }
+
+    private void createName(String name, Feature newFeature) throws BadRequestException {
+        nameGuardCheck(name);
+        newFeature.setName(name);
+    }
+
+    private void createDependencies(List<String> dependencyNames, Feature newFeature) throws ServiceException {
+        final Set<Feature> dependencies = loadFeatures(dependencyNames);
+
+        newFeature.setDependencies(dependencies);
+    }
+
+    private void nameGuardCheck(String name) throws BadRequestException {
+        if (StringUtils.isEmpty(name)) {
+            throw new BadRequestException(Error.FEATURE_NAME_EMPTY);
+        }
+        final Feature existing = featureRepository.findByName(name);
+        if (null != existing) {
+            throw new BadRequestException(Error.FEATURE_DUPLICATE);
+        }
     }
 
     @Transactional
