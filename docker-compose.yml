@@ -7,7 +7,7 @@ services:
     links:
     - postgres-db
     environment:
-    - 'SPRING_APPLICATION_JSON={"spring":{"profiles": {"active": "dev"}, "datasource":{"username": "postgres", "url": "jdbc:postgresql://postgres-db:5432/postgres"}}}'
+    - 'SPRING_APPLICATION_JSON={"spring":{"profiles": {"active": "dev"}, "datasource":{"username": "postgres", "url": "jdbc:postgresql://postgres-db:5432/postgres"}}, "pazuzu": {"registry": {"admins": "admin"}}}'
   postgres-db:
     image: registry.opensource.zalan.do/stups/postgres:9.4.5-1
     expose:

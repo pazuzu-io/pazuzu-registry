@@ -8,7 +8,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.zalando.pazuzu.exception.ServiceException;
 import org.zalando.pazuzu.feature.file.FileDto;
 import org.zalando.pazuzu.feature.file.FileLinkService;
+import org.zalando.pazuzu.security.Roles;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +33,7 @@ public class FeaturesResource {
         this.fileLinkService = fileLinkService;
     }
 
+    @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<FeatureDto> listFeatures(
             @RequestParam(required = false, name = "name") String[] featureNames,
@@ -58,6 +61,7 @@ public class FeaturesResource {
         return featureSet.stream().map(FeatureDto::ofShort).collect(Collectors.toList());
     }
 
+    @RolesAllowed({Roles.ADMIN})
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FeatureFullDto> createFeature(@RequestBody FeatureToCreateDto value, UriComponentsBuilder uriBuilder) throws ServiceException {
         FeatureFullDto feature = featureService.createFeature(
@@ -69,27 +73,32 @@ public class FeaturesResource {
                 .body(feature);
     }
 
+    @RolesAllowed({Roles.ADMIN})
     @RequestMapping(value = "/{featureName}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public FeatureFullDto updateFeature(@PathVariable String featureName, @RequestBody FeatureToCreateDto value) throws ServiceException {
         return featureService.updateFeature(featureName, value.getName(), value.getDockerData(), value.getTestInstruction(), value.getDescription(), value.getDependencies(), FeatureFullDto::makeFull);
     }
 
-    @RequestMapping(value = "/{featureName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public FeatureFullDto getFeature(@PathVariable String featureName) throws ServiceException {
-        return featureService.getFeature(featureName, FeatureFullDto::makeFull);
-    }
-
+    @RolesAllowed({Roles.ADMIN})
     @RequestMapping(value = "/{featureName}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> deleteFeature(@PathVariable String featureName) throws ServiceException {
         featureService.deleteFeature(featureName);
         return ResponseEntity.noContent().build();
     }
 
+    @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
+    @RequestMapping(value = "/{featureName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public FeatureFullDto getFeature(@PathVariable String featureName) throws ServiceException {
+        return featureService.getFeature(featureName, FeatureFullDto::makeFull);
+    }
+
+    @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
     @RequestMapping(value = "/search/{featureName}", method = RequestMethod.GET)
     public List<FeatureDto> searchFeature(@PathVariable String featureName) throws ServiceException {
         return featureService.listFeatures(featureName, FeatureDto::ofShort);
     }
 
+    @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
     @RequestMapping(value = "/{featureName}/files", method = RequestMethod.GET)
     public List<FileDto> listLinkedFiles(@PathVariable String featureName) {
         // TODO (error reporting) Return 404 if feature is not found

@@ -30,3 +30,7 @@ endpoints:
 
 server:
   use-forward-headers: true
+
+pazuzu:
+  registry:
+    admins: admin
