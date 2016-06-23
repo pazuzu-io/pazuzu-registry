@@ -71,7 +71,7 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
     }
 
     @Test
-    public void shouldFailToCreateFeatureWithUserAuthority() {
+    public void shouldCreateFeatureWithUserAuthority() {
 
         // given
         FeatureToCreateDto feature = createTestFeature();
@@ -80,21 +80,6 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
         ResponseEntity response = template.exchange(
                 url("/api/features"), POST, new HttpEntity<>(feature, oauthToken(USER_TOKEN)), Object.class
         );
-
-        // then
-        assertForbidden(response);
-    }
-
-    @Test
-    public void shouldCreateFeatureWithAdminAuthority() {
-
-        // given
-        FeatureToCreateDto feature = createTestFeature();
-
-        // when
-            ResponseEntity response = template.exchange(
-                    url("/api/features"), POST, new HttpEntity<>(feature, oauthToken(ADMIN_TOKEN)), Object.class
-            );
 
         // then
         assertCreated(response);
@@ -202,6 +187,42 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
         // when
         ResponseEntity response = template.exchange(
                 url("/api/features", feature.getName()), DELETE, new HttpEntity<>(oauthToken(ADMIN_TOKEN)), Object.class
+        );
+
+        // then
+        assertNoContent(response);
+    }
+
+    @Test
+    public void shouldFailToApproveFeatureWithUserAuthority() {
+
+        // given
+        FeatureToCreateDto feature = createTestFeature();
+
+        // and
+        createFeature(feature);
+
+        // when
+        ResponseEntity response = template.exchange(
+                url("/api/features", feature.getName(), "approve"), PUT, new HttpEntity<>(oauthToken(USER_TOKEN)), Object.class
+        );
+
+        // then
+        assertForbidden(response);
+    }
+
+    @Test
+    public void shouldApproveFeatureWithAdminAuthority() {
+
+        // given
+        FeatureToCreateDto feature = createTestFeature();
+
+        // and
+        createFeature(feature);
+
+        // when
+        ResponseEntity response = template.exchange(
+                url("/api/features", feature.getName(), "approve"), PUT, new HttpEntity<>(oauthToken(ADMIN_TOKEN)), Object.class
         );
 
         // then

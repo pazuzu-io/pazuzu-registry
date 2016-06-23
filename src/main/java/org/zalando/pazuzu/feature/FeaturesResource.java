@@ -61,7 +61,7 @@ public class FeaturesResource {
         return featureSet.stream().map(FeatureDto::ofShort).collect(Collectors.toList());
     }
 
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Roles.USER})
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FeatureFullDto> createFeature(@RequestBody FeatureToCreateDto value, UriComponentsBuilder uriBuilder) throws ServiceException {
         FeatureFullDto feature = featureService.createFeature(
@@ -105,5 +105,12 @@ public class FeaturesResource {
         return fileLinkService.getFeatureFiles(featureName)
                 .stream().map(FileDto::fromFile)
                 .collect(Collectors.toList());
+    }
+
+    @RolesAllowed({Roles.ADMIN})
+    @RequestMapping(value = "/{featureName}/approve", method = RequestMethod.PUT)
+    public ResponseEntity<Void> approveFeature(@PathVariable String featureName) throws ServiceException {
+        featureService.approveFeature(featureName);
+        return ResponseEntity.noContent().build();
     }
 }
