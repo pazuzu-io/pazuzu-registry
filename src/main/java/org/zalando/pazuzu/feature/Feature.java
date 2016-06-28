@@ -1,5 +1,6 @@
 package org.zalando.pazuzu.feature;
 
+import org.zalando.pazuzu.feature.file.File;
 import org.zalando.pazuzu.feature.tag.Tag;
 
 import javax.persistence.*;
@@ -15,9 +16,11 @@ public class Feature {
             name = "feature_dependency",
             joinColumns = @JoinColumn(name = "feature_id", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "dependency_feature_id", nullable = false))
-    public Set<Feature> dependencies;
+    private Set<Feature> dependencies;
     @ManyToMany(fetch = FetchType.LAZY)
-    public List<Tag> tags;
+    private List<Tag> tags;
+    @ManyToMany(fetch = FetchType.LAZY)
+    private Set<File> files;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -80,6 +83,17 @@ public class Feature {
         return getDependencies().stream().filter(item -> item.containsDependencyRecursively(f)).findAny().isPresent();
     }
 
+    public Set<File> getFiles() {
+        if (null == files) {
+            files = new HashSet<>();
+        }
+        return files;
+    }
+
+    public void setFiles(Set<File> files) {
+        this.files = files;
+    }
+
     public String getTestInstruction() {
         return testInstruction;
     }
@@ -114,6 +128,6 @@ public class Feature {
         }
 
         Feature other = (Feature) obj;
-        return this.getId() == other.getId();
+        return this.getId() == other.getId(); // TODO (review) Is comparison with "==" intended?
     }
 }
