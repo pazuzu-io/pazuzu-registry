@@ -8,6 +8,7 @@ Contents:
 
    Introduction<intro>
    API Reference <api>
+   OAuth2 Authentication <auth>
    License <license>
 
 Indices and tables
