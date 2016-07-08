@@ -1,25 +1,20 @@
 package org.zalando.pazuzu.exception;
 
 
-public class ServiceException extends Exception {
-    private Error error;
-    private String detailedMessage;
+public class ServiceException extends RuntimeException {
+    private final Error error;
 
     public ServiceException(Error error) {
-        super(error.getMessage());
+        super(error.message);
         this.error = error;
     }
 
     public ServiceException(Error error, String detailedMessage) {
+        super(detailedMessage);
         this.error = error;
-        this.detailedMessage = detailedMessage;
     }
 
     public Error getError() {
         return error;
-    }
-
-    public String getDetailedMessage() {
-        return detailedMessage;
     }
 }
