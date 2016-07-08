@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.zalando.pazuzu.exception.BadRequestException;
-import org.zalando.pazuzu.exception.Error;
 import org.zalando.pazuzu.exception.NotFoundException;
 import org.zalando.pazuzu.exception.ServiceException;
 import org.zalando.pazuzu.feature.tag.TagDto;
@@ -85,11 +84,11 @@ public class FeatureService {
 
     private void nameGuardCheck(String name) throws BadRequestException {
         if (StringUtils.isEmpty(name)) {
-            throw new BadRequestException(Error.FEATURE_NAME_EMPTY);
+            throw new BadRequestException(FeatureErrors.FEATURE_NAME_EMPTY);
         }
         final Feature existing = featureRepository.findByName(name);
         if (null != existing) {
-            throw new BadRequestException(Error.FEATURE_DUPLICATE);
+            throw new BadRequestException(FeatureErrors.FEATURE_DUPLICATE);
         }
     }
 
@@ -99,7 +98,7 @@ public class FeatureService {
         if (null != newName && !newName.equals(existing.getName())) {
             final Feature newExisting = featureRepository.findByName(newName);
             if (null != newExisting) {
-                throw new BadRequestException(Error.FEATURE_DUPLICATE);
+                throw new BadRequestException(FeatureErrors.FEATURE_DUPLICATE);
             }
             existing.setName(newName);
         }
@@ -117,7 +116,8 @@ public class FeatureService {
             final List<Feature> recursive = dependencies.stream()
                     .filter(f -> f.containsDependencyRecursively(existing)).collect(Collectors.toList());
             if (!recursive.isEmpty()) {
-                throw new BadRequestException(Error.FEATURE_HAS_RECURSIVE_DEPENDENCY, "Recursive dependencies found: " + recursive.stream().map(Feature::getName).collect(Collectors.joining(", ")));
+                throw new BadRequestException(FeatureErrors.FEATURE_HAS_RECURSIVE_DEPENDENCY,
+                        "Recursive dependencies found: " + recursive.stream().map(Feature::getName).collect(Collectors.joining(", ")));
             }
             existing.setDependencies(dependencies);
         }
@@ -134,12 +134,13 @@ public class FeatureService {
     public void deleteFeature(String featureName) throws ServiceException {
         final Feature feature = featureRepository.findByName(featureName);
         if (feature == null) {
-            throw new NotFoundException(Error.FEATURE_NOT_FOUND);
+            throw new NotFoundException(FeatureErrors.FEATURE_NOT_FOUND);
         }
         final List<Feature> referencing = featureRepository.findByDependenciesContaining(feature);
         if (!referencing.isEmpty()) {
-            throw new BadRequestException(Error.FEATURE_NOT_DELETABLE_DUE_TO_REFERENCES,
-                    "Can't delete feature because it is referenced from other feature(s): " + referencing.stream().map(Feature::getName).collect(Collectors.joining(", ")));
+            throw new BadRequestException(FeatureErrors.FEATURE_NOT_DELETABLE_DUE_TO_REFERENCES,
+                    "Can't delete feature because it is referenced from other feature(s): "
+                            + referencing.stream().map(Feature::getName).collect(Collectors.joining(", ")));
         }
         featureRepository.delete(feature);
     }
@@ -151,7 +152,7 @@ public class FeatureService {
                 .collect(Collectors.toSet());
         if (dependencies.size() != uniqueDependencies.size()) {
             dependencies.forEach(f -> uniqueDependencies.remove(f.getName()));
-            throw new BadRequestException(Error.FEATURE_NOT_FOUND);
+            throw new BadRequestException(FeatureErrors.FEATURE_NOT_FOUND);
         }
         return dependencies;
     }
@@ -165,7 +166,7 @@ public class FeatureService {
     private Feature loadExistingFeature(String name) throws NotFoundException {
         final Feature existing = featureRepository.findByName(name);
         if (null == existing) {
-            throw new NotFoundException(Error.FEATURE_NOT_FOUND);
+            throw new NotFoundException(FeatureErrors.FEATURE_NOT_FOUND);
         }
         return existing;
     }

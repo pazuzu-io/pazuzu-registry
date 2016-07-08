@@ -18,30 +18,31 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     @ResponseBody
     public ErrorDto featureNotExistingException(BadRequestException exception) {
-        return new ErrorDto(exception.getError(), exception.getDetailedMessage());
+        LOG.error(exception.getMessage(), exception);
+        return new ErrorDto(exception);
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundException.class)
     @ResponseBody
     public ErrorDto notFoundException(NotFoundException exception) {
-        return new ErrorDto(exception.getError(), exception.getDetailedMessage());
+        LOG.error(exception.getMessage(), exception);
+        return new ErrorDto(exception);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseBody
     public ErrorDto failedToParseJsonException(HttpMessageNotReadableException exception) {
-        return new ErrorDto(Error.BAD_JSON);
+        LOG.error(exception.getMessage(), exception);
+        return new ErrorDto(CommonErrors.BAD_JSON);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ErrorDto exception(Exception exception) {
-        if (LOG.isErrorEnabled()) {
-            LOG.error(exception.getMessage(), exception);
-        }
-        return new ErrorDto(Error.INTERNAL_SERVER_ERROR);
+        LOG.error(exception.getMessage(), exception);
+        return new ErrorDto(CommonErrors.INTERNAL_SERVER_ERROR);
     }
 }

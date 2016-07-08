@@ -13,18 +13,21 @@ public class ErrorDto {
     @JsonProperty("detailed_message")
     private String detailedMessage;
 
-    public ErrorDto(Error error) {
-        this.code = error.getCode();
-        this.message = error.getMessage();
+    public ErrorDto() {
     }
 
     public ErrorDto(Error error, String detailedMessage) {
-        this.code = error.getCode();
-        this.message = error.getMessage();
+        this.code = error.code;
+        this.message = error.message;
         this.detailedMessage = detailedMessage;
     }
 
-    public ErrorDto() {
+    public ErrorDto(Error error) {
+        this(error, "");
+    }
+
+    public ErrorDto(ServiceException ex) {
+        this(ex.getError(), ex.getMessage());
     }
 
     public String getCode() {
