@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.zalando.pazuzu.exception.ServiceException;
+import org.zalando.pazuzu.feature.file.FileDto;
+import org.zalando.pazuzu.feature.file.FileLinkService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
@@ -21,10 +23,12 @@ public class FeaturesResource {
     private static final String X_TOTAL_COUNT = "X-Total-Count";
     private static final Integer TOPOLOGICAL_SORT = 1;
     private final FeatureService featureService;
+    private final FileLinkService fileLinkService;
 
     @Autowired
-    public FeaturesResource(FeatureService featureService) {
+    public FeaturesResource(FeatureService featureService, FileLinkService fileLinkService) {
         this.featureService = featureService;
+        this.fileLinkService = fileLinkService;
     }
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -86,4 +90,11 @@ public class FeaturesResource {
         return featureService.listFeatures(featureName, FeatureDto::ofShort);
     }
 
+    @RequestMapping(value = "/{featureName}/files", method = RequestMethod.GET)
+    public List<FileDto> listLinkedFiles(@PathVariable String featureName) {
+        // TODO (error reporting) Return 404 if feature is not found
+        return fileLinkService.getFeatureFiles(featureName)
+                .stream().map(FileDto::fromFile)
+                .collect(Collectors.toList());
+    }
 }

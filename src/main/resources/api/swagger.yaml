@@ -120,6 +120,71 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /api/features/{id}/files:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Name of feature
+        type: string
+    get:
+      summary: Get List of files linked (used) in this feature
+      tags:
+        - Features
+        - Files
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/File'
+        default:
+          description: Request can not be fulfilled
+          schema:
+            $ref: '#/definitions/Error'
+  /api/files/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Id of file
+        type: string
+    get:
+      summary: Get description of this file.
+      tags:
+        - Files
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/File'
+        default:
+          description: Request can not be fulfilled
+          schema:
+            $ref: '#/definitions/Error'
+  /api/files/{id}/content:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Id of the file.
+        type: string
+    get:
+      summary: Get content of the file.
+      tags:
+        - Files
+      responses:
+        200:
+          description: OK
+          schema:
+            type: string
+            format: binary
+        default:
+          description: Request can not be fulfilled.
+          schema:
+            $ref: '#/definitions/Error'
+
 definitions:
   Feature:
     type: object
@@ -147,10 +212,10 @@ definitions:
         description: Docker file part to be used with that feature.
       test_instruction:
         type: string
-        description: how to test that feature is working
+        description: How to test that feature is working.
       description:
         type: string
-        description: description of the feature
+        description: Description of the feature.
       dependencies:
         type: array
         items: 
@@ -175,6 +240,18 @@ definitions:
         items:
           $ref: '#/definitions/Feature'
         description: List of dependencies for this feature
+  File:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Unique identifier of a file.
+      name:
+        type: string
+        description: Filename as it appears in search results and Dockerfile fragments.
+      content_href:
+        type: string
+        description: href to resource with file content.
   Error:
     type: object
     properties:

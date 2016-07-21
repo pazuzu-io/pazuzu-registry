@@ -10,8 +10,8 @@ public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "tag_name", nullable = false, length = 256, unique = true)
 
+    @Column(name = "tag_name", nullable = false, length = 256, unique = true)
     private String name;
 
     public Tag() {
