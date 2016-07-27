@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpMethod.GET;
 
 public class FeatureApiTest extends AbstractComponentTest {
 
