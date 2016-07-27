@@ -5,8 +5,9 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 
 public interface FileRepository extends CrudRepository<File, Integer> {
+    List<File> findByFeatureNameAndNameIgnoreCaseContaining(String featureName, String namePart);
 
-    List<File> findByNameIgnoreCaseContaining(String name);
+    List<File> findByFeatureName(String featureName);
 
-    File findByName(String name);
+    File findOneByFeatureNameAndId(String featureName, Integer id);
 }

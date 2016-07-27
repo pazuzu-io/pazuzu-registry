@@ -112,4 +112,15 @@ public class FeatureDto {
     public int hashCode() {
         return Objects.hash(name, dockerData, testInstruction);
     }
+
+    @Override
+    public String toString() {
+        return "FeatureDto{" +
+                "name='" + name + '\'' +
+                ", dockerData='" + dockerData + '\'' +
+                ", testInstruction='" + testInstruction + '\'' +
+                ", description='" + description + '\'' +
+                ", tags=" + tags +
+                '}';
+    }
 }

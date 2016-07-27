@@ -1,5 +1,7 @@
 package org.zalando.pazuzu.feature.file;
 
+import org.zalando.pazuzu.feature.Feature;
+
 import javax.persistence.*;
 import java.nio.file.Path;
 
@@ -9,11 +11,18 @@ public class File {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "name", nullable = false, length = 256, unique = true)
+    @Column(name = "name", nullable = false, length = 256)
     private String name;
 
     @Column(name = "content_path", nullable = false, length = 512)
     private String contentPath;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "feature_id")
+    private Feature feature;
+
+    @Column(name = "approved", nullable = false)
+    private boolean approved;
 
     public File() {
     }
@@ -45,6 +54,22 @@ public class File {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Feature getFeature() {
+        return feature;
+    }
+
+    public void setFeature(Feature feature) {
+        this.feature = feature;
+    }
+
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
     }
 
     @Override

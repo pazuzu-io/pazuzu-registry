@@ -1,36 +1,51 @@
 package org.zalando.pazuzu.feature;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Preconditions;
+import org.zalando.pazuzu.feature.file.FileDto;
 import org.zalando.pazuzu.feature.tag.TagDto;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toSet;
 
 public class FeatureFullDto extends FeatureDto {
 
     @JsonProperty("dependencies")
-    private List<FeatureDto> dependencies;
+    private Set<FeatureDto> dependencies = new HashSet<>();
+
+    @JsonProperty("files")
+    private Set<FileDto> files = new HashSet<>();
 
     public static FeatureFullDto makeFull(Feature feature) {
-        if (null == feature) {
-            return null;
-        }
+        Preconditions.checkNotNull(feature);
+
         final FeatureFullDto result = new FeatureFullDto();
         fillShort(feature, result);
-        result.dependencies = feature.getDependencies().stream().map(FeatureDto::ofShort).collect(Collectors.toList());
+
+        if (feature.getDependencies() != null) {
+            result.dependencies = feature.getDependencies().stream().map(FeatureDto::ofShort).collect(toSet());
+        }
+
         if (feature.getTags() != null && !feature.getTags().isEmpty()) {
             result.setTags(feature.getTags().stream().map(TagDto::ofShort).collect(Collectors.toList()));
+        }
+
+        if (feature.getFiles() != null) {
+            result.files = feature.getFiles().stream().map(FileDto::fromFile).collect(toSet());
         }
         return result;
     }
 
-    public List<FeatureDto> getDependencies() {
-        if (null == dependencies) {
-            dependencies = new ArrayList<>();
-        }
+    public Set<FeatureDto> getDependencies() {
         return dependencies;
+    }
+
+    public Set<FileDto> getFiles() {
+        return files;
     }
 
     @Override
@@ -51,5 +66,13 @@ public class FeatureFullDto extends FeatureDto {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), dependencies);
+    }
+
+    @Override
+    public String toString() {
+        return "FeatureFullDto{" +
+                "dependencies=" + dependencies +
+                ", files=" + files +
+                "} " + super.toString();
     }
 }

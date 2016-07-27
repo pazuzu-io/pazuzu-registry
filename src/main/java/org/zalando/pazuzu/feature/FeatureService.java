@@ -73,10 +73,7 @@ public class FeatureService {
     }
 
     private void setDockerData(Feature feature, String dockerData) {
-        // TODO (usability) This might be too strict and we should allow saving incomplete features.
-        // TODO (usability) Report list of missing files.
         feature.setDockerData(null == dockerData ? "" : dockerData);
-        updateFileLinks(feature);
     }
 
     private void createName(String name, Feature newFeature) throws BadRequestException {
@@ -132,13 +129,6 @@ public class FeatureService {
         }
         featureRepository.save(existing);
         return converter.apply(existing);
-    }
-
-    private void updateFileLinks(Feature feature) {
-        feature.setFiles(
-                DockerParser.getCopyFiles(feature.getDockerData())
-                        .stream().map(fileService::getByName)
-                        .collect(Collectors.toSet()));
     }
 
     @Transactional
