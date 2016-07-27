@@ -41,11 +41,9 @@ public class FileLinkService {
     }
 
     private Feature getFeature(String featureName) {
-        final Feature byName = featureRepository.findByName(featureName);
-        if (null == byName) {
-            throw new FeatureNotFoundException("Feature '" + featureName + "' is not found.");
-        }
-        return byName;
+        return featureRepository.findByName(featureName)
+                .orElseThrow(() -> new FeatureNotFoundException("Feature '" + featureName + "' is not found."));
+
     }
 
 }

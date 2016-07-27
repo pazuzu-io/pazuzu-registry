@@ -101,6 +101,25 @@ public class FeatureApiTest extends AbstractComponentTest {
     }
 
     @Test
+    public void testShouldFailOnDuplicateFeatureCreation() throws Exception {
+        // given
+        createFeature("Test 1000", "Test Data 2", "something to test2", "Test 2 desc");
+
+        // when
+        ResponseEntity<Map> secondCreationResult = createFeatureUnchecked(Map.class, "Test 1000", "test", "test", "test");
+        assertThat(secondCreationResult.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        // then
+        assertThat(secondCreationResult.getBody())
+                .containsOnlyKeys("type","title", "status", "detail")
+                .containsOnly(
+                        entry("type", "http://pazuzu.io/error/feature_duplicate"),
+                        entry("title", "Feature with this name already exists"),
+                        entry("detail", "Feature with name Test 1000 already exists"),
+                        entry("status", HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @Test
     public void returnsNotFoundWhenTryingToRetrieveNonExistingFeature() throws Exception {
         // when
         ResponseEntity<Map> result = template.getForEntity(url("/api/features/non_existing"), Map.class);
@@ -110,6 +129,25 @@ public class FeatureApiTest extends AbstractComponentTest {
         assertThat(result.getBody()).containsOnly(
                    entry("type", "http://pazuzu.io/error/feature_not_found"),
                    entry("title", "Feature was not found"),
+                   entry("detail", "Feature missing: non_existing"),
+                   entry("status", HttpStatus.NOT_FOUND.value()));
+    }
+
+    @Test
+    public void returnsNotFoundWhenTryingToRetrieveMultipleNonExistingFeatures() throws Exception {
+        // given
+        createFeature("FeatureA", "Test Data 2", "something to test2", "Test 2 desc");
+
+        // when
+        ResponseEntity<Map> result = template.getForEntity(url(featuresUrl + "?name={name}"),
+                Map.class, "FeatureA,FeatureB");
+
+        // then
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(result.getBody()).containsOnly(
+                   entry("type", "http://pazuzu.io/error/feature_not_found"),
+                   entry("title", "Feature was not found"),
+                   entry("detail", "Feature missing: FeatureB"),
                    entry("status", HttpStatus.NOT_FOUND.value()));
     }
 
@@ -165,6 +203,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         assertThat(response.getBody()).containsOnly(
                    entry("type", "http://pazuzu.io/error/feature_not_found"),
                    entry("title", "Feature was not found"),
+                   entry("detail", "Feature missing: NotExistingFeature"),
                    entry("status", HttpStatus.NOT_FOUND.value()));
     }
 

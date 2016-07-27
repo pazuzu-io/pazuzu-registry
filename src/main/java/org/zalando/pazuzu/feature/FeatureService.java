@@ -15,12 +15,11 @@ import javax.ws.rs.BadRequestException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toSet;
 
 @Service
 public class FeatureService {
@@ -55,11 +54,11 @@ public class FeatureService {
 
     @Transactional(rollbackFor = ServiceException.class)
     public <T> T createFeature(String name, String dockerData, String testInstruction, String description,
-                               List<String> dependencyNames, List<TagDto> tags, Function<Feature, T> converter) throws ServiceException {
+                               List<String> dependencyNames, List<TagDto> tags, Function<Feature, T> converter) {
         final Feature newFeature = new Feature();
-        createName(name, newFeature);
-        createDependencies(dependencyNames, newFeature);
 
+        setFeatureName(name, newFeature);
+        createDependencies(dependencyNames, newFeature);
         setDockerData(newFeature, dockerData);
         newFeature.setApproved(false);
 
@@ -83,12 +82,12 @@ public class FeatureService {
         updateFileLinks(feature);
     }
 
-    private void createName(String name, Feature newFeature) throws BadRequestException {
+    private void setFeatureName(String name, Feature feature) throws BadRequestException {
         nameGuardCheck(name);
-        newFeature.setName(name);
+        feature.setName(name);
     }
 
-    private void createDependencies(List<String> dependencyNames, Feature newFeature) throws ServiceException {
+    private void createDependencies(List<String> dependencyNames, Feature newFeature) {
         final Set<Feature> dependencies = loadFeatures(dependencyNames);
 
         newFeature.setDependencies(dependencies);
@@ -98,22 +97,19 @@ public class FeatureService {
         if (StringUtils.isEmpty(name)) {
             throw new FeatureNameEmptyException();
         }
-        final Feature existing = featureRepository.findByName(name);
-        if (null != existing) {
-            throw new FeatureDuplicateException();
-        }
+
+        featureRepository.findByName(name).ifPresent(f -> {
+            throw new FeatureDuplicateException(String.format("Feature with name %s already exists", f.getName()));
+        });
     }
 
     @Transactional(rollbackFor = ServiceException.class)
     public <T> T updateFeature(String name, String newName, String dockerData, String testInstruction,
-                               String description, List<String> dependencyNames, Function<Feature, T> converter) throws ServiceException {
+                               String description, List<String> dependencyNames, Function<Feature, T> converter) {
         final Feature existing = loadExistingFeature(name);
+
         if (null != newName && !newName.equals(existing.getName())) {
-            final Feature newExisting = featureRepository.findByName(newName);
-            if (null != newExisting) {
-                throw new FeatureDuplicateException();
-            }
-            existing.setName(newName);
+            setFeatureName(newName, existing);
         }
 
         setDockerData(existing, dockerData);
@@ -142,7 +138,7 @@ public class FeatureService {
         feature.setFiles(
                 DockerParser.getCopyFiles(feature.getDockerData())
                         .stream().map(fileService::getByName)
-                        .collect(Collectors.toSet()));
+                        .collect(toSet()));
     }
 
     @Transactional
@@ -152,10 +148,7 @@ public class FeatureService {
 
     @Transactional(rollbackFor = ServiceException.class)
     public void deleteFeature(String featureName) throws ServiceException {
-        final Feature feature = featureRepository.findByName(featureName);
-        if (feature == null) {
-            throw new FeatureNotFoundException();
-        }
+        final Feature feature = loadExistingFeature(featureName);
         final List<Feature> referencing = featureRepository.findByDependenciesContaining(feature);
         if (!referencing.isEmpty()) {
             throw new FeatureReferencedDeleteException(
@@ -167,25 +160,22 @@ public class FeatureService {
 
     @Transactional
     public void approveFeature(String featureName) throws ServiceException {
-        final Optional<Feature> feature = ofNullable(featureRepository.findByName(featureName));
-        if(!feature.isPresent()) {
-            throw new FeatureNotFoundException();
-        }
-        feature.get().setApproved(true);
-        featureRepository.save(feature.get());
+        Feature feature = loadExistingFeature(featureName);
+        feature.setApproved(true);
+        featureRepository.save(feature);
     }
 
-    public Set<Feature> loadFeatures(List<String> dependencyNames) throws ServiceException {
-        final Set<String> uniqueDependencies = null == dependencyNames ? new HashSet<>() : new HashSet<>(dependencyNames);
-        final Set<Feature> dependencies = uniqueDependencies.stream()
-                .map(featureRepository::findByName).filter(f -> f != null)
-                .collect(Collectors.toSet());
-        if (dependencies.size() != uniqueDependencies.size()) {
-            dependencies.forEach(f -> uniqueDependencies.remove(f.getName()));
-            // TODO: is this really the right exception??
-            throw new FeatureNotFoundException();
+    public Set<Feature> loadFeatures(List<String> featureNames) throws ServiceException {
+        final Set<String> uniqueFeatureNames = null == featureNames ? new HashSet<>() : new HashSet<>(featureNames);
+        final Set<Feature> foundFeatures = featureRepository.findByNameIn(uniqueFeatureNames);
+
+        if (foundFeatures.size() != uniqueFeatureNames.size()) {
+            final Set<String> missingFeaturesNames = new HashSet<>(uniqueFeatureNames);
+            foundFeatures.forEach(f -> missingFeaturesNames.remove(f.getName()));
+            throw new FeatureNotFoundException("Feature missing: " + String.join(",", missingFeaturesNames));
         }
-        return dependencies;
+
+        return foundFeatures;
     }
 
     public List<Feature> getSortedFeatures(Collection<Feature> features) {
@@ -195,10 +185,7 @@ public class FeatureService {
     }
 
     private Feature loadExistingFeature(String name) throws FeatureNotFoundException {
-        final Feature existing = featureRepository.findByName(name);
-        if (null == existing) {
-            throw new FeatureNotFoundException();
-        }
-        return existing;
+        return featureRepository.findByName(name)
+                .orElseThrow(() -> new FeatureNotFoundException("Feature missing: " + name));
     }
 }
