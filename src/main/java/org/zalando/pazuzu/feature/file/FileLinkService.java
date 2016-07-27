@@ -1,7 +1,8 @@
 package org.zalando.pazuzu.feature.file;
 
 import org.springframework.stereotype.Service;
-import org.zalando.pazuzu.exception.NotFoundException;
+import org.zalando.pazuzu.exception.FeatureNotFoundException;
+import org.zalando.pazuzu.exception.FileNotFoundException;
 import org.zalando.pazuzu.feature.Feature;
 import org.zalando.pazuzu.feature.FeatureRepository;
 
@@ -26,7 +27,7 @@ public class FileLinkService {
     public void link(String featureName, Integer fileId) {
         final File file = fileRepository.findOne(fileId);
         if (null == file) {
-            throw new NotFoundException("File #" + fileId + " is not found.");
+            throw new FileNotFoundException("File #" + fileId + " is not found.");
         }
         final Feature feature = getFeature(featureName);
         feature.getFiles().add(file);
@@ -42,7 +43,7 @@ public class FileLinkService {
     private Feature getFeature(String featureName) {
         final Feature byName = featureRepository.findByName(featureName);
         if (null == byName) {
-            throw new NotFoundException("Feature '" + featureName + "' is not found.");
+            throw new FeatureNotFoundException("Feature '" + featureName + "' is not found.");
         }
         return byName;
     }
