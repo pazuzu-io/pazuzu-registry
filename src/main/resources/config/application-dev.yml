@@ -34,4 +34,4 @@ endpoints:
 pazuzu:
   registry:
     cors:
-      allowedOrigins: http://localhost:8080
+      allowedOrigins: https://localhost:8080
