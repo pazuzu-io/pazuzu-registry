@@ -33,7 +33,7 @@ public class TagService {
 
     @Transactional
     public List<Tag> upsertTagDtos(List<TagDto> tags) {
-        List<String> tagNames = tags.stream().map(t -> t.getName()).collect(Collectors.toList());
+        List<String> tagNames = tags.stream().map(TagDto::getName).collect(Collectors.toList());
         createFromTagNames(tagNames);
         return tagRepository.findByNames(tagNames);
     }
