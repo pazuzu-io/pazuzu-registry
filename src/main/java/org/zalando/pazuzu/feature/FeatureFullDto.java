@@ -2,7 +2,6 @@ package org.zalando.pazuzu.feature;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
-import org.zalando.pazuzu.feature.file.FileDto;
 import org.zalando.pazuzu.feature.tag.TagDto;
 
 import java.util.HashSet;
@@ -17,9 +16,6 @@ public class FeatureFullDto extends FeatureDto {
     @JsonProperty("dependencies")
     private Set<FeatureDto> dependencies = new HashSet<>();
 
-    @JsonProperty("files")
-    private Set<FileDto> files = new HashSet<>();
-
     public static FeatureFullDto makeFull(Feature feature) {
         Preconditions.checkNotNull(feature);
 
@@ -33,19 +29,11 @@ public class FeatureFullDto extends FeatureDto {
         if (feature.getTags() != null && !feature.getTags().isEmpty()) {
             result.setTags(feature.getTags().stream().map(TagDto::ofShort).collect(Collectors.toList()));
         }
-
-        if (feature.getFiles() != null) {
-            result.files = feature.getFiles().stream().map(FileDto::fromFile).collect(toSet());
-        }
         return result;
     }
 
     public Set<FeatureDto> getDependencies() {
         return dependencies;
-    }
-
-    public Set<FileDto> getFiles() {
-        return files;
     }
 
     @Override
@@ -72,7 +60,6 @@ public class FeatureFullDto extends FeatureDto {
     public String toString() {
         return "FeatureFullDto{" +
                 "dependencies=" + dependencies +
-                ", files=" + files +
                 "} " + super.toString();
     }
 }

@@ -1,11 +1,14 @@
 package org.zalando.pazuzu.feature;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.zalando.pazuzu.feature.file.FileDto;
 import org.zalando.pazuzu.feature.tag.TagDto;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class FeatureDto {
@@ -19,6 +22,8 @@ public class FeatureDto {
     private String description;
     @JsonProperty("tags")
     private List<TagDto> tags;
+    @JsonProperty("files")
+    private Set<FileDto> files = new HashSet<>();
 
     public static FeatureDto ofShort(Feature feature) {
         if (null == feature) {
@@ -50,6 +55,9 @@ public class FeatureDto {
         result.description = feature.getDescription();
         if (null != feature.getTags() && !feature.getTags().isEmpty()) {
             result.tags = feature.getTags().stream().map(TagDto::ofShort).collect(Collectors.toList());
+        }
+        if (feature.getFiles() != null) {
+            result.files = feature.getFiles().stream().map(FileDto::fromFile).collect(Collectors.toSet());
         }
     }
 
@@ -93,6 +101,14 @@ public class FeatureDto {
         this.tags = tags;
     }
 
+    public Set<FileDto> getFiles() {
+        return files;
+    }
+
+    public void setFiles(Set<FileDto> files) {
+        this.files = files;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -121,6 +137,7 @@ public class FeatureDto {
                 ", testInstruction='" + testInstruction + '\'' +
                 ", description='" + description + '\'' +
                 ", tags=" + tags +
+                ", files='" + description + '\'' +
                 '}';
     }
 }
