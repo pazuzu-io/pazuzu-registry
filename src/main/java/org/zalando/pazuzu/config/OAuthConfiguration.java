@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
+import org.springframework.web.cors.CorsUtils;
 import org.zalando.stups.oauth2.spring.security.expression.ExtendedOAuth2WebSecurityExpressionHandler;
 import org.zalando.stups.oauth2.spring.server.DefaultAuthenticationExtractor;
 import org.zalando.stups.oauth2.spring.server.DefaultTokenInfoRequestExecutor;
@@ -19,7 +20,7 @@ import org.zalando.stups.tokens.config.AccessTokensBeanProperties;
 
 @Configuration
 @EnableResourceServer
-@Profile(value = "production")
+@Profile(value = {"production", "oauth"})
 public class OAuthConfiguration extends ResourceServerConfigurerAdapter {
 
     @Autowired
@@ -43,6 +44,7 @@ public class OAuthConfiguration extends ResourceServerConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.NEVER)
                 .and()
                 .authorizeRequests()
+                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .antMatchers("/api/health").permitAll()
                 .antMatchers("/api/**").access("#oauth2.hasScope('uid')");
         // @formatter:on
