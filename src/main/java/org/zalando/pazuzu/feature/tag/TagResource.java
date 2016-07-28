@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 /**
  * Created by vpavlyshyn on 13/06/16.
  */
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/api/tags")
 public class TagResource {

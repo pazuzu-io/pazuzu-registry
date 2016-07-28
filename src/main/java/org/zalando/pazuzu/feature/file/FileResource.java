@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
  * <p>
  * FIXME File paths are unsuitable generally as  "/" and filename extensions (suffixes) interfere with spring's request mapping.
  */
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/api/files")
 public class FileResource {
