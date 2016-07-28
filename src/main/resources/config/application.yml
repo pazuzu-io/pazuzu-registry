@@ -30,3 +30,8 @@ endpoints:
 
 server:
   use-forward-headers: true
+
+pazuzu:
+  registry:
+    cors:
+      allowedOrigins: https://pazuzu-ui.mentoring.zalan.do

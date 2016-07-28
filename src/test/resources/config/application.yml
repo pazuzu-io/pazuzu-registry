@@ -33,3 +33,8 @@ endpoints:
   health:
     enabled: true
     path: /api/health
+
+pazuzu:
+  registry:
+    cors:
+      allowedOrigins: http://localhost:8080
