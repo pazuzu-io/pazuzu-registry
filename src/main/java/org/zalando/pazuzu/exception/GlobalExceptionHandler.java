@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -48,6 +49,13 @@ public class GlobalExceptionHandler {
     public ErrorDto failedToParseJsonException(HttpMessageNotReadableException exception) {
         LOG.error(exception.getMessage(), exception);
         return new ErrorDto(CommonErrors.BAD_JSON);
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseBody
+    public ErrorDto accessDeniedException(AccessDeniedException exception) {
+        return new ErrorDto(CommonErrors.FORBIDDEN);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
