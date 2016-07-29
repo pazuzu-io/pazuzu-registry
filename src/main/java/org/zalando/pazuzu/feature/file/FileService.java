@@ -2,8 +2,7 @@ package org.zalando.pazuzu.feature.file;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.zalando.pazuzu.exception.NotFoundException;
-import org.zalando.pazuzu.exception.PlainNotFoundException;
+import org.zalando.pazuzu.exception.FileNotFoundException;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -51,7 +50,7 @@ public class FileService {
     public File get(int fileId) {
         final File file = fileRepository.findOne(fileId);
         if (null == file) {
-            throw new NotFoundException(String.format("File #%s is not found.", fileId));
+            throw new FileNotFoundException(String.format("File #%s is not found.", fileId));
         }
         return file;
     }
@@ -59,7 +58,7 @@ public class FileService {
     public File getByName(String name) {
         final File file = fileRepository.findByName(name);
         if (null == file) {
-            throw new NotFoundException(String.format("File with name '%s' is not found.", name));
+            throw new FileNotFoundException(String.format("File with name '%s' is not found.", name));
         }
         return file;
     }
@@ -78,9 +77,6 @@ public class FileService {
     public InputStream getContent(int fileId) {
         try {
             return fileContentService.getContentStream(Paths.get(get(fileId).getContentPath()));
-        } catch (NotFoundException nfe) {
-            // XXX Hack. See comments in org.zalando.pazuzu.exception.GlobalExceptionHandler.plainNotFoundException()
-            throw new PlainNotFoundException(String.format("No file with #%s.", fileId));
         } catch (IOException e) {
             throw new RuntimeException(String.format("Cannot read content of file #%s.", fileId), e);
         }

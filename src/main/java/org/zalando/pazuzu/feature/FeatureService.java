@@ -4,15 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.zalando.pazuzu.exception.BadRequestException;
-import org.zalando.pazuzu.exception.NotFoundException;
-import org.zalando.pazuzu.exception.ServiceException;
+import org.zalando.pazuzu.exception.*;
 import org.zalando.pazuzu.feature.file.DockerParser;
 import org.zalando.pazuzu.feature.file.FileService;
 import org.zalando.pazuzu.feature.tag.TagDto;
 import org.zalando.pazuzu.feature.tag.TagService;
 import org.zalando.pazuzu.sort.TopologicalSortLinear;
 
+import javax.ws.rs.BadRequestException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -97,11 +96,11 @@ public class FeatureService {
 
     private void nameGuardCheck(String name) throws BadRequestException {
         if (StringUtils.isEmpty(name)) {
-            throw new BadRequestException(FeatureErrors.FEATURE_NAME_EMPTY);
+            throw new FeatureNameEmptyException();
         }
         final Feature existing = featureRepository.findByName(name);
         if (null != existing) {
-            throw new BadRequestException(FeatureErrors.FEATURE_DUPLICATE);
+            throw new FeatureDuplicateException();
         }
     }
 
@@ -112,7 +111,7 @@ public class FeatureService {
         if (null != newName && !newName.equals(existing.getName())) {
             final Feature newExisting = featureRepository.findByName(newName);
             if (null != newExisting) {
-                throw new BadRequestException(FeatureErrors.FEATURE_DUPLICATE);
+                throw new FeatureDuplicateException();
             }
             existing.setName(newName);
         }
@@ -130,7 +129,7 @@ public class FeatureService {
             final List<Feature> recursive = dependencies.stream()
                     .filter(f -> f.containsDependencyRecursively(existing)).collect(Collectors.toList());
             if (!recursive.isEmpty()) {
-                throw new BadRequestException(FeatureErrors.FEATURE_HAS_RECURSIVE_DEPENDENCY,
+                throw new FeatureRecursiveDependencyException(
                         "Recursive dependencies found: " + recursive.stream().map(Feature::getName).collect(Collectors.joining(", ")));
             }
             existing.setDependencies(dependencies);
@@ -155,11 +154,11 @@ public class FeatureService {
     public void deleteFeature(String featureName) throws ServiceException {
         final Feature feature = featureRepository.findByName(featureName);
         if (feature == null) {
-            throw new NotFoundException(FeatureErrors.FEATURE_NOT_FOUND);
+            throw new FeatureNotFoundException();
         }
         final List<Feature> referencing = featureRepository.findByDependenciesContaining(feature);
         if (!referencing.isEmpty()) {
-            throw new BadRequestException(FeatureErrors.FEATURE_NOT_DELETABLE_DUE_TO_REFERENCES,
+            throw new FeatureReferencedDeleteException(
                     "Can't delete feature because it is referenced from other feature(s): "
                             + referencing.stream().map(Feature::getName).collect(Collectors.joining(", ")));
         }
@@ -170,7 +169,7 @@ public class FeatureService {
     public void approveFeature(String featureName) throws ServiceException {
         final Optional<Feature> feature = ofNullable(featureRepository.findByName(featureName));
         if(!feature.isPresent()) {
-            throw new NotFoundException(FeatureErrors.FEATURE_NOT_FOUND);
+            throw new FeatureNotFoundException();
         }
         feature.get().setApproved(true);
         featureRepository.save(feature.get());
@@ -183,7 +182,8 @@ public class FeatureService {
                 .collect(Collectors.toSet());
         if (dependencies.size() != uniqueDependencies.size()) {
             dependencies.forEach(f -> uniqueDependencies.remove(f.getName()));
-            throw new BadRequestException(FeatureErrors.FEATURE_NOT_FOUND);
+            // TODO: is this really the right exception??
+            throw new FeatureNotFoundException();
         }
         return dependencies;
     }
@@ -194,10 +194,10 @@ public class FeatureService {
         return new TopologicalSortLinear<>(expandedList, Feature::getDependencies).getTopSorted();
     }
 
-    private Feature loadExistingFeature(String name) throws NotFoundException {
+    private Feature loadExistingFeature(String name) throws FeatureNotFoundException {
         final Feature existing = featureRepository.findByName(name);
         if (null == existing) {
-            throw new NotFoundException(FeatureErrors.FEATURE_NOT_FOUND);
+            throw new FeatureNotFoundException();
         }
         return existing;
     }
