@@ -19,7 +19,7 @@ public class Feature {
     private Set<Feature> dependencies;
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Tag> tags;
-    @ManyToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "feature")
     private Set<File> files;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -12,6 +12,9 @@ public class FileDto {
     @JsonProperty("content_href")
     private String contentHref;
 
+    @JsonProperty("approved")
+    private boolean approved;
+
     public Integer getId() {
         return id;
     }
@@ -36,11 +39,20 @@ public class FileDto {
         this.contentHref = contentHref;
     }
 
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
+    }
+
     public static FileDto fromFile(File f) {
         final FileDto fd = new FileDto();
         fd.setId(f.getId());
         fd.setName(f.getName());
-        fd.setContentHref(String.format("/api/files/%s/content", f.getId())); // XXX Path is hardcoded
+        fd.setContentHref(String.format("/api/features/%s/files/%s/content", f.getFeature().getName(), f.getId())); // XXX Path is hardcoded
+        fd.setApproved(f.isApproved());
         return fd;
     }
 }

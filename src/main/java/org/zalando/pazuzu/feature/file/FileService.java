@@ -2,13 +2,15 @@ package org.zalando.pazuzu.feature.file;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.zalando.pazuzu.exception.InternalServerError;
 import org.zalando.pazuzu.exception.NotFoundException;
 import org.zalando.pazuzu.exception.PlainNotFoundException;
+import org.zalando.pazuzu.feature.Feature;
+import org.zalando.pazuzu.feature.FeatureRepository;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -17,76 +19,81 @@ import java.util.List;
  * <p>
  * TODO (review) Maybe it's worthwhile to store content in DB also. This would simplify deployment/backups and improves data consistency.
  *
- * @see FileContentService
+ * @see LocalFSFileContentService
  * @see FileResource
  */
 @Service
 public class FileService {
     private final FileRepository fileRepository;
+    private final FeatureRepository featureRepository;
     private final FileContentService fileContentService;
 
     @Inject
-    public FileService(FileRepository fileRepository, FileContentService fileContentService) {
-        assert null != fileRepository : "FileRepository is required";
+    public FileService(FileRepository fileRepository, FeatureRepository featureRepository, FileContentService fileContentService) {
         this.fileRepository = fileRepository;
-        assert null != fileContentService : "FileContentService is required";
+        this.featureRepository = featureRepository;
         this.fileContentService = fileContentService;
     }
 
     @Transactional
-    public File create(String fileName, InputStream content) {
-        if (null != fileRepository.findByName(fileName)) {
-            // XXX Probably it's better to produce error with "conflict" status code here.
-            throw new IllegalStateException(String.format("File with name '%s' already exists.", fileName));
+    public File create(String featureName, String fileName, InputStream content) {
+        final Feature feature = featureRepository.findByName(featureName);
+        if (feature == null) {
+            throw new NotFoundException(String.format("Feature with name '%s' not found", featureName));
         }
+
         try {
-            final Path path = Paths.get(fileName);
-            fileContentService.putFile(path, content);
-            return fileRepository.save(new File(fileName, path));
+            fileContentService.putFile(featureName, Paths.get(fileName), content);
+
+            final File file = new File(fileName, Paths.get(fileName));
+            file.setFeature(feature);
+
+            return fileRepository.save(file);
         } catch (IOException e) {
-            throw new RuntimeException("Cannot create file.", e);
+            throw new InternalServerError("Can't create file.", e);
         }
     }
 
-    public File get(int fileId) {
-        final File file = fileRepository.findOne(fileId);
+    public File get(String featureName, int fileId) {
+        final File file = fileRepository.findOneByFeatureNameAndId(featureName, fileId);
         if (null == file) {
             throw new NotFoundException(String.format("File #%s is not found.", fileId));
         }
         return file;
     }
 
-    public File getByName(String name) {
-        final File file = fileRepository.findByName(name);
-        if (null == file) {
-            throw new NotFoundException(String.format("File with name '%s' is not found.", name));
-        }
-        return file;
-    }
-
     @Transactional
-    public void delete(int fileId) {
-        final File file = get(fileId);
+    public void delete(String featureName, int fileId) {
+        final File file = get(featureName, fileId);
         fileRepository.delete(file);
         try {
-            fileContentService.delete(Paths.get(file.getContentPath()));
+            fileContentService.delete(featureName, Paths.get(file.getContentPath()));
         } catch (IOException e) {
-            throw new RuntimeException(String.format("Cannot delete content of file #%s.", fileId), e);
+            throw new InternalServerError(String.format("Cannot delete content of file #%s.", fileId), e);
         }
     }
 
-    public InputStream getContent(int fileId) {
+    public InputStream getContent(String featureName, int fileId) {
         try {
-            return fileContentService.getContentStream(Paths.get(get(fileId).getContentPath()));
+            return fileContentService.getContentStream(featureName, Paths.get(get(featureName, fileId).getContentPath()));
         } catch (NotFoundException nfe) {
             // XXX Hack. See comments in org.zalando.pazuzu.exception.GlobalExceptionHandler.plainNotFoundException()
             throw new PlainNotFoundException(String.format("No file with #%s.", fileId));
         } catch (IOException e) {
-            throw new RuntimeException(String.format("Cannot read content of file #%s.", fileId), e);
+            throw new InternalServerError(String.format("Cannot read content of file #%s.", fileId), e);
         }
     }
 
-    public List<File> findByNamePart(String nameFragment) {
-        return fileRepository.findByNameIgnoreCaseContaining(nameFragment);
+    public List<File> findByNamePart(String featureName, String nameFragment) {
+        return fileRepository.findByFeatureNameAndNameIgnoreCaseContaining(featureName, nameFragment);
+    }
+
+    public void approve(String featureName, int fileId) {
+        File file = fileRepository.findOneByFeatureNameAndId(featureName, fileId);
+        if (file == null) {
+            throw new PlainNotFoundException(String.format("Not file with %d.", fileId));
+        }
+        file.setApproved(true);
+        fileRepository.save(file);
     }
 }
