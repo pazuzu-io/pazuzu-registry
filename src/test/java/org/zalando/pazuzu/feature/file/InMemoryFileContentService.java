@@ -16,7 +16,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by pzalunin on 27/07/16.
  */
 @Service
-@Profile("test")
+@Profile({"test", "oauth"})
 public class InMemoryFileContentService implements FileContentService {
 
     private final ReentrantLock lock = new ReentrantLock();

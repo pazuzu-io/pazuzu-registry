@@ -8,7 +8,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.zalando.pazuzu.security.Roles;
 
+import javax.annotation.security.RolesAllowed;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,6 +35,7 @@ public class FileResource {
         this.fileService = fileService;
     }
 
+    @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<FileDto> searchFiles(@PathVariable String featureName, @RequestParam(required = false, name = "q", defaultValue = "") String queryString) {
         return fileService.findByNamePart(featureName, queryString)
@@ -44,6 +47,7 @@ public class FileResource {
      * The API might be unclear here. Putting name into query param meant to simplify using general purpose
      * tools like curl. Could be more consistent to pass all fields as multipart though.
      */
+    @RolesAllowed({Roles.USER})
     @RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FileDto> createFile(@PathVariable String featureName, @RequestParam(name = "name") String fileName,
                                               InputStream inputStream, UriComponentsBuilder uriBuilder) {
@@ -53,21 +57,25 @@ public class FileResource {
                 .body(fd);
     }
 
+    @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
     @RequestMapping(value = "/{fileId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public FileDto getFile(@PathVariable String featureName, @PathVariable Integer fileId) {
         return FileDto.fromFile(fileService.get(featureName, fileId));
     }
 
+    @RolesAllowed({Roles.ADMIN})
     @RequestMapping(value = "/{fileId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public void deleteFile(@PathVariable String featureName, @PathVariable Integer fileId) {
         fileService.delete(featureName, fileId);
     }
 
+    @RolesAllowed({Roles.ADMIN})
     @RequestMapping(value = "/{fileId}/approve", method = RequestMethod.PUT)
     public void approveFile(@PathVariable String featureName, @PathVariable Integer fileId) {
         fileService.approve(featureName, fileId);
     }
 
+    @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
     @RequestMapping(value = "/{fileId}/content", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public void getFileContent(@PathVariable String featureName, @PathVariable String fileId, OutputStream responseStream) {
         try {
