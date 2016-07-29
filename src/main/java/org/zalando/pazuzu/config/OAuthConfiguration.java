@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
+import org.springframework.web.cors.CorsUtils;
 import org.zalando.pazuzu.oauth2.ClientIdAuthorityGrantingAuthenticationExtractor;
 import org.zalando.pazuzu.properties.PazuzuRegistryProperties;
 import org.zalando.pazuzu.security.Roles;
@@ -22,7 +23,7 @@ import org.zalando.stups.oauth2.spring.server.ExecutorWrappers;
 import org.zalando.stups.oauth2.spring.server.TokenInfoResourceServerTokenServices;
 import org.zalando.stups.tokens.config.AccessTokensBeanProperties;
 
-@Profile({"prod", "oauth"})
+@Profile({"production", "oauth"})
 @Configuration
 @EnableResourceServer
 @EnableGlobalMethodSecurity(jsr250Enabled = true)
@@ -57,6 +58,7 @@ public class OAuthConfiguration extends ResourceServerConfigurerAdapter {
                     .sessionCreationPolicy(SessionCreationPolicy.NEVER)
             .and()
                 .authorizeRequests()
+                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .antMatchers("/api/health").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/**").permitAll()
                 .antMatchers("/api/**").access("#oauth2.hasScope('uid')")
