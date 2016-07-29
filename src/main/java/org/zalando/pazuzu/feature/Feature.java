@@ -32,6 +32,8 @@ public class Feature {
     private String testInstruction;
     @Column(name = "description", nullable = true, length = 4096)
     private String description;
+    @Column(name = "approved", nullable = true)
+    private boolean approved;
 
     public List<Tag> getTags() {
         return tags;
@@ -108,6 +110,14 @@ public class Feature {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
     }
 
     @Override

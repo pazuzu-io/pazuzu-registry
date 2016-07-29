@@ -33,5 +33,6 @@ server:
 
 pazuzu:
   registry:
+    admins: admin
     cors:
       allowedOrigins: https://pazuzu-ui.mentoring.zalan.do

@@ -2,6 +2,7 @@ package org.zalando.pazuzu;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.zalando.pazuzu.exception.ErrorDto;
 import org.zalando.pazuzu.feature.FeatureDto;
@@ -11,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.PUT;
 
 public class FeatureApiTest extends AbstractComponentTest {
 
@@ -72,6 +75,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         assertThat(resultFeature.getTestInstruction()).isEqualTo("something to test2");
         assertThat(resultFeature.getDescription()).isEqualTo("Test 2 desc");
         assertThat(resultFeature.getDependencies()).isEmpty();
+        assertThat(resultFeature.isApproved()).isFalse();
     }
 
     @Test
@@ -103,7 +107,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         createFeature("Feature3", null, null, null);
 
         final Map<String, Object> updateRequest = getFeaturePropertiesMap(null, "dockerData Feature3", "testInstruction Feature3", "description Feature3", "Feature1", "Feature2");
-        ResponseEntity<FeatureFullDto> putResponse = template.exchange(url(featuresUrl + "/Feature3"), HttpMethod.PUT,
+        ResponseEntity<FeatureFullDto> putResponse = template.exchange(url(featuresUrl + "/Feature3"), PUT,
                 new HttpEntity<>(mapper.writeValueAsString(updateRequest), contentType(MediaType.APPLICATION_JSON)), FeatureFullDto.class);
         assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -112,14 +116,13 @@ public class FeatureApiTest extends AbstractComponentTest {
         expectedResponse.setTestInstruction("testInstruction Feature3");
         expectedResponse.setDescription("description Feature3");
         expectedResponse.setName("Feature3");
-        expectedResponse.getDependencies().add(FeatureDto.populate("Feature1", "dockerData Feature1", "testInstruction Feature1", "description Feature1"));
-        expectedResponse.getDependencies().add(FeatureDto.populate("Feature2", "dockerData Feature2", "testInstruction Feature2", "description Feature2"));
+        expectedResponse.getDependencies().add(FeatureDto.populate("Feature1", "dockerData Feature1", "testInstruction Feature1", "description Feature1", true));
+        expectedResponse.getDependencies().add(FeatureDto.populate("Feature2", "dockerData Feature2", "testInstruction Feature2", "description Feature2", true));
 
         assertThat(putResponse.getBody()).isEqualToComparingFieldByField(expectedResponse);
 
         ResponseEntity<FeatureFullDto> getResponse = template.getForEntity(url(featuresUrl + "/Feature3"), FeatureFullDto.class);
         assertThat(getResponse.getBody()).isEqualToComparingFieldByField(expectedResponse);
-
     }
 
     @Test
@@ -165,5 +168,21 @@ public class FeatureApiTest extends AbstractComponentTest {
         ResponseEntity<List> result = template.getForEntity(url(featuresUrl + "/search/foo"), List.class);
         assertThat(result.getStatusCode().is2xxSuccessful());
         assertThat(result.getBody()).hasSize(0);
+    }
+
+    @Test
+    public void shouldApproveFeature() throws Exception {
+        createFeature("test-feature-1", "docker-data-1", "test-instruction-1", "desc-1");
+        createFeature("test-feature-2", "docker-data-2", "test-instruction-2", "desc-2");
+        template.exchange(url(featuresUrl) + "/test-feature-1/approve",
+                PUT, null, new ParameterizedTypeReference<List<FeatureDto>>() {});
+        ResponseEntity<List<FeatureDto>> result =
+                template.exchange(url(featuresUrl), GET, null, new ParameterizedTypeReference<List<FeatureDto>>() {});
+        assertThat(findFeatureByName(result.getBody(), "test-feature-1").isApproved()).isTrue();
+        assertThat(findFeatureByName(result.getBody(), "test-feature-2").isApproved()).isFalse();
+    }
+
+    private FeatureDto findFeatureByName(List<FeatureDto> collection, String name) {
+        return collection.stream().filter(f -> name.equals(f.getName())).findFirst().get();
     }
 }

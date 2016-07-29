@@ -22,6 +22,8 @@ public class FeatureDto {
     private String description;
     @JsonProperty("tags")
     private List<TagDto> tags;
+    @JsonProperty("approved")
+    private boolean approved;
     @JsonProperty("files")
     private Set<FileDto> files = new HashSet<>();
 
@@ -34,18 +36,19 @@ public class FeatureDto {
         return result;
     }
 
-    public static FeatureDto populate(String name, String dockerData, String testInstruction, String description, List<TagDto> tags) {
+    public static FeatureDto populate(String name, String dockerData, String testInstruction, String description, boolean approved, List<TagDto> tags) {
         final FeatureDto result = new FeatureDto();
         result.name = name;
         result.dockerData = dockerData;
         result.testInstruction = testInstruction;
+        result.approved = approved;
         result.description = description;
         result.tags = tags;
         return result;
     }
 
-    public static FeatureDto populate(String name, String dockerData, String testInstruction, String description) {
-        return populate(name, dockerData, testInstruction, description, Collections.emptyList());
+    public static FeatureDto populate(String name, String dockerData, String testInstruction, String description, boolean approved) {
+        return populate(name, dockerData, testInstruction, description, approved, Collections.emptyList());
     }
 
     protected static void fillShort(Feature feature, FeatureDto result) {
@@ -53,6 +56,7 @@ public class FeatureDto {
         result.dockerData = feature.getDockerData();
         result.testInstruction = feature.getTestInstruction();
         result.description = feature.getDescription();
+        result.approved = feature.isApproved();
         if (null != feature.getTags() && !feature.getTags().isEmpty()) {
             result.tags = feature.getTags().stream().map(TagDto::ofShort).collect(Collectors.toList());
         }
@@ -83,6 +87,14 @@ public class FeatureDto {
 
     public void setTestInstruction(String testInstruction) {
         this.testInstruction = testInstruction;
+    }
+
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
     }
 
     public String getDescription() {

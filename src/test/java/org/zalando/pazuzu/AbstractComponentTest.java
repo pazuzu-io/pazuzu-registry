@@ -2,6 +2,7 @@ package org.zalando.pazuzu;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.util.Strings;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -30,8 +31,8 @@ public abstract class AbstractComponentTest {
     @Value("${local.server.port}")
     private int port;
 
-    protected String url(String path) {
-        return "http://127.0.0.1:" + port + path;
+    protected String url(String... paths) {
+        return "http://127.0.0.1:" + port + Strings.join(paths).with("/");
     }
 
     protected ResponseEntity<FeatureFullDto> createFeature(String name, String dockerData, String testInstruction, String description, String... dependencies) throws JsonProcessingException {
