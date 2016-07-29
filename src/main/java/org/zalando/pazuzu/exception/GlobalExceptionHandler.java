@@ -59,7 +59,7 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler({Exception.class, InternalServerError.class})
     @ResponseBody
     public ErrorDto exception(Exception exception) {
         LOG.error(exception.getMessage(), exception);

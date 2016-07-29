@@ -2,6 +2,7 @@ package org.zalando.pazuzu.feature.file;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.zalando.pazuzu.exception.InternalServerError;
 import org.zalando.pazuzu.exception.NotFoundException;
 import org.zalando.pazuzu.exception.PlainNotFoundException;
 import org.zalando.pazuzu.feature.Feature;
@@ -49,7 +50,7 @@ public class FileService {
 
             return fileRepository.save(file);
         } catch (IOException e) {
-            throw new RuntimeException("Can't create file.", e);
+            throw new InternalServerError("Can't create file.", e);
         }
     }
 
@@ -68,7 +69,7 @@ public class FileService {
         try {
             fileContentService.delete(featureName, Paths.get(file.getContentPath()));
         } catch (IOException e) {
-            throw new RuntimeException(String.format("Cannot delete content of file #%s.", fileId), e);
+            throw new InternalServerError(String.format("Cannot delete content of file #%s.", fileId), e);
         }
     }
 
@@ -79,7 +80,7 @@ public class FileService {
             // XXX Hack. See comments in org.zalando.pazuzu.exception.GlobalExceptionHandler.plainNotFoundException()
             throw new PlainNotFoundException(String.format("No file with #%s.", fileId));
         } catch (IOException e) {
-            throw new RuntimeException(String.format("Cannot read content of file #%s.", fileId), e);
+            throw new InternalServerError(String.format("Cannot read content of file #%s.", fileId), e);
         }
     }
 
