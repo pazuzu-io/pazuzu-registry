@@ -100,7 +100,6 @@ public class FeaturesResource {
     @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
     @RequestMapping(value = "/{featureName}/files", method = RequestMethod.GET)
     public List<FileDto> listLinkedFiles(@PathVariable String featureName) {
-        // TODO (error reporting) Return 404 if feature is not found
         return fileLinkService.getFeatureFiles(featureName)
                 .stream().map(FileDto::fromFile)
                 .collect(Collectors.toList());
