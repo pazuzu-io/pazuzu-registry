@@ -3,106 +3,57 @@ package org.zalando.pazuzu.feature;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.zalando.pazuzu.feature.tag.TagDto;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class FeatureDto {
-    @JsonProperty("name")
-    private String name;
-    @JsonProperty("docker_data")
-    private String dockerData;
-    @JsonProperty("test_instruction")
-    private String testInstruction;
-    @JsonProperty("description")
-    private String description;
-    @JsonProperty("tags")
-    private List<TagDto> tags;
-    @JsonProperty("approved")
-    private boolean approved;
+    @JsonProperty("meta")
+    private FeatureMetaDto meta = new FeatureMetaDto();
+    @JsonProperty("snippet")
+    private String snippet;
+    @JsonProperty("test_snippet")
+    private String testSnippet;
 
-    public static FeatureDto ofShort(Feature feature) {
-        if (null == feature) {
-            return null;
-        }
-        final FeatureDto result = new FeatureDto();
-        fillShort(feature, result);
-        return result;
+    public static FeatureDto of(Feature feature) {
+
+        FeatureDto dto = new FeatureDto()
+                .setSnippet(feature.getDockerData())
+                .setTestSnippet(feature.getTestInstruction());
+        dto.getMeta().setName(feature.getName())
+                .setDescription(feature.getDescription())
+                .setDependencies(feature.getDependencies().stream().map(Feature::getName).collect(Collectors.toList()));
+        return dto;
     }
 
-    public static FeatureDto populate(String name, String dockerData, String testInstruction, String description, boolean approved, List<TagDto> tags) {
-        final FeatureDto result = new FeatureDto();
-        result.name = name;
-        result.dockerData = dockerData;
-        result.testInstruction = testInstruction;
-        result.approved = approved;
-        result.description = description;
-        result.tags = tags;
-        return result;
+    public FeatureMetaDto getMeta() {
+        return meta;
     }
 
-    public static FeatureDto populate(String name, String dockerData, String testInstruction, String description, boolean approved) {
-        return populate(name, dockerData, testInstruction, description, approved, Collections.emptyList());
+    public FeatureDto setMeta(FeatureMetaDto meta) {
+        this.meta = meta;
+        return this;
     }
 
-    protected static void fillShort(Feature feature, FeatureDto result) {
-        result.name = feature.getName();
-        result.dockerData = feature.getDockerData();
-        result.testInstruction = feature.getTestInstruction();
-        result.description = feature.getDescription();
-        result.approved = feature.isApproved();
-        if (null != feature.getTags() && !feature.getTags().isEmpty()) {
-            result.tags = feature.getTags().stream().map(TagDto::ofShort).collect(Collectors.toList());
-        }
+    public String getSnippet() {
+        return snippet;
     }
 
-    public String getName() {
-        return name;
+    public FeatureDto setSnippet(String snippet) {
+        this.snippet = snippet;
+        return this;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getTestSnippet() {
+        return testSnippet;
     }
 
-    public String getDockerData() {
-        return dockerData;
-    }
-
-    public void setDockerData(String dockerData) {
-        this.dockerData = dockerData;
-    }
-
-    public String getTestInstruction() {
-        return testInstruction;
-    }
-
-    public void setTestInstruction(String testInstruction) {
-        this.testInstruction = testInstruction;
-    }
-
-    public boolean isApproved() {
-        return approved;
-    }
-
-    public void setApproved(boolean approved) {
-        this.approved = approved;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public List<TagDto> getTags() {
-        return (null != tags) ? tags : Collections.emptyList();
-    }
-
-    public void setTags(List<TagDto> tags) {
-        this.tags = tags;
+    public FeatureDto setTestSnippet(String testSnippet) {
+        this.testSnippet = testSnippet;
+        return this;
     }
 
     @Override
@@ -114,14 +65,13 @@ public class FeatureDto {
             return false;
         }
         FeatureDto that = (FeatureDto) o;
-        return Objects.equals(name, that.name) &&
-                Objects.equals(dockerData, that.dockerData) &&
-                Objects.equals(testInstruction, that.testInstruction) &&
-                Objects.equals(description, that.description);
+        return Objects.equals(meta, that.meta) &&
+                Objects.equals(snippet, that.snippet) &&
+                Objects.equals(testSnippet, that.testSnippet);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, dockerData, testInstruction);
+        return Objects.hash(meta, snippet, testSnippet);
     }
 }

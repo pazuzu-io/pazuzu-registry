@@ -54,7 +54,7 @@ public class FeatureService {
 
     @Transactional(rollbackFor = ServiceException.class)
     public <T> T createFeature(String name, String dockerData, String testInstruction, String description,
-                               List<String> dependencyNames, List<TagDto> tags, Function<Feature, T> converter) {
+                               List<String> dependencyNames, Function<Feature, T> converter) {
         final Feature newFeature = new Feature();
 
         setFeatureName(name, newFeature);
@@ -67,9 +67,6 @@ public class FeatureService {
         }
         if (null != description && !description.isEmpty()) {
             newFeature.setDescription(description);
-        }
-        if (null != tags && !tags.isEmpty()) {
-            newFeature.setTags(tagService.upsertTagDtos(tags));
         }
         featureRepository.save(newFeature);
         return converter.apply(newFeature);
