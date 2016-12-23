@@ -1,15 +1,12 @@
 package org.zalando.pazuzu.feature;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.zalando.pazuzu.feature.tag.TagDto;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FeatureDto {
     @JsonProperty("meta")
     private FeatureMetaDto meta = new FeatureMetaDto();
@@ -31,11 +28,6 @@ public class FeatureDto {
 
     public FeatureMetaDto getMeta() {
         return meta;
-    }
-
-    public FeatureDto setMeta(FeatureMetaDto meta) {
-        this.meta = meta;
-        return this;
     }
 
     public String getSnippet() {
@@ -73,5 +65,14 @@ public class FeatureDto {
     @Override
     public int hashCode() {
         return Objects.hash(meta, snippet, testSnippet);
+    }
+
+    @Override
+    public String toString() {
+        return "FeatureDto{" +
+                "meta=" + meta +
+                ", snippet='" + snippet + '\'' +
+                ", testSnippet='" + testSnippet + '\'' +
+                '}';
     }
 }

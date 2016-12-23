@@ -7,15 +7,11 @@ import org.springframework.util.StringUtils;
 import org.zalando.pazuzu.exception.*;
 import org.zalando.pazuzu.feature.file.DockerParser;
 import org.zalando.pazuzu.feature.file.FileService;
-import org.zalando.pazuzu.feature.tag.TagDto;
 import org.zalando.pazuzu.feature.tag.TagService;
 import org.zalando.pazuzu.sort.TopologicalSortLinear;
 
 import javax.ws.rs.BadRequestException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -179,6 +175,12 @@ public class FeatureService {
         final Set<Feature> expandedList = new HashSet<>();
         features.forEach(f -> collectRecursively(expandedList, f));
         return new TopologicalSortLinear<>(expandedList, Feature::getDependencies).getTopSorted();
+    }
+
+    public List<Feature> resolveFeatures(List<String> featureNames) {
+        final Set<Feature> expandedList = new HashSet<>();
+        loadFeatures(featureNames).forEach(f -> collectRecursively(expandedList, f));
+        return new ArrayList<>(expandedList);
     }
 
     private Feature loadExistingFeature(String name) throws FeatureNotFoundException {

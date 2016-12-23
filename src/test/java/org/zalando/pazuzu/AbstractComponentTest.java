@@ -16,7 +16,6 @@ import org.zalando.pazuzu.feature.FeatureDto;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,6 +29,8 @@ public abstract class AbstractComponentTest {
             TEST_SNIPPET = "feature-test-snippet-";
 
     protected final String featuresUrl = "/api/features";
+    protected final String resolvedFeaturesUrl = "/api/resolved-features";
+    protected final String featuresMetaUrl = "/api/features-meta";
     protected final TestRestTemplate template = new TestRestTemplate();
     protected final ObjectMapper mapper = new ObjectMapper();
     @Value("${local.server.port}")

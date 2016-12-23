@@ -2,17 +2,14 @@ package org.zalando.pazuzu;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.zalando.pazuzu.feature.FeatureDto;
 
-import javax.print.attribute.standard.MediaSize;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpMethod.GET;
 
 public class FeatureApiTest extends AbstractComponentTest {
 

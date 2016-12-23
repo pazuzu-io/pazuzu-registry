@@ -1,12 +1,15 @@
 package org.zalando.pazuzu.feature;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FeatureMetaDto {
     @JsonProperty("name")
     private String name;
@@ -18,6 +21,12 @@ public class FeatureMetaDto {
     private ZonedDateTime updatedAt;
     @JsonProperty("dependencies")
     private List<String> dependencies = new ArrayList<>();
+
+    public static FeatureMetaDto of(Feature feature) {
+        return new FeatureMetaDto().setName(feature.getName())
+                .setDescription(feature.getDescription())
+                .setDependencies(feature.getDependencies().stream().map(Feature::getName).collect(Collectors.toList()));
+    }
 
     public String getName() {
         return name;
@@ -83,5 +92,16 @@ public class FeatureMetaDto {
     @Override
     public int hashCode() {
         return Objects.hash(name);
+    }
+
+    @Override
+    public String toString() {
+        return "FeatureMetaDto{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", author='" + author + '\'' +
+                ", updatedAt=" + updatedAt +
+                ", dependencies=" + dependencies +
+                '}';
     }
 }
