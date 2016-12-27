@@ -29,8 +29,8 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
         assertThat(result.getBody()).containsOnly(
                 entry("type", "http://pazuzu.io/error/feature_not_found"),
                 entry("title", "Feature was not found"),
-                entry("detail", "Feature missing: feature-1"),
-                entry("status", HttpStatus.NOT_FOUND.value()));;
+                entry("detail", "Feature missing: " + NAME + 1),
+                entry("status", HttpStatus.NOT_FOUND.value()));
     }
 
 

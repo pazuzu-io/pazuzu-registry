@@ -15,7 +15,7 @@ paths:
     get:
       summary: Resolve all features by name
       description: |
-        Returns all the features with all it's dependencies in a single array.
+        Returns all the features with all its dependencies in a single array.
       parameters:
         - name: name
           in: query
@@ -41,7 +41,7 @@ paths:
     get:
       summary: Get all features
       description: |
-        Returns all the features without it's dependencies.
+        Returns all the features without its dependencies.
       parameters:
         - name: name
           in: query
@@ -105,12 +105,12 @@ paths:
     get:
       summary: Get single feature
       description: |
-        Returns all the feature data without it's dependencies.
+        Returns all the feature data without its dependencies.
       tags:
         - Features
       responses:
         200:
-          description: a singel feature
+          description: a single feature
           schema:
             $ref: '#/definitions/Feature'
         default:
@@ -203,7 +203,7 @@ paths:
         - FeatureMetas
       responses:
         200:
-          description: a singel feature meta data
+          description: a single feature meta data
           schema:
             $ref: '#/definitions/FeatureMeta'
         default:
@@ -225,7 +225,7 @@ definitions:
         description: Name of the feature author
       updated_at:
         type: string
-        description: Last update date in ISO 8601	format
+        description: Last update date in ISO 8601 format
       dependencies:
         type: array
         items:
