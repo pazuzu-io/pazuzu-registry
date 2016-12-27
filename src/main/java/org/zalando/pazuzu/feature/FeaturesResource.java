@@ -32,7 +32,6 @@ public class FeaturesResource {
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<FeatureDto> listFeatures(
             @RequestParam(required = false, name = "name") String[] featureNames,
-            @RequestParam(required = false, name = "sorting") Integer sorting,
             @RequestParam(required = false, name = "offset") Integer offset,
             @RequestParam(required = false, name = "limit") Integer limit,
             HttpServletResponse response)
@@ -49,10 +48,7 @@ public class FeaturesResource {
             }
         }
         Set<Feature> featureSet = featureService.loadFeatures(Arrays.stream(featureNames).collect(Collectors.toList()));
-        if (sorting != null && sorting.equals(TOPOLOGICAL_SORT)) {
-            List<Feature> features = featureService.getSortedFeatures(featureSet);
-            return features.stream().map(FeatureDto::of).collect(Collectors.toList());
-        }
+
         return featureSet.stream().map(FeatureDto::of).collect(Collectors.toList());
     }
 

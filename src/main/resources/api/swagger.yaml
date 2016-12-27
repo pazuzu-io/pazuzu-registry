@@ -2,19 +2,46 @@ swagger: '2.0'
 info:
   title: Pazuzu registry
   description: Generating Dockerfiles by sets of required functions
-  version: "0.0.3"
+  version: "0.0.4"
 host: pazuzu.zalando.net
 schemes:
   - http
 produces:
   - application/json
+consumes:
+  - application/json
 paths:
+  /api/resolved-features:
+    get:
+      summary: Resolve all features by name
+      description: |
+        Returns all the features with all it's dependencies in a single array.
+      parameters:
+        - name: name
+          in: query
+          description: feature names.
+          required: true
+          type: array
+          items:
+            type: string
+      tags:
+        - Features
+      responses:
+        200:
+          description: An array of features
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Feature'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /api/features:
     get:
-      summary: List all the features in pazuzu
+      summary: Get all features
       description: |
-        Returns all the features without it's dependencies. Each features can further be accessed
-        one by one and the dependencies will be there
+        Returns all the features without it's dependencies.
       parameters:
         - name: name
           in: query
@@ -23,9 +50,14 @@ paths:
           type: array
           items:
             type: string
-        - name: sorted
+        - name: offset
           in: query
-          description: flag to indicate if output should be sorted
+          description: the offset to start from.
+          required: false
+          type: integer
+        - name: limit
+          in: query
+          description: maximum number of features to return.
           required: false
           type: integer
       tags:
@@ -44,43 +76,43 @@ paths:
     post:
       summary: Creates a new feature
       description: |
-        Creates a new feature with specified name, docker data, etc. Feature 
+        Creates a new feature with specified name, docker data, etc. Feature
         name is checked to be unique.
       parameters:
         - name: feature
           required: true
           in: body
           schema:
-            $ref: '#/definitions/FeatureToCreate'
+            $ref: '#/definitions/Feature'
       tags:
         - Features
       responses:
         201:
           description: Feature successfully created
           schema:
-            $ref: '#/definitions/FeatureFull'
+            $ref: '#/definitions/Feature'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /api/features/{id}:
+  /api/features/{name}:
     parameters:
-      - name: id
-        in: path
-        required: true
-        description: Name of feature
-        type: string
+    - name: name
+      in: path
+      description: the feature name.
+      required: true
+      type: string
     get:
-      summary: Get full feature elements
+      summary: Get single feature
       description: |
-        Returns all the feature information, including dependencies
+        Returns all the feature data without it's dependencies.
       tags:
         - Features
       responses:
         200:
-          description: Full feature representation
+          description: a singel feature
           schema:
-            $ref: '#/definitions/FeatureFull'
+            $ref: '#/definitions/Feature'
         default:
           description: Unexpected error
           schema:
@@ -88,20 +120,20 @@ paths:
     put:
       summary: Replace this feature's content
       description: |
-        Replaces docker_data and dependencies for this feature. Recursion checking is performed on this step
-      tags: 
+        Replaces snippet, test_snippet and meta data for this feature.
+      tags:
         - Features
       parameters:
         - name: feature
           required: true
           in: body
           schema:
-            $ref: '#/definitions/FeatureToCreate'
+            $ref: '#/definitions/Feature'
       responses:
         200:
-          description: Full feature representation
+          description: Feature successfully updated
           schema:
-            $ref: "#/definitions/FeatureFull"
+            $ref: "#/definitions/Feature"
         default:
           description: Unexpected exception
           schema:
@@ -109,8 +141,8 @@ paths:
     delete:
       summary: Delete feature
       description: |
-        Delete this feature. In case when another features has links to this feature - nothing will be deleted and
-        error will be returned.
+        Delete this feature. If another features has links to this feature
+        nothing will be deleted and error will be returned.
       tags:
         - Features
       responses:
@@ -120,138 +152,96 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /api/features/{id}/files:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        description: Name of feature
-        type: string
+  /api/feature-metas:
     get:
-      summary: Get List of files linked (used) in this feature
+      summary: Get all feature meta data
+      description: |
+        Returns all the features meta data.
+      parameters:
+        - name: name
+          in: query
+          description: value, that must present in feature name.
+          required: true
+          type: array
+          items:
+            type: string
+        - name: offset
+          in: query
+          description: the offset to start from.
+          required: false
+          type: integer
+        - name: limit
+          in: query
+          description: maximum number of features to return.
+          required: false
+          type: integer
       tags:
-        - Features
-        - Files
+        - FeatureMetas
       responses:
         200:
-          description: OK
+          description: An array of feature meta data
           schema:
             type: array
             items:
-              $ref: '#/definitions/File'
+              $ref: '#/definitions/FeatureMeta'
         default:
-          description: Request can not be fulfilled
+          description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /api/files/{id}:
+  /api/feature-metas/{name}:
     parameters:
-      - name: id
-        in: path
-        required: true
-        description: Id of file
-        type: string
+    - name: name
+      in: path
+      description: the feature name.
+      required: true
+      type: string
     get:
-      summary: Get description of this file.
+      summary: Get single feature meta
+      description: |
+        Returns feature meta data.
       tags:
-        - Files
+        - FeatureMetas
       responses:
         200:
-          description: OK
+          description: a singel feature meta data
           schema:
-            $ref: '#/definitions/File'
+            $ref: '#/definitions/FeatureMeta'
         default:
-          description: Request can not be fulfilled
+          description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /api/files/{id}/content:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        description: Id of the file.
-        type: string
-    get:
-      summary: Get content of the file.
-      tags:
-        - Files
-      responses:
-        200:
-          description: OK
-          schema:
-            type: string
-            format: binary
-        default:
-          description: Request can not be fulfilled.
-          schema:
-            $ref: '#/definitions/Error'
-
 definitions:
-  Feature:
+  FeatureMeta:
     type: object
     properties:
       name:
         type: string
         description: Unique identifier representing a specific feature.
-      docker_data:
-        type: string
-        description: Docker file part to be used with that feature.
-      test_instruction:
-        type: string
-        description: how to test that feature is working
       description:
         type: string
-        description: description of the feature
-  FeatureToCreate:
-    type: object
-    properties:
-      name:
+        description: Description of the feature
+      author:
         type: string
-        description: Unique identifier representing a specific feature.
-      docker_data:
+        description: Name of the feature author
+      updated_at:
         type: string
-        description: Docker file part to be used with that feature.
-      test_instruction:
-        type: string
-        description: How to test that feature is working.
-      description:
-        type: string
-        description: Description of the feature.
-      dependencies:
-        type: array
-        items: 
-          type: string
-  FeatureFull:
-    type: object
-    properties:
-      name:
-        type: string
-        description: Unique identifier representing a specific feature.
-      docker_data:
-        type: string
-        description: Docker file part to be used with that feature.
-      test_instruction:
-        type: string
-        description: how to test that feature is working
-      description:
-        type: string
-        description: description of the feature
+        description: Last update date in ISO 8601	format
       dependencies:
         type: array
         items:
-          $ref: '#/definitions/Feature'
-        description: List of dependencies for this feature
-  File:
+          type: string
+        description: array of feature names
+  Feature:
     type: object
     properties:
-      id:
+      meta:
+        $ref: '#/definitions/FeatureMeta'
+      snippet:
         type: string
-        description: Unique identifier of a file.
-      name:
+        description: Docker file part to be used with that feature.
+      test_snippet:
         type: string
-        description: Filename as it appears in search results and Dockerfile fragments.
-      content_href:
-        type: string
-        description: href to resource with file content.
+        description: how to test that feature is working
   Error:
     type: object
     properties:

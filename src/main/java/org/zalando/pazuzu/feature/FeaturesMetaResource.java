@@ -30,7 +30,6 @@ public class FeaturesMetaResource {
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<FeatureMetaDto> listFeaturesMeta(
             @RequestParam(required = false, name = "name") String[] featureNames,
-            @RequestParam(required = false, name = "sorting") Integer sorting,
             @RequestParam(required = false, name = "offset") Integer offset,
             @RequestParam(required = false, name = "limit") Integer limit,
             HttpServletResponse response)
@@ -47,10 +46,6 @@ public class FeaturesMetaResource {
             }
         }
         Set<Feature> featureSet = featureService.loadFeatures(Arrays.stream(featureNames).collect(Collectors.toList()));
-        if (sorting != null && sorting.equals(TOPOLOGICAL_SORT)) {
-            List<Feature> features = featureService.getSortedFeatures(featureSet);
-            return features.stream().map(FeatureMetaDto::of).collect(Collectors.toList());
-        }
         return featureSet.stream().map(FeatureMetaDto::of).collect(Collectors.toList());
     }
 

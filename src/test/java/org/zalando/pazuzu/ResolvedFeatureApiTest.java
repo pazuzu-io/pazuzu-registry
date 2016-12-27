@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 public class ResolvedFeatureApiTest extends AbstractComponentTest {
 
@@ -18,6 +19,20 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
+
+    @Test
+    public void retrievingResolvedFeatureWithNonExistingNameShouldResultInError() throws Exception {
+        // when
+        ResponseEntity<Map> result = template.getForEntity(url(resolvedFeaturesUrl + "?name={name}"),
+                Map.class, NAME + 1);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(result.getBody()).containsOnly(
+                entry("type", "http://pazuzu.io/error/feature_not_found"),
+                entry("title", "Feature was not found"),
+                entry("detail", "Feature missing: feature-1"),
+                entry("status", HttpStatus.NOT_FOUND.value()));;
+    }
+
 
     @Test
     public void retrievingResolvedFeatureShouldReturnFeaturesWithAllItsDependencies() throws Exception {
