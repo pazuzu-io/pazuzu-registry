@@ -25,6 +25,8 @@ public class FeatureMetaDto {
     public static FeatureMetaDto of(Feature feature) {
         return new FeatureMetaDto().setName(feature.getName())
                 .setDescription(feature.getDescription())
+                .setAuthor(feature.getAuthor())
+                .setUpdatedAt(feature.getUpdatedAt())
                 .setDependencies(feature.getDependencies().stream().map(Feature::getName).collect(Collectors.toList()));
     }
 

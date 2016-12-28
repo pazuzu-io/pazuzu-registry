@@ -91,7 +91,7 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
         FeatureDto feature = createTestFeature();
 
         // and
-        createFeature(feature);
+        createFeatureOAuth(feature);
 
         // when
         ResponseEntity response = template.exchange(
@@ -109,7 +109,7 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
         FeatureDto feature = createTestFeature();
 
         // and
-        createFeature(feature);
+        createFeatureOAuth(feature);
 
         // when
         ResponseEntity response = template.exchange(
@@ -127,7 +127,7 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
         FeatureDto feature = createTestFeature();
 
         // and
-        createFeature(feature);
+        createFeatureOAuth(feature);
 
         // when
         ResponseEntity response = template.exchange(
@@ -145,7 +145,7 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
         FeatureDto feature = createTestFeature();
 
         // and
-        createFeature(feature);
+        createFeatureOAuth(feature);
 
         // when
         ResponseEntity response = template.exchange(
@@ -163,7 +163,7 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
         FeatureDto feature = createTestFeature();
 
         // and
-        createFeature(feature);
+        createFeatureOAuth(feature);
 
         // when
         ResponseEntity response = template.exchange(
@@ -181,7 +181,7 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
         FeatureDto feature = createTestFeature();
 
         // and
-        createFeature(feature);
+        createFeatureOAuth(feature);
 
         // when
         ResponseEntity response = template.exchange(
@@ -199,12 +199,11 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
         FeatureDto feature = createTestFeature();
 
         // and
-        createFeature(feature);
+        createFeatureOAuth(feature);
 
         // when
         ResponseEntity<List<FeatureDto>> response = template.exchange(
-                url("/api/features"), GET, null, new ParameterizedTypeReference<List<FeatureDto>>() {
-                }
+                url("/api/features"), GET, null, new ParameterizedTypeReference<List<FeatureDto>>() {}
         );
 
         // then
@@ -219,7 +218,7 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
         FeatureDto feature = createTestFeature();
 
         // and
-        createFeature(feature);
+        createFeatureOAuth(feature);
 
         // when
         ResponseEntity<FeatureDto> response = template.exchange(
@@ -231,7 +230,7 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
         assertThat(response.getBody()).isNotNull();
     }
 
-    private void createFeature(FeatureDto feature) {
+    private void createFeatureOAuth(FeatureDto feature) {
         template.exchange(
                 url("/api/features"), POST, new HttpEntity<Object>(feature, oauthToken(ADMIN_TOKEN)), Object.class
         );

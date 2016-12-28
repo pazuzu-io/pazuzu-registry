@@ -36,11 +36,11 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
 
     @Test
     public void retrievingResolvedFeatureShouldReturnFeaturesWithAllItsDependencies() throws Exception {
-        createFeature(1);
-        createFeature(2);
-        createFeature(3, 1);
-        createFeature(4, 3);
-        createFeature(5, 2);
+        createNewFeature(1);
+        createNewFeature(2);
+        createNewFeature(3, 1);
+        createNewFeature(4, 3);
+        createNewFeature(5, 2);
         ResponseEntity<List> result = template.getForEntity(url(resolvedFeaturesUrl + "?names={name}"),
                 List.class, NAME + "1," + NAME + 4);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -57,9 +57,9 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
 
     @Test
     public void retrievingResolvedFeaturesWithTheSameDependenciesShouldNotReturnDuplicates() throws Exception {
-        createFeature(11);
-        createFeature(12, 11);
-        createFeature(13, 11);
+        createNewFeature(11);
+        createNewFeature(12, 11);
+        createNewFeature(13, 11);
         ResponseEntity<List> result = template.getForEntity(url(resolvedFeaturesUrl + "?names={name}"),
                 List.class, NAME + "12," + NAME + 13);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
