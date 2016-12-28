@@ -17,7 +17,7 @@ paths:
       description: |
         Returns all the features with all its dependencies in a single array.
       parameters:
-        - name: name
+        - name: names
           in: query
           description: feature names.
           required: true
@@ -43,7 +43,7 @@ paths:
       description: |
         Returns all the features without its dependencies.
       parameters:
-        - name: name
+        - name: names
           in: query
           description: value, that must present in feature name.
           required: false

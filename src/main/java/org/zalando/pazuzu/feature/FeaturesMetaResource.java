@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 public class FeaturesMetaResource {
 
     private static final String X_TOTAL_COUNT = "X-Total-Count";
-    private static final Integer TOPOLOGICAL_SORT = 1;
     private final FeatureService featureService;
 
     @Autowired

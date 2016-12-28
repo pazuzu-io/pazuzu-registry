@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 public class FeaturesResource {
 
     private static final String X_TOTAL_COUNT = "X-Total-Count";
-    private static final Integer TOPOLOGICAL_SORT = 1;
     private final FeatureService featureService;
 
     @Autowired
@@ -31,7 +30,7 @@ public class FeaturesResource {
     @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<FeatureDto> listFeatures(
-            @RequestParam(required = false, name = "name") String[] featureNames,
+            @RequestParam(required = false, name = "names") String[] featureNames,
             @RequestParam(required = false, name = "offset") Integer offset,
             @RequestParam(required = false, name = "limit") Integer limit,
             HttpServletResponse response)
@@ -56,8 +55,8 @@ public class FeaturesResource {
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FeatureDto> createFeature(@RequestBody FeatureDto value, UriComponentsBuilder uriBuilder) throws ServiceException {
         FeatureDto feature = featureService.createFeature(
-                value.getMeta().getName(), value.getSnippet(), value.getTestSnippet(), value.getMeta().getDescription(),
-                value.getMeta().getDependencies(), FeatureDto::of);
+                value.getMeta().getName(), value.getMeta().getDescription(), value.getMeta().getAuthor(),
+                value.getSnippet(), value.getTestSnippet(), value.getMeta().getDependencies(), FeatureDto::of);
 
         return ResponseEntity
                 .created(uriBuilder.path("/api/features/{featureName}").buildAndExpand(feature.getMeta().getName()).toUri())
@@ -68,8 +67,8 @@ public class FeaturesResource {
     @RequestMapping(value = "/{featureName}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public FeatureDto updateFeature(@PathVariable String featureName, @RequestBody FeatureDto value) throws ServiceException {
         return featureService.updateFeature(
-                featureName, value.getMeta().getName(), value.getSnippet(), value.getTestSnippet(),
-                value.getMeta().getDescription(), value.getMeta().getDependencies(), FeatureDto::of);
+                featureName, value.getMeta().getName(), value.getMeta().getDescription(), value.getMeta().getAuthor(),
+                value.getSnippet(), value.getTestSnippet(), value.getMeta().getDependencies(), FeatureDto::of);
     }
 
     @RolesAllowed({Roles.ADMIN})

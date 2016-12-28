@@ -23,7 +23,7 @@ public class ResolvedFeaturesResource {
 
     @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<FeatureDto> listResolvedFeatures(@RequestParam(name = "name") String[] featureNames) throws ServiceException {
+    public List<FeatureDto> listResolvedFeatures(@RequestParam(name = "names") String[] featureNames) throws ServiceException {
 
         return featureService
                 .resolveFeatures(Arrays.stream(featureNames).collect(Collectors.toList()))

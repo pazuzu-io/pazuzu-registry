@@ -132,7 +132,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         createFeature(4);
 
         // when
-        ResponseEntity<Map> result = template.getForEntity(url(featuresUrl + "?name={name}"),
+        ResponseEntity<Map> result = template.getForEntity(url(featuresUrl + "?names={name}"),
                 Map.class, NAME + "4,feature-5");
 
         // then
@@ -180,10 +180,12 @@ public class FeatureApiTest extends AbstractComponentTest {
         expectedResponse.getMeta().getDependencies().add(NAME + 6);
         expectedResponse.getMeta().getDependencies().add(NAME + 7);
 
-        assertThat(putResponse.getBody()).isEqualToComparingFieldByField(expectedResponse);
+        assertThat(putResponse.getBody()).isEqualToIgnoringGivenFields(expectedResponse, "meta");
+        assertThat(putResponse.getBody().getMeta()).isEqualToIgnoringGivenFields(expectedResponse.getMeta(), "updatedAt");
 
         ResponseEntity<FeatureDto> getResponse = template.getForEntity(url(featuresUrl + "/" + NAME + 8), FeatureDto.class);
-        assertThat(getResponse.getBody()).isEqualToComparingFieldByField(expectedResponse);
+        assertThat(putResponse.getBody()).isEqualToIgnoringGivenFields(expectedResponse, "meta");
+        assertThat(putResponse.getBody().getMeta()).isEqualToIgnoringGivenFields(expectedResponse.getMeta(), "updatedAt");
     }
 
     @Test

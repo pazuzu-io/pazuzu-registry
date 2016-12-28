@@ -5,30 +5,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.zalando.pazuzu.exception.*;
-import org.zalando.pazuzu.feature.file.DockerParser;
-import org.zalando.pazuzu.feature.file.FileService;
-import org.zalando.pazuzu.feature.tag.TagService;
-import org.zalando.pazuzu.sort.TopologicalSortLinear;
 
 import javax.ws.rs.BadRequestException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toSet;
-
 @Service
 public class FeatureService {
 
     private final FeatureRepository featureRepository;
-    private final TagService tagService;
-    private final FileService fileService;
 
     @Autowired
-    public FeatureService(FeatureRepository featureRepository, TagService tagService, FileService fileService) {
+    public FeatureService(FeatureRepository featureRepository) {
         this.featureRepository = featureRepository;
-        this.tagService = tagService;
-        this.fileService = fileService;
     }
 
     private static void collectRecursively(Collection<Feature> result, Feature f) {
@@ -49,30 +39,26 @@ public class FeatureService {
     }
 
     @Transactional(rollbackFor = ServiceException.class)
-    public <T> T createFeature(String name, String dockerData, String testInstruction, String description,
+    public <T> T createFeature(String name, String description, String author, String snippet, String testSnippet,
                                List<String> dependencyNames, Function<Feature, T> converter) {
         final Feature newFeature = new Feature();
 
         setFeatureName(name, newFeature);
         createDependencies(dependencyNames, newFeature);
-        setDockerData(newFeature, dockerData);
-        newFeature.setApproved(false);
-
-        if (null != testInstruction) {
-            newFeature.setTestInstruction(testInstruction);
+        if (null != snippet && !snippet.isEmpty()) {
+            newFeature.setSnippet(snippet);
+        }
+        if (null != testSnippet && !testSnippet.isEmpty()) {
+            newFeature.setTestSnippet(testSnippet);
         }
         if (null != description && !description.isEmpty()) {
             newFeature.setDescription(description);
         }
+        if (null != author && !author.isEmpty()) {
+            newFeature.setAuthor(author);
+        }
         featureRepository.save(newFeature);
         return converter.apply(newFeature);
-    }
-
-    private void setDockerData(Feature feature, String dockerData) {
-        // TODO (usability) This might be too strict and we should allow saving incomplete features.
-        // TODO (usability) Report list of missing files.
-        feature.setDockerData(null == dockerData ? "" : dockerData);
-        updateFileLinks(feature);
     }
 
     private void setFeatureName(String name, Feature feature) throws BadRequestException {
@@ -97,22 +83,19 @@ public class FeatureService {
     }
 
     @Transactional(rollbackFor = ServiceException.class)
-    public <T> T updateFeature(String name, String newName, String dockerData, String testInstruction,
-                               String description, List<String> dependencyNames, Function<Feature, T> converter) {
+    public <T> T updateFeature(String name, String newName, String description, String author, String snippet,
+                               String testSnippet, List<String> dependencyNames, Function<Feature, T> converter) {
         final Feature existing = loadExistingFeature(name);
 
         if (null != newName && !newName.equals(existing.getName())) {
             setFeatureName(newName, existing);
         }
+        // Allow deleting nullable data
+        existing.setSnippet(valueOrNull(snippet));
+        existing.setTestSnippet(valueOrNull(testSnippet));
+        existing.setDescription(valueOrNull(description));
+        existing.setAuthor(valueOrNull(author));
 
-        setDockerData(existing, dockerData);
-
-        if (null != testInstruction) {
-            existing.setTestInstruction(testInstruction);
-        }
-        if (null != description) {
-            existing.setDescription(description);
-        }
         if (null != dependencyNames) {
             final Set<Feature> dependencies = loadFeatures(dependencyNames);
             final List<Feature> recursive = dependencies.stream()
@@ -127,11 +110,8 @@ public class FeatureService {
         return converter.apply(existing);
     }
 
-    private void updateFileLinks(Feature feature) {
-        feature.setFiles(
-                DockerParser.getCopyFiles(feature.getDockerData())
-                        .stream().map(fileService::getByName)
-                        .collect(toSet()));
+    private String valueOrNull(String value) {
+        return null != value && !value.isEmpty() ? value : null;
     }
 
     @Transactional
@@ -151,13 +131,6 @@ public class FeatureService {
         featureRepository.delete(feature);
     }
 
-    @Transactional
-    public void approveFeature(String featureName) throws ServiceException {
-        Feature feature = loadExistingFeature(featureName);
-        feature.setApproved(true);
-        featureRepository.save(feature);
-    }
-
     public Set<Feature> loadFeatures(List<String> featureNames) throws ServiceException {
         final Set<String> uniqueFeatureNames = null == featureNames ? new HashSet<>() : new HashSet<>(featureNames);
         final Set<Feature> foundFeatures = featureRepository.findByNameIn(uniqueFeatureNames);
@@ -169,12 +142,6 @@ public class FeatureService {
         }
 
         return foundFeatures;
-    }
-
-    public List<Feature> getSortedFeatures(Collection<Feature> features) {
-        final Set<Feature> expandedList = new HashSet<>();
-        features.forEach(f -> collectRecursively(expandedList, f));
-        return new TopologicalSortLinear<>(expandedList, Feature::getDependencies).getTopSorted();
     }
 
     public List<Feature> resolveFeatures(List<String> featureNames) {

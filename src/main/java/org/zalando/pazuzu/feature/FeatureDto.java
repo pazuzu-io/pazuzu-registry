@@ -18,10 +18,12 @@ public class FeatureDto {
     public static FeatureDto of(Feature feature) {
 
         FeatureDto dto = new FeatureDto()
-                .setSnippet(feature.getDockerData())
-                .setTestSnippet(feature.getTestInstruction());
+                .setSnippet(feature.getSnippet())
+                .setTestSnippet(feature.getTestSnippet());
         dto.getMeta().setName(feature.getName())
                 .setDescription(feature.getDescription())
+                .setAuthor(feature.getAuthor())
+                .setUpdatedAt(feature.getUpdatedAt())
                 .setDependencies(feature.getDependencies().stream().map(Feature::getName).collect(Collectors.toList()));
         return dto;
     }

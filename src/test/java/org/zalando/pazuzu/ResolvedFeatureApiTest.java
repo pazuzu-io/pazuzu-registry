@@ -23,7 +23,7 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
     @Test
     public void retrievingResolvedFeatureWithNonExistingNameShouldResultInError() throws Exception {
         // when
-        ResponseEntity<Map> result = template.getForEntity(url(resolvedFeaturesUrl + "?name={name}"),
+        ResponseEntity<Map> result = template.getForEntity(url(resolvedFeaturesUrl + "?names={name}"),
                 Map.class, NAME + 1);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(result.getBody()).containsOnly(
@@ -41,7 +41,7 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
         createFeature(3, 1);
         createFeature(4, 3);
         createFeature(5, 2);
-        ResponseEntity<List> result = template.getForEntity(url(resolvedFeaturesUrl + "?name={name}"),
+        ResponseEntity<List> result = template.getForEntity(url(resolvedFeaturesUrl + "?names={name}"),
                 List.class, NAME + "1," + NAME + 4);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         List resolvedFeature = result.getBody();
@@ -60,7 +60,7 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
         createFeature(11);
         createFeature(12, 11);
         createFeature(13, 11);
-        ResponseEntity<List> result = template.getForEntity(url(resolvedFeaturesUrl + "?name={name}"),
+        ResponseEntity<List> result = template.getForEntity(url(resolvedFeaturesUrl + "?names={name}"),
                 List.class, NAME + "12," + NAME + 13);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         List<String> featureNames = ((List<Object>) result.getBody()).stream()
