@@ -2,17 +2,16 @@ package org.zalando.pazuzu;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.zalando.pazuzu.exception.*;
 import org.zalando.pazuzu.feature.FeatureDto;
-import org.zalando.pazuzu.feature.FeatureFullDto;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpMethod.GET;
 
 public class FeatureApiTest extends AbstractComponentTest {
 
@@ -20,7 +19,6 @@ public class FeatureApiTest extends AbstractComponentTest {
     public void retrievingFeaturesShouldReturnEmptyListWhenNoFeaturesAreStored() throws Exception {
         // when
         ResponseEntity<List> result = template.getForEntity(url(featuresUrl), List.class);
-
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(result.getBody()).isEmpty();
@@ -29,41 +27,30 @@ public class FeatureApiTest extends AbstractComponentTest {
     @Test
     public void createFeatureShouldReturnCreatedFeature() throws Exception {
         // when
-        ResponseEntity<FeatureFullDto> result = createFeature("Test", "Test Data", "test something", "The test feature");
-
+        int id = 1;
+        ResponseEntity<FeatureDto> result = createNewFeature(id);
         // then
-        FeatureFullDto resultFeature = result.getBody();
-        assertThat(resultFeature.getName()).isEqualTo("Test");
-        assertThat(resultFeature.getTestInstruction()).isEqualTo("test something");
-        assertThat(resultFeature.getDescription()).isEqualTo("The test feature");
-        assertThat(resultFeature.getDockerData()).isEqualTo("Test Data");
-        assertThat(resultFeature.getDependencies()).isEmpty();
+        assertEqualFeaturesIgnoreUpdatedAt(newFeature(id), result.getBody());
     }
 
     @Test
     public void createFeatureShouldFailOnWrongNameNull() throws Exception {
         // when
-        final ResponseEntity<Map> error = createFeatureUnchecked(Map.class, null, null, null, null);
-
+        final ResponseEntity<Map> error = createFeatureError(new FeatureDto().setSnippet(SNIPPET + 1));
         // then
         assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(error.getBody()).containsOnly(
-                entry("type", "http://pazuzu.io/error/feature_name_empty"),
-                entry("title", "Feature name is empty"),
-                entry("status", HttpStatus.BAD_REQUEST.value()));
+        assertEqualErrors(new FeatureNameEmptyException(), error.getBody());
     }
 
     @Test
     public void createFeatureShouldFailOnWrongNameEmpty() throws Exception {
         // when
-        final ResponseEntity<Map> error = createFeatureUnchecked(Map.class, "", null, null, null);
-
+        FeatureDto dto = newFeature(1);
+        dto.getMeta().setName("");
+        final ResponseEntity<Map> error = createFeatureError(dto);
         // then
         assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(error.getBody()).containsOnly(
-                entry("type", "http://pazuzu.io/error/feature_name_empty"),
-                entry("title", "Feature name is empty"),
-                entry("status", HttpStatus.BAD_REQUEST.value()));
+        assertEqualErrors(new FeatureNameEmptyException(), error.getBody());
     }
 
     @Test
@@ -72,216 +59,133 @@ public class FeatureApiTest extends AbstractComponentTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         ResponseEntity<Map> error = template.postForEntity(url(featuresUrl), new HttpEntity<>("{json crap}", headers), Map.class);
-
         // then
         assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(error.getBody())
                 .containsOnlyKeys("title", "status", "detail")
-                .contains(entry("title", "Bad Request"),
-                          entry("status", HttpStatus.BAD_REQUEST.value()));
+                .contains(entry("title", "Bad Request"), entry("status", HttpStatus.BAD_REQUEST.value()));
     }
 
     @Test
     public void createdFeatureShouldBeRetrievableAfterwards() throws Exception {
         // given
-        ResponseEntity<FeatureFullDto> createdResult = createFeature("Test 2", "Test Data 2", "something to test2", "Test 2 desc");
-
+        ResponseEntity<FeatureDto> createdResult = createNewFeature(2);
         // when
-        ResponseEntity<FeatureFullDto> result = template.getForEntity(createdResult.getHeaders().getLocation(), FeatureFullDto.class);
+        ResponseEntity<FeatureDto> result = template.getForEntity(createdResult.getHeaders().getLocation(), FeatureDto.class);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-
         // then
-        FeatureFullDto resultFeature = result.getBody();
-        assertThat(resultFeature.getName()).isEqualTo("Test 2");
-        assertThat(resultFeature.getDockerData()).isEqualTo("Test Data 2");
-        assertThat(resultFeature.getTestInstruction()).isEqualTo("something to test2");
-        assertThat(resultFeature.getDescription()).isEqualTo("Test 2 desc");
-        assertThat(resultFeature.getDependencies()).isEmpty();
-        assertThat(resultFeature.isApproved()).isFalse();
+        assertEqualFeaturesIgnoreUpdatedAt(newFeature(2), result.getBody());
     }
 
     @Test
     public void testShouldFailOnDuplicateFeatureCreation() throws Exception {
         // given
-        createFeature("Test 1000", "Test Data 2", "something to test2", "Test 2 desc");
-
+        int id = 3;
+        createNewFeature(id);
         // when
-        ResponseEntity<Map> secondCreationResult = createFeatureUnchecked(Map.class, "Test 1000", "test", "test", "test");
-        assertThat(secondCreationResult.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-
+        ResponseEntity<Map> error = createFeatureError(newFeature(id));
         // then
-        assertThat(secondCreationResult.getBody())
-                .containsOnlyKeys("type","title", "status", "detail")
-                .containsOnly(
-                        entry("type", "http://pazuzu.io/error/feature_duplicate"),
-                        entry("title", "Feature with this name already exists"),
-                        entry("detail", "Feature with name Test 1000 already exists"),
-                        entry("status", HttpStatus.BAD_REQUEST.value()));
+        assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertEqualErrors(
+                new FeatureDuplicateException("Feature with name " + NAME + id + " already exists"), error.getBody()
+        );
     }
 
     @Test
     public void returnsNotFoundWhenTryingToRetrieveNonExistingFeature() throws Exception {
         // when
         ResponseEntity<Map> result = template.getForEntity(url("/api/features/non_existing"), Map.class);
-
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(result.getBody()).containsOnly(
-                   entry("type", "http://pazuzu.io/error/feature_not_found"),
-                   entry("title", "Feature was not found"),
-                   entry("detail", "Feature missing: non_existing"),
-                   entry("status", HttpStatus.NOT_FOUND.value()));
+        assertEqualErrors(new FeatureNotFoundException("Feature missing: non_existing"), result.getBody());
     }
 
     @Test
     public void returnsNotFoundWhenTryingToRetrieveMultipleNonExistingFeatures() throws Exception {
         // given
-        createFeature("FeatureA", "Test Data 2", "something to test2", "Test 2 desc");
-
+        createNewFeature(4);
         // when
-        ResponseEntity<Map> result = template.getForEntity(url(featuresUrl + "?name={name}"),
-                Map.class, "FeatureA,FeatureB");
-
+        String missingName = "feature-5";
+        ResponseEntity<Map> error = template.getForEntity(url(featuresUrl + "?names={name}"),
+                Map.class, NAME + "4," + missingName);
         // then
-        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(result.getBody()).containsOnly(
-                   entry("type", "http://pazuzu.io/error/feature_not_found"),
-                   entry("title", "Feature was not found"),
-                   entry("detail", "Feature missing: FeatureB"),
-                   entry("status", HttpStatus.NOT_FOUND.value()));
+        assertThat(error.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertEqualErrors(new FeatureNotFoundException("Feature missing: " + missingName), error.getBody());
     }
 
     @Test
     public void deleteFeatureProperly() throws JsonProcessingException {
         // given
-        createFeature("Feature", "some data", "something to test2", "Feature desc");
-
+        createNewFeature(5);
         // when
-        ResponseEntity<Void> response = template.exchange(url(featuresUrl + "/Feature"), HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+        ResponseEntity<Void> response = template.exchange(url(featuresUrl + "/" + NAME + 5), HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
         ResponseEntity<List> result = template.getForEntity(url(featuresUrl), List.class);
-
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         assertThat(result.getBody()).isEmpty();
     }
 
     @Test
-    public void updateFeature() throws JsonProcessingException {
+    public void updateFeature() throws JsonProcessingException, InterruptedException {
         // given
-        createFeature("Feature1", "dockerData Feature1", "testInstruction Feature1", "description Feature1");
-        createFeature("Feature2", "dockerData Feature2", "testInstruction Feature2", "description Feature2");
-        createFeature("Feature3", null, null, null);
-
+        createNewFeature(6);
+        createNewFeature(7);
+        FeatureDto toBeUpdated = new FeatureDto();
+        toBeUpdated.getMeta().setName(NAME + 8);
+        Date beforeUpdate = createFeature(toBeUpdated).getBody().getMeta().getUpdatedAt();
+        // The Api does not return milliseconds so we need to wait to see changes in the seconds.
+        Thread.sleep(2000);
         // when
-        final Map<String, Object> updateRequest = getFeaturePropertiesMap(null, "dockerData Feature3", "testInstruction Feature3", "description Feature3", "Feature1", "Feature2");
-        ResponseEntity<FeatureFullDto> putResponse = template.exchange(url(featuresUrl + "/Feature3"), PUT,
-                new HttpEntity<>(mapper.writeValueAsString(updateRequest), contentType(MediaType.APPLICATION_JSON)), FeatureFullDto.class);
-        assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-
+        ResponseEntity<FeatureDto> putResponse = template.exchange(
+                url(featuresUrl + "/" + toBeUpdated.getMeta().getName()),
+                PUT,
+                new HttpEntity<>(mapper.writeValueAsString(newFeature(8, 6, 7)), contentType(MediaType.APPLICATION_JSON)),
+                FeatureDto.class
+        );
         // then
-        FeatureFullDto expectedResponse = new FeatureFullDto();
-        expectedResponse.setDockerData("dockerData Feature3");
-        expectedResponse.setTestInstruction("testInstruction Feature3");
-        expectedResponse.setDescription("description Feature3");
-        expectedResponse.setName("Feature3");
-        expectedResponse.getDependencies().add(FeatureDto.populate("Feature1", "dockerData Feature1", "testInstruction Feature1", "description Feature1", true));
-        expectedResponse.getDependencies().add(FeatureDto.populate("Feature2", "dockerData Feature2", "testInstruction Feature2", "description Feature2", true));
-
-        assertThat(putResponse.getBody()).isEqualToComparingFieldByField(expectedResponse);
-
-        ResponseEntity<FeatureFullDto> getResponse = template.getForEntity(url(featuresUrl + "/Feature3"), FeatureFullDto.class);
-        assertThat(getResponse.getBody()).isEqualToComparingFieldByField(expectedResponse);
+        assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        FeatureDto expected = newFeature(8, 6, 7);
+        assertThat(putResponse.getBody().getMeta().getUpdatedAt()).isAfter(beforeUpdate);
+        assertEqualFeaturesIgnoreUpdatedAt(expected, putResponse.getBody());
+        ResponseEntity<FeatureDto> getResponse = template.getForEntity(url(featuresUrl + "/" + NAME + 8), FeatureDto.class);
+        assertEqualFeaturesIgnoreUpdatedAt(expected, getResponse.getBody());
     }
 
     @Test
     public void notFoundWhenDeletingNotExistingFeature() throws JsonProcessingException {
         /// when
         ResponseEntity<Map> response = template.exchange(url(featuresUrl + "/NotExistingFeature"), HttpMethod.DELETE, HttpEntity.EMPTY, Map.class);
-
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(response.getBody()).containsOnly(
-                   entry("type", "http://pazuzu.io/error/feature_not_found"),
-                   entry("title", "Feature was not found"),
-                   entry("detail", "Feature missing: NotExistingFeature"),
-                   entry("status", HttpStatus.NOT_FOUND.value()));
+        assertEqualErrors(new FeatureNotFoundException("Feature missing: NotExistingFeature"), response.getBody());
     }
 
     @Test
     public void badRequestWhenDeletingStillReferencedFeature() throws JsonProcessingException {
         // given
-        createFeature("Feature", "some data", "something to test2", "Feature desc");
-        createFeature("FeatureWithDependency", "some data", "something to test2", "Feature desc", "Feature");
-
+        createNewFeature(9);
+        createNewFeature(10, 9);
         // when
-        ResponseEntity<Map> response = template.exchange(url(featuresUrl + "/Feature"), HttpMethod.DELETE, HttpEntity.EMPTY, Map.class);
-
+        ResponseEntity<Map> response = template.exchange(url(featuresUrl + "/" + NAME + 9), HttpMethod.DELETE, HttpEntity.EMPTY, Map.class);
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).containsOnly(
-                           entry("type", "http://pazuzu.io/error/feature_not_deletable_due_to_references"),
-                           entry("title", "Can't delete feature because it still has references"),
-                           entry("detail", "Can't delete feature because it is referenced from other feature(s): FeatureWithDependency"),
-                           entry("status", HttpStatus.BAD_REQUEST.value()));
+        assertEqualErrors(new FeatureReferencedDeleteException("Can't delete feature because it is referenced from other feature(s): feature-10"), response.getBody());
     }
 
     @Test
     public void testGetSortedFeaturesSuccess() throws JsonProcessingException {
         // given
-        createFeature("test-feature-1", "docker-data-1", "test-instruction-1", "desc-1");
-        createFeature("test-feature-2", "docker-data-2", "test-instruction-2", "desc-2");
-        createFeature("test-feature-3", "docker-data-3", "test-instruction-3", "desc-3", "test-feature-2");
-
+        createNewFeature(11);
+        createNewFeature(12);
+        createNewFeature(13, 12);
         // when
-        ResponseEntity<List> result = template.getForEntity(url(featuresUrl), List.class, "sorted", 1, "name", "test-feature-1,test-feature2");
-
+        ResponseEntity<List> result = template.getForEntity(url(featuresUrl), List.class, "sorted", 1, "name", NAME + 11 + "," + NAME + 12);
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(result.getBody()).hasSize(3);
     }
 
-    @Test
-    public void testFeatureSearchSuccess() throws JsonProcessingException {
-        // given
-        createFeature("test-feature-1", "docker-data-1", "test-instruction-1", "desc-1");
-        createFeature("test-feature-2", "docker-data-2", "test-instruction-2", "desc-2");
-        createFeature("feature-3", "docker-data-3", "test-instruction-3", "desc-3");
-
-        // when
-        ResponseEntity<List> result = template.getForEntity(url(featuresUrl + "/search/test"), List.class);
-
-        // then
-        assertThat(result.getStatusCode().is2xxSuccessful());
-        assertThat(result.getBody()).hasSize(2);
-    }
-
-    @Test
-    public void testFeatureSearchEmptyResult() throws JsonProcessingException {
-        // given
-        createFeature("test-feature-1", "docker-data-1", "test-instruction-1", "desc-1");
-        createFeature("test-feature-2", "docker-data-2", "test-instruction-2", "desc-2");
-
-        // when
-        ResponseEntity<List> result = template.getForEntity(url(featuresUrl + "/search/foo"), List.class);
-
-        // then
-        assertThat(result.getStatusCode().is2xxSuccessful());
-        assertThat(result.getBody()).hasSize(0);
-    }
-
-    @Test
-    public void shouldApproveFeature() throws Exception {
-        createFeature("test-feature-1", "docker-data-1", "test-instruction-1", "desc-1");
-        createFeature("test-feature-2", "docker-data-2", "test-instruction-2", "desc-2");
-        template.exchange(url(featuresUrl) + "/test-feature-1/approve",
-                PUT, null, new ParameterizedTypeReference<List<FeatureDto>>() {});
-        ResponseEntity<List<FeatureDto>> result =
-                template.exchange(url(featuresUrl), GET, null, new ParameterizedTypeReference<List<FeatureDto>>() {});
-        assertThat(findFeatureByName(result.getBody(), "test-feature-1").isApproved()).isTrue();
-        assertThat(findFeatureByName(result.getBody(), "test-feature-2").isApproved()).isFalse();
-    }
-
     private FeatureDto findFeatureByName(List<FeatureDto> collection, String name) {
-        return collection.stream().filter(f -> name.equals(f.getName())).findFirst().get();
+        return collection.stream().filter(f -> name.equals(f.getMeta().getName())).findFirst().get();
     }
 }

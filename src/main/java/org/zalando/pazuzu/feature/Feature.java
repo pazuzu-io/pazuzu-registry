@@ -1,11 +1,7 @@
 package org.zalando.pazuzu.feature;
 
-import org.zalando.pazuzu.feature.file.File;
-import org.zalando.pazuzu.feature.tag.Tag;
-
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Date;
 import java.util.Set;
 
 @Entity
@@ -17,107 +13,94 @@ public class Feature {
             joinColumns = @JoinColumn(name = "feature_id", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "dependency_feature_id", nullable = false))
     private Set<Feature> dependencies;
-    @ManyToMany(fetch = FetchType.LAZY)
-    private List<Tag> tags;
-    @ManyToMany(fetch = FetchType.LAZY)
-    private Set<File> files;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "feature_name", nullable = false, length = 256)
+    @Column(name = "name", nullable = false, length = 256)
     private String name;
-    @Column(name = "docker_data", nullable = false, length = 4096)
-    private String dockerData;
-    @Column(name = "test_instruction", nullable = true, length = 4096)
-    private String testInstruction;
-    @Column(name = "description", nullable = true, length = 4096)
+    @Column(name = "description", length = 4096)
     private String description;
-    @Column(name = "approved", nullable = true)
-    private boolean approved;
+    @Column(name = "updated_at", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt;
+    @Column(name = "author", length = 256)
+    private String author;
+    @Column(name = "snippet", nullable = false, length = 4096)
+    private String snippet;
+    @Column(name = "test_snippet", nullable = true, length = 4096)
+    private String testSnippet;
 
-    public List<Tag> getTags() {
-        return tags;
+    public Set<Feature> getDependencies() {
+        return dependencies;
     }
 
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
+    public Feature setDependencies(Set<Feature> dependencies) {
+        this.dependencies = dependencies;
+        return this;
     }
 
     public Integer getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public Feature setId(Integer id) {
         this.id = id;
+        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public Feature setName(String name) {
         this.name = name;
-    }
-
-    public String getDockerData() {
-        return dockerData;
-    }
-
-    public void setDockerData(String dockerData) {
-        this.dockerData = dockerData;
-    }
-
-    public Set<Feature> getDependencies() {
-        if (null == dependencies) {
-            dependencies = new HashSet<>();
-        }
-        return dependencies;
-    }
-
-    public void setDependencies(Set<Feature> dependencies) {
-        this.dependencies = dependencies;
-    }
-
-    public boolean containsDependencyRecursively(Feature f) {
-        if (this == f) {
-            return true;
-        }
-        return getDependencies().stream().filter(item -> item.containsDependencyRecursively(f)).findAny().isPresent();
-    }
-
-    public Set<File> getFiles() {
-        if (null == files) {
-            files = new HashSet<>();
-        }
-        return files;
-    }
-
-    public void setFiles(Set<File> files) {
-        this.files = files;
-    }
-
-    public String getTestInstruction() {
-        return testInstruction;
-    }
-
-    public void setTestInstruction(String testInstruction) {
-        this.testInstruction = testInstruction;
+        return this;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public Feature setDescription(String description) {
         this.description = description;
+        return this;
     }
 
-    public boolean isApproved() {
-        return approved;
+    public Date getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setApproved(boolean approved) {
-        this.approved = approved;
+    @PrePersist
+    @PreUpdate
+    public void setUpdatedAt() {
+        this.updatedAt = new Date();
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public Feature setAuthor(String author) {
+        this.author = author;
+        return this;
+    }
+
+    public String getSnippet() {
+        return snippet;
+    }
+
+    public Feature setSnippet(String snippet) {
+        this.snippet = snippet;
+        return this;
+    }
+
+    public String getTestSnippet() {
+        return testSnippet;
+    }
+
+    public Feature setTestSnippet(String testSnippet) {
+        this.testSnippet = testSnippet;
+        return this;
     }
 
     @Override
@@ -140,4 +123,12 @@ public class Feature {
         Feature other = (Feature) obj;
         return this.getId() == other.getId(); // TODO (review) Is comparison with "==" intended?
     }
+
+    public boolean containsDependencyRecursively(Feature existing) {
+        if (this == existing) {
+            return true;
+        }
+        return dependencies.stream().anyMatch(item -> item.containsDependencyRecursively(existing));
+    }
+
 }
