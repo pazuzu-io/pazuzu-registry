@@ -31,7 +31,7 @@ public abstract class AbstractComponentTest {
 
     protected final String featuresUrl = "/api/features";
     protected final String resolvedFeaturesUrl = "/api/resolved-features";
-    protected final String featuresMetaUrl = "/api/features-meta";
+    protected final String featuresMetaUrl = "/api/feature-metas";
     protected final TestRestTemplate template = new TestRestTemplate();
     protected final ObjectMapper mapper = new ObjectMapper();
     @Value("${local.server.port}")

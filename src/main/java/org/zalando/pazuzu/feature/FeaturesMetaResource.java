@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/api/features-meta")
+@RequestMapping(value = "/api/feature-metas")
 public class FeaturesMetaResource {
 
     private static final String X_TOTAL_COUNT = "X-Total-Count";

@@ -141,8 +141,8 @@ paths:
     delete:
       summary: Delete feature
       description: |
-        Delete this feature. If another features has links to this feature
-        nothing will be deleted and error will be returned.
+        Delete this feature. If another feature depends on this feature
+        nothing will be deleted and an error will be returned.
       tags:
         - Features
       responses:
