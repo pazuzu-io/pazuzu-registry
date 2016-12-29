@@ -14,7 +14,7 @@ import java.util.TimeZone;
 public class MapperConfiguration {
     @Bean
     public ObjectMapper objectMapper() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ddZ", Locale.US);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         return new ObjectMapper()
                 .setDateFormat(dateFormat)

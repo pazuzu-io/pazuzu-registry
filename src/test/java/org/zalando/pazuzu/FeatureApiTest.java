@@ -126,14 +126,15 @@ public class FeatureApiTest extends AbstractComponentTest {
     }
 
     @Test
-    public void updateFeature() throws JsonProcessingException {
+    public void updateFeature() throws JsonProcessingException, InterruptedException {
         // given
         createNewFeature(6);
         createNewFeature(7);
         FeatureDto toBeUpdated = new FeatureDto();
         toBeUpdated.getMeta().setName(NAME + 8);
-        createFeature(toBeUpdated);
-        Date beforeUpdate = new Date();
+        Date beforeUpdate = createFeature(toBeUpdated).getBody().getMeta().getUpdatedAt();
+        // The Api does not return milliseconds so we need to wait to see changes in the seconds.
+        Thread.sleep(2000);
         // when
         ResponseEntity<FeatureDto> putResponse = template.exchange(
                 url(featuresUrl + "/" + toBeUpdated.getMeta().getName()),
