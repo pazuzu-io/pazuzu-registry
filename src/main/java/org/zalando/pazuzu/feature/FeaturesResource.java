@@ -12,8 +12,6 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/api/features")
@@ -46,9 +44,7 @@ public class FeaturesResource {
                 return featureService.listFeatures("", FeatureDto::of);
             }
         }
-        Set<Feature> featureSet = featureService.loadFeatures(Arrays.stream(featureNames).collect(Collectors.toList()));
-
-        return featureSet.stream().map(FeatureDto::of).collect(Collectors.toList());
+        return featureService.searchFeatures(Arrays.asList(featureNames), FeatureDto::of);
     }
 
     @RolesAllowed({Roles.USER})

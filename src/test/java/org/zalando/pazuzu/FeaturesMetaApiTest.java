@@ -2,15 +2,19 @@ package org.zalando.pazuzu;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.zalando.pazuzu.exception.FeatureNotFoundException;
+import org.zalando.pazuzu.feature.FeatureDto;
 import org.zalando.pazuzu.feature.FeatureMetaDto;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.springframework.http.HttpMethod.GET;
 
 public class FeaturesMetaApiTest extends AbstractComponentTest {
 
@@ -37,16 +41,76 @@ public class FeaturesMetaApiTest extends AbstractComponentTest {
                 entry("status", HttpStatus.NOT_FOUND.value()));
     }
 
+
     @Test
-    public void returnsNotFoundWhenTryingToRetrieveMultipleNonExistingFeaturesMeta() throws Exception {
+    public void listFeaturesMetaShouldNotReturnAnErrorForUnmatchedNames() throws Exception {
         // given
-        createNewFeature(1);
+        createNewFeature(4);
         // when
-        ResponseEntity<Map> result = template.getForEntity(url(featuresMetaUrl + "?name={name}"),
-                Map.class, NAME + "1,feature-2");
+        String missingName = "feature-5";
+        ResponseEntity<List<FeatureMetaDto>> result = template.exchange(url(featuresMetaUrl + "?name={name}"),
+                GET, null, new ParameterizedTypeReference<List<FeatureMetaDto>>() {
+                }, NAME + "4," + missingName);
         // then
-        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertEqualErrors(new FeatureNotFoundException("Feature missing: feature-2"), result.getBody());
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(result.getBody().size()).isEqualTo(1);
+        assertThat(result.getBody().stream().map(FeatureMetaDto::getName)).containsOnly(NAME + 4);
+    }
+
+    @Test
+    public void listFeaturesShouldReturnsFeaturesThatMatchesTheNamePartially() throws Exception {
+        // given
+        createFeature(new FeatureDto("java"));
+        createFeature(new FeatureDto("java-node"));
+        createFeature(new FeatureDto("node"));
+        createFeature(new FeatureDto("node-mongo"));
+        createFeature(new FeatureDto("python"));
+        // when
+        ResponseEntity<List<FeatureMetaDto>> jaResult = template.exchange(url(featuresMetaUrl + "?name=ja"),
+                GET, null, new ParameterizedTypeReference<List<FeatureMetaDto>>() {
+                });
+        // then
+        assertThat(jaResult.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(jaResult.getBody().size()).isEqualTo(2);
+        assertThat(jaResult.getBody().stream().map(FeatureMetaDto::getName)).containsOnly("java", "java-node");
+        // when
+        ResponseEntity<List<FeatureMetaDto>> nodResult = template.exchange(url(featuresMetaUrl + "?name=nod"),
+                GET, null, new ParameterizedTypeReference<List<FeatureMetaDto>>() {
+                });
+        // then
+        assertThat(nodResult.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(nodResult.getBody().size()).isEqualTo(3);
+        assertThat(nodResult.getBody().stream().map(FeatureMetaDto::getName))
+                .containsOnly("node", "java-node", "node-mongo");
+    }
+
+    @Test
+    public void listFeaturesShouldReturnsEmptyArrayIfNothingMatched() throws Exception {
+        // given
+        createFeature(new FeatureDto("java"));
+        createFeature(new FeatureDto("java-node"));
+        // when
+        ResponseEntity<List<FeatureMetaDto>> result = template.exchange(url(featuresMetaUrl + "?name=rails"),
+                GET, null, new ParameterizedTypeReference<List<FeatureMetaDto>>() {
+                });
+        // then
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(result.getBody().size()).isEqualTo(0);
+    }
+
+    @Test
+    public void listFeaturesShouldReturnsFeaturesThatMatchesTheNameIgnoringTheCase() throws Exception {
+        // given
+        createFeature(new FeatureDto("java"));
+        createFeature(new FeatureDto("java-node"));
+        // when
+        ResponseEntity<List<FeatureMetaDto>> jaResult = template.exchange(url(featuresMetaUrl + "?name=JaV"),
+                GET, null, new ParameterizedTypeReference<List<FeatureMetaDto>>() {
+                });
+        // then
+        assertThat(jaResult.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(jaResult.getBody().size()).isEqualTo(2);
+        assertThat(jaResult.getBody().stream().map(FeatureMetaDto::getName)).containsOnly("java", "java-node");
     }
 
     @Test

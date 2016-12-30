@@ -2,15 +2,18 @@ package org.zalando.pazuzu;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.zalando.pazuzu.exception.*;
 import org.zalando.pazuzu.feature.FeatureDto;
+import org.zalando.pazuzu.feature.FeatureMetaDto;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
 
 public class FeatureApiTest extends AbstractComponentTest {
@@ -101,16 +104,76 @@ public class FeatureApiTest extends AbstractComponentTest {
     }
 
     @Test
-    public void returnsNotFoundWhenTryingToRetrieveMultipleNonExistingFeatures() throws Exception {
+    public void listFeaturesShouldNotReturnAnErrorForUnmatchedNames() throws Exception {
         // given
         createNewFeature(4);
         // when
         String missingName = "feature-5";
-        ResponseEntity<Map> error = template.getForEntity(url(featuresUrl + "?names={name}"),
-                Map.class, NAME + "4," + missingName);
+        ResponseEntity<List<FeatureDto>> result = template.exchange(url(featuresUrl + "?names={name}"),
+                GET, null, new ParameterizedTypeReference<List<FeatureDto>>() {
+                }, NAME + "4," + missingName);
         // then
-        assertThat(error.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertEqualErrors(new FeatureNotFoundException("Feature missing: " + missingName), error.getBody());
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(result.getBody().size()).isEqualTo(1);
+        assertEqualFeaturesIgnoreUpdatedAt(newFeature(4), result.getBody().get(0));
+    }
+
+    @Test
+    public void listFeaturesShouldReturnsFeaturesThatMatchesTheNamePartially() throws Exception {
+        // given
+        createFeature(new FeatureDto("java"));
+        createFeature(new FeatureDto("java-node"));
+        createFeature(new FeatureDto("node"));
+        createFeature(new FeatureDto("node-mongo"));
+        createFeature(new FeatureDto("python"));
+        // when
+        ResponseEntity<List<FeatureDto>> jaResult = template.exchange(url(featuresUrl + "?names=ja"),
+                GET, null, new ParameterizedTypeReference<List<FeatureDto>>() {
+                });
+        // then
+        assertThat(jaResult.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(jaResult.getBody().size()).isEqualTo(2);
+        assertThat(jaResult.getBody().stream().map(FeatureDto::getMeta).map(FeatureMetaDto::getName))
+                .containsOnly("java", "java-node");
+        // when
+        ResponseEntity<List<FeatureDto>> nodResult = template.exchange(url(featuresUrl + "?names=nod"),
+                GET, null, new ParameterizedTypeReference<List<FeatureDto>>() {
+                });
+        // then
+        assertThat(nodResult.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(nodResult.getBody().size()).isEqualTo(3);
+        assertThat(nodResult.getBody().stream().map(FeatureDto::getMeta).map(FeatureMetaDto::getName))
+                .containsOnly("node", "java-node", "node-mongo");
+    }
+
+    @Test
+    public void listFeaturesShouldReturnsEmptyArrayIfNothingMatched() throws Exception {
+        // given
+        createFeature(new FeatureDto("java"));
+        createFeature(new FeatureDto("java-node"));
+        // when
+        ResponseEntity<List<FeatureDto>> result = template.exchange(url(featuresUrl + "?names=rails"),
+                GET, null, new ParameterizedTypeReference<List<FeatureDto>>() {
+                });
+        // then
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(result.getBody().size()).isEqualTo(0);
+    }
+
+    @Test
+    public void listFeaturesShouldReturnsFeaturesThatMatchesTheNameIgnoringTheCase() throws Exception {
+        // given
+        createFeature(new FeatureDto("java"));
+        createFeature(new FeatureDto("java-node"));
+        // when
+        ResponseEntity<List<FeatureDto>> jaResult = template.exchange(url(featuresUrl + "?names=JaV"),
+                GET, null, new ParameterizedTypeReference<List<FeatureDto>>() {
+                });
+        // then
+        assertThat(jaResult.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(jaResult.getBody().size()).isEqualTo(2);
+        assertThat(jaResult.getBody().stream().map(FeatureDto::getMeta).map(FeatureMetaDto::getName))
+                .containsOnly("java", "java-node");
     }
 
     @Test
@@ -185,7 +248,4 @@ public class FeatureApiTest extends AbstractComponentTest {
         assertThat(result.getBody()).hasSize(3);
     }
 
-    private FeatureDto findFeatureByName(List<FeatureDto> collection, String name) {
-        return collection.stream().filter(f -> name.equals(f.getMeta().getName())).findFirst().get();
-    }
 }

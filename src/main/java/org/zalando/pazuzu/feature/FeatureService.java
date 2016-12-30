@@ -144,6 +144,17 @@ public class FeatureService {
         return foundFeatures;
     }
 
+
+    public <T> List<T> searchFeatures(List<String> patterns, Function<Feature, T> converter) throws ServiceException {
+        return patterns.stream()
+                .map(featureRepository::findByNameIgnoreCaseContaining)
+                .filter(s -> !s.isEmpty())
+                .flatMap(Collection::stream)
+                .distinct()
+                .map(converter)
+                .collect(Collectors.toList());
+    }
+
     public List<Feature> resolveFeatures(List<String> featureNames) {
         final Set<Feature> expandedList = new HashSet<>();
         loadFeatures(featureNames).forEach(f -> collectRecursively(expandedList, f));

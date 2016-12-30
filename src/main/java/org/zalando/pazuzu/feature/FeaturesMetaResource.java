@@ -44,8 +44,7 @@ public class FeaturesMetaResource {
                 return featureService.listFeatures("", FeatureMetaDto::of);
             }
         }
-        Set<Feature> featureSet = featureService.loadFeatures(Arrays.stream(featureNames).collect(Collectors.toList()));
-        return featureSet.stream().map(FeatureMetaDto::of).collect(Collectors.toList());
+        return featureService.searchFeatures(Arrays.asList(featureNames), FeatureMetaDto::of);
     }
 
     @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
