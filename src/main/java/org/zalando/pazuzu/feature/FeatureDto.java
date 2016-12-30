@@ -15,6 +15,13 @@ public class FeatureDto {
     @JsonProperty("test_snippet")
     private String testSnippet;
 
+    public FeatureDto() {
+    }
+
+    public FeatureDto(String name) {
+        this.getMeta().setName(name);
+    }
+
     public static FeatureDto of(Feature feature) {
 
         FeatureDto dto = new FeatureDto()
