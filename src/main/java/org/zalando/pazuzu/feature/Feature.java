@@ -16,18 +16,21 @@ public class Feature {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "name", nullable = false, length = 256)
+    @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "description", length = 4096)
+    @Column(name = "description")
     private String description;
-    @Column(name = "updated_at", nullable = false)
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+    @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
     @Column(name = "author", length = 256)
     private String author;
-    @Column(name = "snippet", nullable = false, length = 4096)
+    @Column(name = "snippet")
     private String snippet;
-    @Column(name = "test_snippet", nullable = true, length = 4096)
+    @Column(name = "test_snippet")
     private String testSnippet;
 
     public Set<Feature> getDependencies() {
@@ -66,15 +69,14 @@ public class Feature {
         return this;
     }
 
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
     public Date getUpdatedAt() {
         return updatedAt;
     }
 
-    @PrePersist
-    @PreUpdate
-    public void setUpdatedAt() {
-        this.updatedAt = new Date();
-    }
 
     public String getAuthor() {
         return author;
@@ -101,6 +103,17 @@ public class Feature {
     public Feature setTestSnippet(String testSnippet) {
         this.testSnippet = testSnippet;
         return this;
+    }
+
+    @PrePersist
+    private void setDatesAtCreation() {
+        this.createdAt = new Date();
+        setUpdatedAt();
+    }
+
+    @PreUpdate
+    private void setUpdatedAt() {
+        this.updatedAt = new Date();
     }
 
     @Override
