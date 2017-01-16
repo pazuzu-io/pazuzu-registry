@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class RegistryTest extends AbstractComponentTest {
 
-    static final Logger LOGGER = LoggerFactory.getLogger(RegistryTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegistryTest.class);
     @Autowired
     private RegistryRepository repository;
 
