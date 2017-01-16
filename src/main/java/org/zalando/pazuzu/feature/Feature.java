@@ -106,13 +106,13 @@ public class Feature {
     }
 
     @PrePersist
-    private void setDatesAtCreation() {
+    public void setDatesAtCreation() {
         this.createdAt = new Date();
         setUpdatedAt();
     }
 
     @PreUpdate
-    private void setUpdatedAt() {
+    public void setUpdatedAt() {
         this.updatedAt = new Date();
     }
 
