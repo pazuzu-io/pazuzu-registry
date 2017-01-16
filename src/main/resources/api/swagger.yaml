@@ -8,14 +8,14 @@ schemes:
   - http
 produces:
   - application/json
-consumes:
-  - application/json
 paths:
   /api/resolved-features:
     get:
       summary: Resolve all features by name
       description: |
         Returns all the features with all its dependencies in a single array.
+      tags:
+        - Features
       parameters:
         - name: names
           in: query
@@ -24,8 +24,6 @@ paths:
           type: array
           items:
             type: string
-      tags:
-        - Features
       responses:
         200:
           description: An array of features
@@ -42,6 +40,8 @@ paths:
       summary: Get all features
       description: |
         Returns all the features without its dependencies.
+      tags:
+        - Features
       parameters:
         - name: names
           in: query
@@ -60,8 +60,6 @@ paths:
           description: maximum number of features to return.
           required: false
           type: integer
-      tags:
-        - Features
       responses:
         200:
           description: An array of features
@@ -78,14 +76,16 @@ paths:
       description: |
         Creates a new feature with specified name, docker data, etc. Feature
         name is checked to be unique.
+      tags:
+        - Features
       parameters:
         - name: feature
           required: true
           in: body
           schema:
             $ref: '#/definitions/Feature'
-      tags:
-        - Features
+      consumes:
+        - application/json
       responses:
         201:
           description: Feature successfully created
@@ -129,6 +129,8 @@ paths:
           in: body
           schema:
             $ref: '#/definitions/Feature'
+      consumes:
+        - application/json
       responses:
         200:
           description: Feature successfully updated
@@ -157,11 +159,13 @@ paths:
       summary: Get all feature meta data
       description: |
         Returns all the features meta data.
+      tags:
+        - FeatureMetas
       parameters:
         - name: name
           in: query
           description: value, that must present in feature name.
-          required: true
+          required: false
           type: array
           items:
             type: string
@@ -175,8 +179,6 @@ paths:
           description: maximum number of features to return.
           required: false
           type: integer
-      tags:
-        - FeatureMetas
       responses:
         200:
           description: An array of feature meta data

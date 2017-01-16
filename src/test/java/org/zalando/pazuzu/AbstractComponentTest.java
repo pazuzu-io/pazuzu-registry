@@ -12,7 +12,6 @@ import org.springframework.http.*;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.zalando.pazuzu.exception.ServiceException;
-import org.zalando.pazuzu.feature.FeatureDto;
 
 import java.util.Arrays;
 import java.util.Map;
