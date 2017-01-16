@@ -28,6 +28,9 @@ public class Feature {
     private Date updatedAt;
     @Column(name = "author", length = 256)
     private String author;
+    @Column(name = "status", length = 256)
+    @Enumerated(EnumType.STRING)
+    private FeatureStatus status;
     @Column(name = "snippet")
     private String snippet;
     @Column(name = "test_snippet")
@@ -85,6 +88,14 @@ public class Feature {
     public Feature setAuthor(String author) {
         this.author = author;
         return this;
+    }
+
+    public FeatureStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(FeatureStatus status) {
+        this.status = status;
     }
 
     public String getSnippet() {
