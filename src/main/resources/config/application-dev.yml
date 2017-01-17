@@ -35,3 +35,6 @@ pazuzu:
   registry:
     cors:
       allowedOrigins: https://localhost:8080
+
+flyway:
+  locations: ['classpath:db/migration', 'classpath:dev/db/provisioning']
