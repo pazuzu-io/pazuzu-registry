@@ -5,8 +5,6 @@ import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.zalando.pazuzu.exception.*;
-import org.zalando.pazuzu.feature.FeatureDto;
-import org.zalando.pazuzu.feature.FeatureMetaDto;
 
 import java.util.Date;
 import java.util.List;

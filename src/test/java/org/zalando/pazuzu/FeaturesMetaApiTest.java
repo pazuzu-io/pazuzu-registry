@@ -4,13 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
-import org.zalando.pazuzu.exception.FeatureNotFoundException;
-import org.zalando.pazuzu.feature.FeatureDto;
-import org.zalando.pazuzu.feature.FeatureMetaDto;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
