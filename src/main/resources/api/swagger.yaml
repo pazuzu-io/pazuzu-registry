@@ -51,6 +51,7 @@ paths:
           description: status of the features the call should return.
           required: false
           default: approved
+          type: string
           enum:
             - approved
             - new
