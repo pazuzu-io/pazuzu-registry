@@ -43,7 +43,6 @@
                 <scope>import</scope>
             </dependency>
         </dependencies>
-
     </dependencyManagement>
 
     <dependencies>
@@ -134,8 +133,6 @@
             <version>3.3.0</version>
             <scope>test</scope>
         </dependency>
-
-
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -194,6 +191,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -234,5 +232,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
