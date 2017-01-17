@@ -9,47 +9,49 @@ schemes:
 produces:
   - application/json
 paths:
-  /api/resolved-features:
-    get:
-      summary: Resolve all features by name
-      description: |
-        Returns all the features with all its dependencies in a single array.
-      tags:
-        - Features
-      parameters:
-        - name: names
-          in: query
-          description: feature names.
-          required: true
-          type: array
-          items:
-            type: string
-      responses:
-        200:
-          description: An array of features
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Feature'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
   /api/features:
     get:
-      summary: Get all features
+      summary: Get features
       description: |
-        Returns all the features without its dependencies.
+        Returns the features.
       tags:
         - Features
       parameters:
         - name: names
           in: query
-          description: value, that must present in feature name.
+          description: exact name of the feature the call should return.
           required: false
           type: array
+          maxItems: 128
           items:
             type: string
+        - name:
+          in: query
+          description: flag triggering feature depedencies resolution. If set to true, names field is required.
+          required: false
+          default: false
+          type: boolean
+        - name: q
+          in: query
+          description: part of the name of the features the call should return. Mutually exclusive with names.
+          required: false
+          type: string
+        - name: author
+          in: query
+          description: name of the author of the returned features. Mutually exclusive with names.
+          required: false
+          type: string
+        - name: fields
+          in: query
+          description: the fields present in the response (JSON Field).
+          required: false
+          type: string
+        - name: status
+          in: query
+          description: status of the features the call should return.
+          required: false
+          default: approved
+          type: string
         - name: offset
           in: query
           description: the offset to start from.
@@ -59,6 +61,8 @@ paths:
           in: query
           description: maximum number of features to return.
           required: false
+          default: 50
+          maximum: 1000
           type: integer
       responses:
         200:
@@ -154,64 +158,6 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /api/feature-metas:
-    get:
-      summary: Get all feature meta data
-      description: |
-        Returns all the features meta data.
-      tags:
-        - FeatureMetas
-      parameters:
-        - name: name
-          in: query
-          description: value, that must present in feature name.
-          required: false
-          type: array
-          items:
-            type: string
-        - name: offset
-          in: query
-          description: the offset to start from.
-          required: false
-          type: integer
-        - name: limit
-          in: query
-          description: maximum number of features to return.
-          required: false
-          type: integer
-      responses:
-        200:
-          description: An array of feature meta data
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/FeatureMeta'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /api/feature-metas/{name}:
-    parameters:
-    - name: name
-      in: path
-      description: the feature name.
-      required: true
-      type: string
-    get:
-      summary: Get single feature meta
-      description: |
-        Returns feature meta data.
-      tags:
-        - FeatureMetas
-      responses:
-        200:
-          description: a single feature meta data
-          schema:
-            $ref: '#/definitions/FeatureMeta'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
 definitions:
   FeatureMeta:
     type: object
@@ -225,7 +171,13 @@ definitions:
       author:
         type: string
         description: Name of the feature author
+      status:
+        type: string
+        description: Status of the feature.
       updated_at:
+        type: string
+        description: Last update date in ISO 8601 format
+      created_at:
         type: string
         description: Last update date in ISO 8601 format
       dependencies:
