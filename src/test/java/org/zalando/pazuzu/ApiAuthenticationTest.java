@@ -17,7 +17,6 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.MultiValueMap;
-import org.zalando.pazuzu.feature.FeatureDto;
 import org.zalando.pazuzu.oauth2.ClientIdAuthorityGrantingAuthenticationExtractor;
 import org.zalando.pazuzu.security.Roles;
 import org.zalando.stups.oauth2.spring.server.TokenInfoResourceServerTokenServices;

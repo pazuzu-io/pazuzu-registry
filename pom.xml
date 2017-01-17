@@ -43,7 +43,6 @@
                 <scope>import</scope>
             </dependency>
         </dependencies>
-
     </dependencyManagement>
 
     <dependencies>
@@ -122,7 +121,6 @@
             <artifactId>postgresql</artifactId>
             <version>9.4-1206-jdbc42</version>
         </dependency>
-
         <dependency>
             <groupId>com.googlecode.catch-exception</groupId>
             <artifactId>catch-exception</artifactId>
@@ -135,8 +133,6 @@
             <version>3.3.0</version>
             <scope>test</scope>
         </dependency>
-
-
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -161,6 +157,36 @@
                     <execution>
                         <goals>
                             <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19.1</version>
+                <configuration>
+                    <argLine>${surefireArgLine}</argLine>
+                </configuration>
+            </plugin>
+
+            <!-- Generate REST default interface from Swagger spec -->
+            <plugin>
+                <groupId>org.zalando.maven.plugins</groupId>
+                <artifactId>swagger-codegen-maven-plugin</artifactId>
+                <version>0.4.34</version>
+                <configuration>
+                    <apiFile>${project.basedir}/src/main/resources/api/swagger.yaml</apiFile>
+                    <language>springinterfacesResponseEntityNoSwaggerAnnotations</language>
+                    <apiPackage>org.zalando.pazuzu.api</apiPackage>
+                    <modelPackage>org.zalando.pazuzu.model</modelPackage>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>swagger-codegen</id>
+                        <goals>
+                            <goal>codegen</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -206,5 +232,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
