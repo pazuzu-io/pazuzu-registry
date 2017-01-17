@@ -25,7 +25,7 @@ paths:
           maxItems: 128
           items:
             type: string
-        - name:
+        - name: resolve
           in: query
           description: flag triggering feature depedencies resolution. If set to true, names field is required.
           required: false
@@ -51,7 +51,10 @@ paths:
           description: status of the features the call should return.
           required: false
           default: approved
-          type: string
+          enum:
+            - approved
+            - new
+            - declined
         - name: offset
           in: query
           description: the offset to start from.
@@ -179,7 +182,7 @@ definitions:
         description: Last update date in ISO 8601 format
       created_at:
         type: string
-        description: Last update date in ISO 8601 format
+        description: Creation date in ISO 8601 format
       dependencies:
         type: array
         items:
