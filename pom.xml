@@ -125,7 +125,6 @@
             <artifactId>postgresql</artifactId>
             <version>9.4-1206-jdbc42</version>
         </dependency>
-
         <dependency>
             <groupId>com.googlecode.catch-exception</groupId>
             <artifactId>catch-exception</artifactId>
@@ -191,22 +190,21 @@
 
             <!-- Generate REST default interface from Swagger spec -->
             <plugin>
-                <groupId>io.swagger</groupId>
+                <groupId>org.zalando.maven.plugins</groupId>
                 <artifactId>swagger-codegen-maven-plugin</artifactId>
-                <version>${swagger.codegen.version}</version>
+                <version>0.4.35-SNAPSHOT</version>
+                <configuration>
+                    <apiFile>${project.basedir}/src/main/resources/api/swagger.yaml</apiFile>
+                    <language>springinterfacesResponseEntityNoSwaggerAnnotations</language>
+                    <apiPackage>org.zalando.pazuzu.api</apiPackage>
+                    <modelPackage>org.zalando.pazuzu.model</modelPackage>
+                </configuration>
                 <executions>
                     <execution>
+                        <id>swagger-codegen</id>
                         <goals>
-                            <goal>generate</goal>
+                            <goal>codegen</goal>
                         </goals>
-                        <configuration>
-                            <inputSpec>src/main/resources/api/swagger.yaml</inputSpec>
-                            <language>spring-mvc</language>
-                            <configOptions>
-                                <sourceFolder>src/gen/java/main</sourceFolder>
-                                <library>j8-async</library>
-                            </configOptions>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
