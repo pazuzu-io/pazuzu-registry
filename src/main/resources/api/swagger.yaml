@@ -201,6 +201,9 @@ definitions:
   FeatureList:
     type: object
     properties:
+      total_count:
+        type: integer
+        description: The total number of features.
       features:
         type: array
         items:
@@ -208,7 +211,7 @@ definitions:
       _links:
         type: object
         properties:
-          previous:
+          prev:
             $ref: '#/definitions/Link'
           next:
             $ref: '#/definitions/Link'
