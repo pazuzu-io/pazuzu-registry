@@ -19,7 +19,7 @@ paths:
       parameters:
         - name: names
           in: query
-          description: eExact names of the features the call should return.
+          description: Exact names of the features the call should return.
           required: false
           type: array
           maxItems: 128
