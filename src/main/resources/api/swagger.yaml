@@ -70,7 +70,7 @@ paths:
           type: integer
       responses:
         200:
-          description: An list of features
+          description: A list of features
           schema:
             $ref: '#/definitions/FeatureList'
         default:
