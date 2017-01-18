@@ -70,11 +70,9 @@ paths:
           type: integer
       responses:
         200:
-          description: An array of features
+          description: An list of features
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/Feature'
+            $ref: '#/definitions/FeatureList'
         default:
           description: Unexpected error
           schema:
@@ -200,6 +198,26 @@ definitions:
       test_snippet:
         type: string
         description: how to test that feature is working
+  FeatureList:
+    type: object
+    properties:
+      features:
+        type: array
+        items:
+          $ref: '#/definitions/Feature'
+      _links:
+        type: object
+        properties:
+          previous:
+            $ref: '#/definitions/Link'
+          next:
+            $ref: '#/definitions/Link'
+  Link:
+    type: object
+    properties:
+      href:
+        type: string
+        description: url
   Error:
     type: object
     properties:
