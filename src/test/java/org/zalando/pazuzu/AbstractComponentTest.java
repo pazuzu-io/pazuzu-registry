@@ -12,6 +12,8 @@ import org.springframework.http.*;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.zalando.pazuzu.exception.ServiceException;
+import org.zalando.pazuzu.model.Feature;
+import org.zalando.pazuzu.model.FeatureMeta;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -29,8 +31,6 @@ public abstract class AbstractComponentTest {
             SNIPPET = "feature-snippet-", TEST_SNIPPET = "feature-test-snippet-";
 
     protected final String featuresUrl = "/api/features";
-    protected final String resolvedFeaturesUrl = "/api/resolved-features";
-    protected final String featuresMetaUrl = "/api/feature-metas";
     protected final TestRestTemplate template = new TestRestTemplate();
     protected final ObjectMapper mapper = new ObjectMapper();
     @Value("${local.server.port}")
@@ -54,29 +54,33 @@ public abstract class AbstractComponentTest {
         );
     }
 
-    protected FeatureDto newFeature(int id, int... dependencies) throws JsonProcessingException {
-        FeatureDto dto = new FeatureDto();
-        dto.setSnippet(SNIPPET + id).setTestSnippet(TEST_SNIPPET + id);
-        dto.getMeta().setName(NAME + id).setDescription(DESCRIPTION + id).setAuthor(AUTHOR + id);
+    protected Feature newFeature(int id, int... dependencies) throws JsonProcessingException {
+        Feature dto = new Feature();
+        dto.setSnippet(SNIPPET + id);
+        dto.setTestSnippet(TEST_SNIPPET + id);
+        dto.setMeta(new FeatureMeta());
+        dto.getMeta().setName(NAME + id);
+        dto.getMeta().setDescription(DESCRIPTION + id);
+        dto.getMeta().setAuthor(AUTHOR + id);
         Arrays.stream(dependencies).mapToObj(i -> NAME + i).forEach(dto.getMeta().getDependencies()::add);
         return dto;
     }
 
-    protected ResponseEntity<FeatureDto> createFeature(FeatureDto dto) throws JsonProcessingException {
-        final ResponseEntity<FeatureDto> response = post(dto, FeatureDto.class);
+    protected ResponseEntity<Feature> createFeature(Feature dto) throws JsonProcessingException {
+        final ResponseEntity<Feature> response = post(dto, Feature.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         return response;
     }
 
-    protected ResponseEntity<FeatureDto> createNewFeature(int id, int... dependencies) throws JsonProcessingException {
+    protected ResponseEntity<Feature> createNewFeature(int id, int... dependencies) throws JsonProcessingException {
         return createFeature(newFeature(id, dependencies));
     }
 
-    protected ResponseEntity<Map> createFeatureError(FeatureDto dto) throws JsonProcessingException {
+    protected ResponseEntity<Map> createFeatureError(Feature dto) throws JsonProcessingException {
         return post(dto, Map.class);
     }
 
-    protected void assertEqualFeaturesIgnoreUpdatedAt(FeatureDto expected, FeatureDto actual) {
+    protected void assertEqualFeaturesIgnoreUpdatedAt(Feature expected, Feature actual) {
         assertThat(actual).isEqualToIgnoringGivenFields(expected, "meta");
         assertThat(actual.getMeta()).isEqualToIgnoringGivenFields(expected.getMeta(), "updatedAt");
     }
@@ -93,5 +97,13 @@ public abstract class AbstractComponentTest {
                     entry("type", expected.getType().toString()),
                     entry("title", expected.getTitle()),
                     entry("status", expected.getStatus().getStatusCode()));
+    }
+
+
+    protected Feature newFeature(String featureName) {
+        Feature ret = new Feature();
+        ret.setMeta(new FeatureMeta());
+        ret.getMeta().setName(featureName);
+        return ret;
     }
 }
