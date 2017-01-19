@@ -1,7 +1,7 @@
-INSERT INTO FEATURE (NAME, DESCRIPTION, CREATED_AT, UPDATED_AT, AUTHOR, SNIPPET, TEST_SNIPPET) VALUES
-  ('A', 'Java + Leiningen', now(), now(), 'Pazuzu team', NULL, NULL),
-  ('B', 'Java + Node', now(), now(), 'Pazuzu team', NULL, NULL),
-  ('C-A-B', 'A + B', now(), now(), 'Pazuzu team', NULL, NULL);
+INSERT INTO FEATURE (NAME, DESCRIPTION, CREATED_AT, UPDATED_AT, STATUS, AUTHOR, SNIPPET, TEST_SNIPPET) VALUES
+  ('A', 'Java + Leiningen', now(), now(), 'APPROVED', 'Pazuzu team', NULL, NULL),
+  ('B', 'Java + Node', now(), now(), 'APPROVED', 'Pazuzu team', NULL, NULL),
+  ('C-A-B', 'A + B', now(), now(), 'APPROVED', 'Pazuzu team', NULL, NULL);
 
 INSERT INTO FEATURE_DEPENDENCY (FEATURE_ID, DEPENDENCY_FEATURE_ID)
   SELECT f.ID, d.ID FROM FEATURE f, FEATURE d WHERE f.NAME = 'A' AND d.NAME = 'java';
