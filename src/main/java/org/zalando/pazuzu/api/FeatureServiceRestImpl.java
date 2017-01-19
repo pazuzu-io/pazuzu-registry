@@ -4,48 +4,49 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.zalando.pazuzu.model.Feature;
-import org.zalando.pazuzu.model.FeatureMeta;
+import org.zalando.pazuzu.model.FeatureList;
 
 import java.util.List;
 
+//
+// GENERATED CLASS, DO NOT EDIT
+//
+// RestController implementation. No need to modify or extend. Just use it.
+//
+
 @RestController
 public final class FeatureServiceRestImpl implements ApiApi {
-  private FeatureServiceImpl impl;
+  private ApiApi impl;
 
   @Autowired
-  public FeatureServiceRestImpl(FeatureServiceImpl impl) {
+  public FeatureServiceRestImpl(ApiApi impl) {
     this.impl = impl;
   }
 
   @Override
-  @RequestMapping(value="/api/feature-metas",method=RequestMethod.GET , produces={ "application/json" })
-  public ResponseEntity<List<FeatureMeta>> apiFeatureMetasGet( @RequestParam(value="name", required=false)
-    List<String> name,
-     @RequestParam(value="offset", required=false)
-    Integer offset,
-     @RequestParam(value="limit", required=false)
-    Integer limit) {
-    return this.impl.apiFeatureMetasGet(    name,
-      offset,
-      limit);
-  }
-
-  @Override
-  @RequestMapping(value="/api/feature-metas/{name}",method=RequestMethod.GET , produces={ "application/json" })
-  public ResponseEntity<FeatureMeta> apiFeatureMetasNameGet( @PathVariable("name")
-    String name) {
-    return this.impl.apiFeatureMetasNameGet(    name);
-  }
-
-  @Override
   @RequestMapping(value="/api/features",method=RequestMethod.GET , produces={ "application/json" })
-  public ResponseEntity<List<Feature>> apiFeaturesGet( @RequestParam(value="names", required=false)
+  public ResponseEntity<FeatureList> apiFeaturesGet( @RequestParam(value="names", required=false)
     List<String> names,
+     @RequestParam(value="resolve", required=false)
+    Boolean resolve,
+     @RequestParam(value="q", required=false)
+    String q,
+     @RequestParam(value="author", required=false)
+    String author,
+     @RequestParam(value="fields", required=false)
+    String fields,
+     @RequestParam(value="status", required=false)
+    String status,
      @RequestParam(value="offset", required=false)
     Integer offset,
      @RequestParam(value="limit", required=false)
     Integer limit) {
     return this.impl.apiFeaturesGet(    names,
+      resolve,
+      q,
+      author,
+      fields,
+      status,
       offset,
       limit);
   }
@@ -79,13 +80,6 @@ public final class FeatureServiceRestImpl implements ApiApi {
   public ResponseEntity<Feature> apiFeaturesPost( @RequestBody
     Feature feature) {
     return this.impl.apiFeaturesPost(    feature);
-  }
-
-  @Override
-  @RequestMapping(value="/api/resolved-features",method=RequestMethod.GET , produces={ "application/json" })
-  public ResponseEntity<List<Feature>> apiResolvedFeaturesGet( @RequestParam(value="names")
-    List<String> names) {
-    return this.impl.apiResolvedFeaturesGet(    names);
   }
 
 }
