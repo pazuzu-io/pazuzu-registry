@@ -7,10 +7,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.zalando.pazuzu.exception.FeatureNameEmptyException;
 import org.zalando.pazuzu.exception.FeatureNotFoundException;
 import org.zalando.pazuzu.feature.FeatureService;
 import org.zalando.pazuzu.feature.FeaturesWithTotalCount;
 import org.zalando.pazuzu.model.Feature;
+import org.zalando.pazuzu.model.FeatureList;
 import org.zalando.pazuzu.model.FeatureMeta;
 import org.zalando.pazuzu.security.Roles;
 
@@ -27,7 +29,7 @@ import java.util.stream.Collectors;
  * Created by hhueter on 16/01/2017.
  */
 @Service
-public class FeatureServiceImpl {
+public class FeatureServiceImpl implements  ApiApi {
     private static final String X_TOTAL_COUNT = "X-Total-Count";
     private final FeatureService featureService;
 
@@ -43,17 +45,29 @@ public class FeatureServiceImpl {
         this.featureService = featureService;
     }
 
-    @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
-    public ResponseEntity<List<Feature>> apiFeaturesGet(List<String> names, Integer offset, Integer limit) {
-        List<Feature> features = listFeatures(names, offset, limit, FeatureServiceImpl::asDto);
+    @Override
+    public ResponseEntity<FeatureList> apiFeaturesGet(List<String> names, Boolean resolve, String q, String author, String fields, String status, Integer offset, Integer limit) {
+        List<Feature> features;
+        if (resolve != null && resolve) {
+            if (names == null || names.isEmpty())
+                throw new FeatureNameEmptyException();
+            features = featureService
+                    .resolveFeatures(names)
+                    .stream().map(FeatureServiceImpl::asDto).collect(Collectors.toList());
+        } else
+            features = listFeatures(names, offset, limit, FeatureServiceImpl::asDto);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
-        ResponseEntity<List<Feature>> entity = new ResponseEntity<List<Feature>>(features, responseHeaders, HttpStatus.OK);
+        FeatureList ret = new FeatureList();
+        ret.setFeatures(features);
+        ResponseEntity<FeatureList> entity = new ResponseEntity<FeatureList>(ret, responseHeaders, HttpStatus.OK);
         return entity;
     }
 
     @RolesAllowed({Roles.USER})
     public ResponseEntity<Feature> apiFeaturesPost(Feature feature) {
+        if (feature.getMeta() == null)
+            feature.setMeta(new FeatureMeta());
         ServletUriComponentsBuilder servletUriComponentsBuilder = ServletUriComponentsBuilder.fromCurrentContextPath();
         Feature newFeature = featureService.createFeature(
                 feature.getMeta().getName(), feature.getMeta().getDescription(), feature.getMeta().getAuthor(),
@@ -90,37 +104,6 @@ public class FeatureServiceImpl {
     public ResponseEntity<Void> apiFeaturesNameDelete(String name) {
         featureService.deleteFeature(name);
         return ResponseEntity.noContent().build();
-    }
-
-    @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
-    public ResponseEntity<List<FeatureMeta>> apiFeatureMetasGet(List<String> name, Integer offset, Integer limit) {
-        List<FeatureMeta> features = listFeatures(name, offset, limit, FeatureServiceImpl::asMetaDto);
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
-        ResponseEntity<List<FeatureMeta>> entity = new ResponseEntity<List<FeatureMeta>>(features, responseHeaders, HttpStatus.OK);
-        return entity;
-    }
-
-    @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
-    public ResponseEntity<FeatureMeta> apiFeatureMetasNameGet(String name) {
-        FeatureMeta feature = featureService.getFeature(name, FeatureServiceImpl::asMetaDto);
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
-        ResponseEntity<FeatureMeta> entity = new ResponseEntity<FeatureMeta>(feature, responseHeaders, HttpStatus.OK);
-        return entity;
-    }
-
-    @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
-    public ResponseEntity<List<Feature>> apiResolvedFeaturesGet(List<String> names) {
-        if (names == null || names.isEmpty())
-            throw new FeatureNotFoundException();
-        List<Feature> features = featureService
-                .resolveFeatures(names)
-                .stream().map(FeatureServiceImpl::asDto).collect(Collectors.toList());
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
-        ResponseEntity<List<Feature>> entity = new ResponseEntity<List<Feature>>(features, responseHeaders, HttpStatus.OK);
-        return entity;
     }
 
     private <T> List<T> listFeatures(List<String> names, Integer offset, Integer limit,
