@@ -4,41 +4,53 @@ info:
   description: Generating Dockerfiles by sets of required functions.
   version: "0.0.5"
 host: pazuzu.zalando.net
+basePath: /api
 schemes:
   - http
 produces:
   - application/json
 paths:
-  /api/features:
+  /dependencies:
     get:
-      summary: Get features
+      summary: Topologicaly sorted list of features
       description: |
-        Returns the features.
+        Returns the list of features topologicaly sorted base on the dependencies base on list of top features.
       tags:
         - Features
       parameters:
         - name: names
           in: query
           description: Exact names of the features the call should return.
-          required: false
+          required: true
           type: array
           maxItems: 128
           items:
             type: string
-        - name: resolve
-          in: query
-          description: Flag triggering feature depedencies resolution. If set to true, names field is required.
-          required: false
-          default: false
-          type: boolean
+      responses:
+        200:
+          description: A list of features.
+          schema:
+            $ref: '#/definitions/DependenciesList'
+        default:
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  /features:
+    get:
+      summary: Get features
+      description: |
+        Returns the features sorted by name.
+      tags:
+        - Features
+      parameters:
         - name: q
           in: query
-          description: Part of the name of the features the call should return. Mutually exclusive with names.
+          description: Part of the name of the features the call should return.
           required: false
           type: string
         - name: author
           in: query
-          description: Name of the author of the returned features. Mutually exclusive with names.
+          description: Name of the author of the returned features.
           required: false
           type: string
         - name: fields
@@ -101,7 +113,7 @@ paths:
           description: Unexpected error.
           schema:
             $ref: '#/definitions/Error'
-  /api/features/{name}:
+  /features/{name}:
     parameters:
     - name: name
       in: path
@@ -215,6 +227,18 @@ definitions:
             $ref: '#/definitions/Link'
           next:
             $ref: '#/definitions/Link'
+  DependenciesList:
+    type: object
+    properties:
+      requested_features:
+        description: List of feature name for which dependencies have been requested.
+        type: array
+        items: string
+      depedencies:
+        description: Topologicaly sorted list of features resulting of the dependencies resolution.
+        type: array
+        items:
+          $ref: '#/definitions/Feature'
   Link:
     type: object
     properties:
