@@ -38,8 +38,7 @@ paths:
   /features:
     get:
       summary: Get features
-      description: |
-        Returns the features sorted by name.
+      description: Returns the features sorted by name.
       tags:
         - Features
       parameters:
@@ -91,9 +90,7 @@ paths:
             $ref: '#/definitions/Error'
     post:
       summary: Creates a new feature
-      description: |
-        Creates a new feature with specified name, docker data, etc. Feature
-        name is checked to be unique.
+      description: Creates a new feature with specified name, docker data, etc. Feature name is checked to be unique.
       tags:
         - Features
       parameters:
@@ -117,13 +114,12 @@ paths:
     parameters:
     - name: name
       in: path
-      description: the feature name.
+      description: The feature name.
       required: true
       type: string
     get:
       summary: Get single feature.
-      description: |
-        Returns all the feature data without its dependencies.
+      description: Returns all the feature data without its dependencies.
       tags:
         - Features
       responses:
@@ -137,8 +133,7 @@ paths:
             $ref: '#/definitions/Error'
     put:
       summary: Replace this feature's content.
-      description: |
-        Replaces snippet, test_snippet and meta data for this feature.
+      description: Replaces snippet, test_snippet and meta data for this feature.
       tags:
         - Features
       parameters:
@@ -155,14 +150,14 @@ paths:
           schema:
             $ref: "#/definitions/Feature"
         default:
-          description: Unexpected exception
+          description: Unexpected exception.
           schema:
             $ref: "#/definitions/Error"
     delete:
       summary: Delete feature.
       description: |
-        Delete this feature. If another feature depends on this feature
-        nothing will be deleted and an error will be returned.
+        Delete this feature. If another feature depends on this feature nothing will be deleted and an error will be
+        returned.
       tags:
         - Features
       responses:
@@ -244,7 +239,7 @@ definitions:
     properties:
       href:
         type: string
-        description: url
+        description: The URL for the link.
   Error:
     type: object
     properties:
