@@ -12,7 +12,7 @@ produces:
 paths:
   /dependencies:
     get:
-      summary: Topologicaly sorted list of features
+      summary: Topologicaly sorted list of features.
       description: |
         Returns the list of features topologicaly sorted base on the dependencies base on list of top features.
       tags:
@@ -37,7 +37,7 @@ paths:
             $ref: '#/definitions/Error'
   /features:
     get:
-      summary: Get features
+      summary: Get features.
       description: Returns the features sorted by name.
       tags:
         - Features
@@ -89,7 +89,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     post:
-      summary: Creates a new feature
+      summary: Creates a new feature.
       description: Creates a new feature with specified name, docker data, etc. Feature name is checked to be unique.
       tags:
         - Features
