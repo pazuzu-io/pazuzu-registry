@@ -121,7 +121,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         createNewFeature(4);
         // when
         String missingName = "feature-5";
-        ResponseEntity<FeatureList> result = template.exchange(url(featuresUrl + "?names={name}"),
+        ResponseEntity<FeatureList> result = template.exchange(url(featuresUrl + "?q={name}"),
                 GET, null, FeatureList.class, NAME + "4," + missingName);
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -138,7 +138,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         createFeature(newFeature("node-mongo"));
         createFeature(newFeature("python"));
         // when
-        ResponseEntity<FeatureList> jaResult = template.exchange(url(featuresUrl + "?names=ja"),
+        ResponseEntity<FeatureList> jaResult = template.exchange(url(featuresUrl + "?q=ja"),
                 GET, null, FeatureList.class);
         // then
         assertThat(jaResult.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -146,7 +146,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         assertThat(jaResult.getBody().getFeatures().stream().map(Feature::getMeta).map(FeatureMeta::getName))
                 .containsOnly("java", "java-node");
         // when
-        ResponseEntity<FeatureList> nodResult = template.exchange(url(featuresUrl + "?names=nod"),
+        ResponseEntity<FeatureList> nodResult = template.exchange(url(featuresUrl + "?q=nod"),
                 GET, null, FeatureList.class);
         // then
         assertThat(nodResult.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -161,7 +161,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         createFeature(newFeature("java"));
         createFeature(newFeature("java-node"));
         // when
-        ResponseEntity<FeatureList> result = template.exchange(url(featuresUrl + "?names=rails"),
+        ResponseEntity<FeatureList> result = template.exchange(url(featuresUrl + "?q=rails"),
                 GET, null, FeatureList.class);
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -174,7 +174,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         createFeature(newFeature("java"));
         createFeature(newFeature("java-node"));
         // when
-        ResponseEntity<FeatureList> jaResult = template.exchange(url(featuresUrl + "?names=JaV"),
+        ResponseEntity<FeatureList> jaResult = template.exchange(url(featuresUrl + "?q=JaV"),
                 GET, null, FeatureList.class);
         // then
         assertThat(jaResult.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -245,18 +245,5 @@ public class FeatureApiTest extends AbstractComponentTest {
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertEqualErrors(new FeatureReferencedDeleteException("Can't delete feature because it is referenced from other feature(s): feature-10"), response.getBody());
-    }
-
-    @Test
-    public void testGetSortedFeaturesSuccess() throws JsonProcessingException {
-        // given
-        createNewFeature(11);
-        createNewFeature(12);
-        createNewFeature(13, 12);
-        // when
-        ResponseEntity<FeatureList> result = template.getForEntity(url(featuresUrl), FeatureList.class, "sorted", 1, "name", NAME + 11 + "," + NAME + 12);
-        // then
-        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(result.getBody().getFeatures()).hasSize(3);
     }
 }

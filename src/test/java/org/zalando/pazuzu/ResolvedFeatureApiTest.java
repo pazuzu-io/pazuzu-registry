@@ -1,10 +1,11 @@
 package org.zalando.pazuzu;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.zalando.pazuzu.model.Feature;
-import org.zalando.pazuzu.model.FeatureList;
+import org.zalando.pazuzu.model.DependenciesList;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,7 +18,7 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
     @Test
     public void retrievingResolvedFeatureWithoutNameShouldResultInError() throws Exception {
         // when
-        ResponseEntity<Object> result = template.getForEntity(url(featuresUrl + "?resolve=true"), Object.class);
+        ResponseEntity<Object> result = template.getForEntity(url(resolvedFeaturesUrl), Object.class);
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
@@ -25,7 +26,7 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
     @Test
     public void retrievingResolvedFeatureWithNonExistingNameShouldResultInError() throws Exception {
         // when
-        ResponseEntity<Map> result = template.getForEntity(url(featuresUrl + "?resolve=true&names={name}"),
+        ResponseEntity<Map> result = template.getForEntity(url(resolvedFeaturesUrl + "?names={name}"),
                 Map.class, NAME + 1);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(result.getBody()).containsOnly(
@@ -43,10 +44,10 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
         createNewFeature(3, 1);
         createNewFeature(4, 3);
         createNewFeature(5, 2);
-        ResponseEntity<FeatureList> result = template.getForEntity(url(featuresUrl + "?resolve=true&names={name}"),
-                FeatureList.class, NAME + "1," + NAME + 4);
+        ResponseEntity<DependenciesList> result = template.getForEntity(url(resolvedFeaturesUrl + "?names={name}"),
+                DependenciesList.class, NAME + "1," + NAME + 4);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-        List<Feature> resolvedFeature = result.getBody().getFeatures();
+        List<Feature> resolvedFeature = result.getBody().getDepedencies();
         assertThat(resolvedFeature.size()).isEqualTo(3);
         List<String> featureNames = (resolvedFeature).stream()
                 .map(this::featureToName)
@@ -62,10 +63,10 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
         createNewFeature(11);
         createNewFeature(12, 11);
         createNewFeature(13, 11);
-        ResponseEntity<FeatureList> result = template.getForEntity(url(featuresUrl + "?resolve=true&names={name}"),
-                FeatureList.class, NAME + "12," + NAME + 13);
+        ResponseEntity<DependenciesList> result = template.getForEntity(url(resolvedFeaturesUrl + "?names={name}"),
+                DependenciesList.class, NAME + "12," + NAME + 13);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-        List<String> featureNames = (result.getBody().getFeatures()).stream()
+        List<String> featureNames = (result.getBody().getDepedencies()).stream()
                 .map(this::featureToName)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -74,7 +75,6 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
         assertThat(featureNames).containsOnly(NAME + 11, NAME + 12, NAME + 13);
 
     }
-
 
     private Optional<String> featureToName(Feature feature) {
         if (feature.getMeta() != null)

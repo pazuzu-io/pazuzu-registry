@@ -31,6 +31,7 @@ public abstract class AbstractComponentTest {
             SNIPPET = "feature-snippet-", TEST_SNIPPET = "feature-test-snippet-";
 
     protected final String featuresUrl = "/api/features";
+    protected final String resolvedFeaturesUrl = "/api/dependencies";
     protected final TestRestTemplate template = new TestRestTemplate();
     protected final ObjectMapper mapper = new ObjectMapper();
     @Value("${local.server.port}")

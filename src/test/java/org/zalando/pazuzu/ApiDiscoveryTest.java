@@ -12,6 +12,6 @@ public class ApiDiscoveryTest extends AbstractComponentTest {
     public void swaggerApiDesciptionShouldBeAccessible() {
         ResponseEntity<String> response = template.getForEntity(url("/api"), String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).contains("/api/features");
+        assertThat(response.getBody()).startsWith("{\"swagger\":\"2.0\"");
     }
 }

@@ -6,6 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.zalando.pazuzu.exception.FeatureNameEmptyException;
 import org.zalando.pazuzu.exception.FeatureNotFoundException;
@@ -21,6 +24,7 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -29,7 +33,7 @@ import java.util.stream.Collectors;
  * Created by hhueter on 16/01/2017.
  */
 @Service
-public class FeatureServiceImpl implements  ApiApi {
+public class FeatureServiceImpl {
     private static final String X_TOTAL_COUNT = "X-Total-Count";
     private final FeatureService featureService;
 
@@ -45,17 +49,13 @@ public class FeatureServiceImpl implements  ApiApi {
         this.featureService = featureService;
     }
 
-    @Override
-    public ResponseEntity<FeatureList> apiFeaturesGet(List<String> names, Boolean resolve, String q, String author, String fields, String status, Integer offset, Integer limit) {
+    @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
+    public ResponseEntity<FeatureList> featuresGet(@RequestParam(value = "q", required = false) String q, @RequestParam(value = "author", required = false) String author, @RequestParam(value = "fields", required = false) String fields, @RequestParam(value = "status", required = false) String status, @RequestParam(value = "offset", required = false) Integer offset, @RequestParam(value = "limit", required = false) Integer limit) {
         List<Feature> features;
-        if (resolve != null && resolve) {
-            if (names == null || names.isEmpty())
-                throw new FeatureNameEmptyException();
-            features = featureService
-                    .resolveFeatures(names)
-                    .stream().map(FeatureServiceImpl::asDto).collect(Collectors.toList());
-        } else
-            features = listFeatures(names, offset, limit, FeatureServiceImpl::asDto);
+        if (q != null && q.trim().length() > 0)
+            features = listFeatures(Collections.singletonList(q), offset, limit, FeatureServiceImpl::asDto);
+        else
+            features = listFeatures(Collections.emptyList(), offset, limit, FeatureServiceImpl::asDto);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
         FeatureList ret = new FeatureList();
@@ -65,7 +65,7 @@ public class FeatureServiceImpl implements  ApiApi {
     }
 
     @RolesAllowed({Roles.USER})
-    public ResponseEntity<Feature> apiFeaturesPost(Feature feature) {
+    public ResponseEntity<Feature> featuresPost(@RequestBody Feature feature) {
         if (feature.getMeta() == null)
             feature.setMeta(new FeatureMeta());
         ServletUriComponentsBuilder servletUriComponentsBuilder = ServletUriComponentsBuilder.fromCurrentContextPath();
@@ -81,7 +81,7 @@ public class FeatureServiceImpl implements  ApiApi {
     }
 
     @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
-    public ResponseEntity<Feature> apiFeaturesNameGet(String name) {
+    public ResponseEntity<Feature> featuresNameGet(@PathVariable("name") String name) {
         Feature feature = featureService.getFeature(name, FeatureServiceImpl::asDto);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
@@ -90,7 +90,7 @@ public class FeatureServiceImpl implements  ApiApi {
     }
 
     @RolesAllowed({Roles.ADMIN})
-    public ResponseEntity<Feature> apiFeaturesNamePut(String name, Feature feature) {
+    public ResponseEntity<Feature> featuresNamePut(@PathVariable("name") String name, @RequestBody Feature feature) {
         Feature featureDto = featureService.updateFeature(
                 name, feature.getMeta().getName(), feature.getMeta().getDescription(), feature.getMeta().getAuthor(),
                 feature.getSnippet(), feature.getTestSnippet(), feature.getMeta().getDependencies(), FeatureServiceImpl::asDto);
@@ -101,7 +101,7 @@ public class FeatureServiceImpl implements  ApiApi {
     }
 
     @RolesAllowed({Roles.ADMIN})
-    public ResponseEntity<Void> apiFeaturesNameDelete(String name) {
+    public ResponseEntity<Void> featuresNameDelete(@PathVariable("name") String name) {
         featureService.deleteFeature(name);
         return ResponseEntity.noContent().build();
     }
@@ -125,7 +125,7 @@ public class FeatureServiceImpl implements  ApiApi {
         return features;
     }
 
-    private static Feature asDto(org.zalando.pazuzu.feature.Feature feature) {
+    static Feature asDto(org.zalando.pazuzu.feature.Feature feature) {
         Feature dto = new Feature();
         dto.setMeta(asMetaDto(feature));
         dto.setSnippet(feature.getSnippet());
@@ -133,7 +133,7 @@ public class FeatureServiceImpl implements  ApiApi {
         return dto;
     }
 
-    private static FeatureMeta asMetaDto(org.zalando.pazuzu.feature.Feature feature) {
+    static FeatureMeta asMetaDto(org.zalando.pazuzu.feature.Feature feature) {
         FeatureMeta dto = new FeatureMeta();
         dto.setName(feature.getName());
         dto.setDescription(feature.getDescription());
