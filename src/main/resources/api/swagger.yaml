@@ -228,7 +228,8 @@ definitions:
       requested_features:
         description: List of feature name for which dependencies have been requested.
         type: array
-        items: string
+        items:
+          type: string
       depedencies:
         description: Topologicaly sorted list of features resulting of the dependencies resolution.
         type: array
