@@ -15,9 +15,9 @@ spring:
   profiles:
     active: production
   datasource:
-    url: jdbc:postgresql://pazuzu.mentoring.zalan.do:5432/pazuzu?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory
-    username: pazuzu
-    password: pazuzu
+    url: ${DBURL}
+    username: ${DBUSER}
+    password: ${DBPASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
