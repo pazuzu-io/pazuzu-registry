@@ -118,25 +118,24 @@ public class FeatureApiTest extends AbstractComponentTest {
     @Test
     public void listFeaturesShouldNotReturnAnErrorForUnmatchedNames() throws Exception {
         // given
-        createNewFeature(4);
+        createAndAcceptFeature(newFeature(4));
         // when
         String missingName = "feature-5";
         ResponseEntity<FeatureList> result = template.exchange(url(featuresUrl + "?q={name}"),
-                GET, null, FeatureList.class, NAME + "4," + missingName);
+                GET, null, FeatureList.class, missingName);
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(result.getBody().getFeatures().size()).isEqualTo(1);
-        assertEqualFeaturesIgnoreUpdatedAt(newFeature(4), result.getBody().getFeatures().get(0));
+        assertThat(result.getBody().getFeatures().size()).isEqualTo(0);
     }
 
     @Test
     public void listFeaturesShouldReturnsFeaturesThatMatchesTheNamePartially() throws Exception {
         // given
-        createFeature(newFeature("java"));
-        createFeature(newFeature("java-node"));
-        createFeature(newFeature("node"));
-        createFeature(newFeature("node-mongo"));
-        createFeature(newFeature("python"));
+        createAndAcceptFeature(newFeature("java"));
+        createAndAcceptFeature(newFeature("java-node"));
+        createAndAcceptFeature(newFeature("node"));
+        createAndAcceptFeature(newFeature("node-mongo"));
+        createAndAcceptFeature(newFeature("python"));
         // when
         ResponseEntity<FeatureList> jaResult = template.exchange(url(featuresUrl + "?q=ja"),
                 GET, null, FeatureList.class);
@@ -171,8 +170,8 @@ public class FeatureApiTest extends AbstractComponentTest {
     @Test
     public void listFeaturesShouldReturnsFeaturesThatMatchesTheNameIgnoringTheCase() throws Exception {
         // given
-        createFeature(newFeature("java"));
-        createFeature(newFeature("java-node"));
+        createAndAcceptFeature(newFeature("java"));
+        createAndAcceptFeature(newFeature("java-node"));
         // when
         ResponseEntity<FeatureList> jaResult = template.exchange(url(featuresUrl + "?q=JaV"),
                 GET, null, FeatureList.class);
