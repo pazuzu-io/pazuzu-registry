@@ -2,7 +2,7 @@ version: '2'
 services:
   web:
     build: .
-    image: pierone.stups.zalan.do/mentoring/pazuzu-registry:1.1.1
+    image: pierone.stups.zalan.do/mentoring/pazuzu-registry:1.1.2
     ports:
     - "8080:8080"
     links:
