@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.MultiValueMap;
+import org.zalando.pazuzu.feature.FeatureStatus;
 import org.zalando.pazuzu.model.Feature;
 import org.zalando.pazuzu.model.FeatureList;
 import org.zalando.pazuzu.model.FeatureMeta;
@@ -132,6 +133,7 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
         createFeatureOAuth(feature);
 
         // when
+        feature.getMeta().setStatus(FeatureStatus.PENDING.jsonValue());
         ResponseEntity response = template.exchange(
                 url(featuresUrl, feature.getMeta().getName()), PUT, new HttpEntity<>(feature, oauthToken(ADMIN_TOKEN)), Object.class
         );
@@ -202,6 +204,12 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
 
         // and
         createFeatureOAuth(feature);
+
+        // and (anonymous user can only list approved features)
+        feature.getMeta().setStatus(FeatureStatus.APPROVED.jsonValue());
+        template.exchange(
+                url(featuresUrl, feature.getMeta().getName()), PUT, new HttpEntity<>(feature, oauthToken(ADMIN_TOKEN)), Object.class
+        );
 
         // when
         ResponseEntity<FeatureList> response = template.exchange(

@@ -6,13 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.zalando.pazuzu.exception.FeatureNameEmptyException;
 import org.zalando.pazuzu.feature.FeatureService;
 import org.zalando.pazuzu.model.DependenciesList;
 import org.zalando.pazuzu.model.Feature;
-import org.zalando.pazuzu.model.FeatureList;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -44,7 +42,7 @@ public class DependenciesServiceImpl {
                 throw new FeatureNameEmptyException();
             features = featureService
                     .resolveFeatures(names)
-                    .stream().map(FeatureServiceImpl::asDto).collect(Collectors.toList());
+                    .stream().map(FeatureConverter::asDto).collect(Collectors.toList());
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
 

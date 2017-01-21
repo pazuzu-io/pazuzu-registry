@@ -12,6 +12,7 @@ import org.springframework.http.*;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.zalando.pazuzu.exception.ServiceException;
+import org.zalando.pazuzu.feature.FeatureStatus;
 import org.zalando.pazuzu.model.Feature;
 import org.zalando.pazuzu.model.FeatureMeta;
 
@@ -55,6 +56,14 @@ public abstract class AbstractComponentTest {
         );
     }
 
+    protected void put(String name, Object body) throws JsonProcessingException {
+        template.put(
+                url(featuresUrl + "/{name}"),
+                new HttpEntity<>(mapper.writeValueAsString(body), contentType(MediaType.APPLICATION_JSON)),
+                name
+        );
+    }
+
     protected Feature newFeature(int id, int... dependencies) throws JsonProcessingException {
         Feature dto = new Feature();
         dto.setSnippet(SNIPPET + id);
@@ -63,6 +72,7 @@ public abstract class AbstractComponentTest {
         dto.getMeta().setName(NAME + id);
         dto.getMeta().setDescription(DESCRIPTION + id);
         dto.getMeta().setAuthor(AUTHOR + id);
+        dto.getMeta().setStatus(FeatureStatus.PENDING.jsonValue());
         Arrays.stream(dependencies).mapToObj(i -> NAME + i).forEach(dto.getMeta().getDependencies()::add);
         return dto;
     }
@@ -71,6 +81,13 @@ public abstract class AbstractComponentTest {
         final ResponseEntity<Feature> response = post(dto, Feature.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         return response;
+    }
+
+    protected void createAndAcceptFeature(Feature dto) throws JsonProcessingException {
+        ResponseEntity<Feature> creationResponse = createFeature(dto);
+        Feature feature = creationResponse.getBody();
+        feature.getMeta().setStatus(FeatureStatus.APPROVED.jsonValue());
+        put(feature.getMeta().getName(), feature);
     }
 
     protected ResponseEntity<Feature> createNewFeature(int id, int... dependencies) throws JsonProcessingException {
@@ -83,7 +100,7 @@ public abstract class AbstractComponentTest {
 
     protected void assertEqualFeaturesIgnoreUpdatedAt(Feature expected, Feature actual) {
         assertThat(actual).isEqualToIgnoringGivenFields(expected, "meta");
-        assertThat(actual.getMeta()).isEqualToIgnoringGivenFields(expected.getMeta(), "updatedAt");
+        assertThat(actual.getMeta()).isEqualToIgnoringGivenFields(expected.getMeta(), "updatedAt", "createdAt");
     }
 
     protected void assertEqualErrors(ServiceException expected, Map actual) {
