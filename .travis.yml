@@ -1,6 +1,8 @@
 language: java
 jdk:
 - oraclejdk8
+script:
+- mvn clean test -B
 after_success:
 - curl http://www.jpm4j.org/install/script > jpmInstall.sh
 - sudo sh jpmInstall.sh
