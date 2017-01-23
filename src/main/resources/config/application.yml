@@ -15,9 +15,9 @@ spring:
   profiles:
     active: production
   datasource:
-    url: jdbc:hsqldb:mem:pazuzudb;sql.syntax_pgs=true
-    username: sa
-    password:
+    url: ${DBURL}
+    username: ${DBUSER}
+    password: ${DBPASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate

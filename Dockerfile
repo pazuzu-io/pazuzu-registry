@@ -1,4 +1,4 @@
-FROM registry.opensource.zalan.do/stups/openjdk:8-42
+FROM registry.opensource.zalan.do/stups/openjdk:8-cd26
 RUN mkdir /usr/pazuzu
 COPY ./target/pazuzu-registry.jar /usr/pazuzu
 COPY scm-source.json /

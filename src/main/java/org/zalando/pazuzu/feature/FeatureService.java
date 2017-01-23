@@ -1,15 +1,22 @@
 package org.zalando.pazuzu.feature;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.zalando.pazuzu.exception.*;
 
+import javax.persistence.criteria.Predicate;
 import javax.ws.rs.BadRequestException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class FeatureService {
@@ -57,6 +64,7 @@ public class FeatureService {
         if (null != author && !author.isEmpty()) {
             newFeature.setAuthor(author);
         }
+        newFeature.setStatus(FeatureStatus.PENDING);
         featureRepository.save(newFeature);
         return converter.apply(newFeature);
     }
@@ -84,7 +92,8 @@ public class FeatureService {
 
     @Transactional(rollbackFor = ServiceException.class)
     public <T> T updateFeature(String name, String newName, String description, String author, String snippet,
-                               String testSnippet, List<String> dependencyNames, Function<Feature, T> converter) {
+                               String testSnippet, List<String> dependencyNames, FeatureStatus status,
+                               Function<Feature, T> converter) {
         final Feature existing = loadExistingFeature(name);
 
         if (null != newName && !newName.equals(existing.getName())) {
@@ -95,6 +104,7 @@ public class FeatureService {
         existing.setTestSnippet(valueOrNull(testSnippet));
         existing.setDescription(valueOrNull(description));
         existing.setAuthor(valueOrNull(author));
+        existing.setStatus(status);
 
         if (null != dependencyNames) {
             final Set<Feature> dependencies = loadFeatures(dependencyNames);
@@ -145,14 +155,48 @@ public class FeatureService {
     }
 
 
-    public <T> List<T> searchFeatures(List<String> patterns, Function<Feature, T> converter) throws ServiceException {
-        return patterns.stream()
-                .map(featureRepository::findByNameIgnoreCaseContaining)
-                .filter(s -> !s.isEmpty())
-                .flatMap(Collection::stream)
-                .distinct()
-                .map(converter)
-                .collect(Collectors.toList());
+    /**
+     * Search feature base on give search criteria, ordered by name.
+     * @param name string the name should contains.
+     * @param author string the author should contains.
+     * @param status the status of the feature, if not present do no filter on status.
+     * @param offset the offset of the result list (must be present)
+     * @param limit the maximum size of the returned list (must be present)
+     * @param converter the converter that will be used to map the feature to the expected result type
+     * @param <T> the list item result type
+     * @return paginated list of feature that match the search criteria with the totcal count.
+     * @throws ServiceException
+     */
+    public <T> FeaturesWithTotalCount<T> searchFeatures(String name, String author, FeatureStatus status,
+                                                        Integer offset, Integer limit,
+                                                        Function<Feature, T> converter) throws ServiceException {
+        Specification<Feature> spec = (root, query, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (name != null) {
+                predicates.add(builder.like(builder.lower(root.get(Feature_.name)), escapeLike(name), '|' ));
+            }
+
+            if (author != null) {
+                predicates.add(builder.like(builder.lower(root.get(Feature_.author)), escapeLike(author), '|'));
+            }
+
+            if (status != null) {
+                predicates.add(builder.equal(root.get(Feature_.status), status));
+            }
+
+            return builder.and(predicates.toArray(new Predicate[predicates.size()]));
+        };
+        Pageable pageable = new PageRequest(offset / limit, limit, Sort.Direction.ASC, "name");
+        Page<Feature> page = featureRepository.findAll(spec, pageable);
+        return new FeaturesWithTotalCount<>(StreamSupport.stream(page.spliterator(), false)
+                                            .map(converter)
+                                            .collect(Collectors.toList()),
+                                        page.getTotalElements());
+    }
+
+    private String escapeLike(String name) {
+        return "%" + name.replace("%", "|%").toLowerCase(Locale.ENGLISH) + "%";
     }
 
     public List<Feature> resolveFeatures(List<String> featureNames) {

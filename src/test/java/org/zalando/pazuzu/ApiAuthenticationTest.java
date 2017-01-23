@@ -17,6 +17,10 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.MultiValueMap;
+import org.zalando.pazuzu.feature.FeatureStatus;
+import org.zalando.pazuzu.model.Feature;
+import org.zalando.pazuzu.model.FeatureList;
+import org.zalando.pazuzu.model.FeatureMeta;
 import org.zalando.pazuzu.oauth2.ClientIdAuthorityGrantingAuthenticationExtractor;
 import org.zalando.pazuzu.security.Roles;
 import org.zalando.stups.oauth2.spring.server.TokenInfoResourceServerTokenServices;
@@ -57,11 +61,11 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
     public void shouldFailToCreateFeatureWithoutAuthorization() {
 
         // given
-        FeatureDto feature = createTestFeature();
+        Feature feature = createTestFeature();
 
         // when
         ResponseEntity response = template.exchange(
-                url("/api/features"), POST, new HttpEntity<>(feature), Object.class
+                url(featuresUrl), POST, new HttpEntity<>(feature), Object.class
         );
 
         // then
@@ -72,11 +76,11 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
     public void shouldCreateFeatureWithUserAuthority() {
 
         // given
-        FeatureDto feature = createTestFeature();
+        Feature feature = createTestFeature();
 
         // when
         ResponseEntity response = template.exchange(
-                url("/api/features"), POST, new HttpEntity<>(feature, oauthToken(USER_TOKEN)), Object.class
+                url(featuresUrl), POST, new HttpEntity<>(feature, oauthToken(USER_TOKEN)), Object.class
         );
 
         // then
@@ -87,14 +91,14 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
     public void shouldFailToUpdateFeatureWithoutAuthorization() {
 
         // given
-        FeatureDto feature = createTestFeature();
+        Feature feature = createTestFeature();
 
         // and
         createFeatureOAuth(feature);
 
         // when
         ResponseEntity response = template.exchange(
-                url("/api/features", feature.getMeta().getName()), PUT, new HttpEntity<>(feature), Object.class
+                url(featuresUrl, feature.getMeta().getName()), PUT, new HttpEntity<>(feature), Object.class
         );
 
         // then
@@ -105,14 +109,14 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
     public void shouldFailToUpdateFeatureWithUserAuthority() {
 
         // given
-        FeatureDto feature = createTestFeature();
+        Feature feature = createTestFeature();
 
         // and
         createFeatureOAuth(feature);
 
         // when
         ResponseEntity response = template.exchange(
-                url("/api/features", feature.getMeta().getName()), PUT, new HttpEntity<>(feature, oauthToken(USER_TOKEN)), Object.class
+                url(featuresUrl, feature.getMeta().getName()), PUT, new HttpEntity<>(feature, oauthToken(USER_TOKEN)), Object.class
         );
 
         // then
@@ -123,14 +127,15 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
     public void shouldUpdateFeatureWithAdminAuthority() {
 
         // given
-        FeatureDto feature = createTestFeature();
+        Feature feature = createTestFeature();
 
         // and
         createFeatureOAuth(feature);
 
         // when
+        feature.getMeta().setStatus(FeatureStatus.PENDING.jsonValue());
         ResponseEntity response = template.exchange(
-                url("/api/features", feature.getMeta().getName()), PUT, new HttpEntity<>(feature, oauthToken(ADMIN_TOKEN)), Object.class
+                url(featuresUrl, feature.getMeta().getName()), PUT, new HttpEntity<>(feature, oauthToken(ADMIN_TOKEN)), Object.class
         );
 
         // then
@@ -141,14 +146,14 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
     public void shouldFailToDeleteFeatureWithoutAuthorization() {
 
         // given
-        FeatureDto feature = createTestFeature();
+        Feature feature = createTestFeature();
 
         // and
         createFeatureOAuth(feature);
 
         // when
         ResponseEntity response = template.exchange(
-                url("/api/features", feature.getMeta().getName()), DELETE, null, Object.class
+                url(featuresUrl, feature.getMeta().getName()), DELETE, null, Object.class
         );
 
         // then
@@ -159,14 +164,14 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
     public void shouldFailToDeleteFeatureWithUserAuthority() {
 
         // given
-        FeatureDto feature = createTestFeature();
+        Feature feature = createTestFeature();
 
         // and
         createFeatureOAuth(feature);
 
         // when
         ResponseEntity response = template.exchange(
-                url("/api/features", feature.getMeta().getName()), DELETE, new HttpEntity<>(oauthToken(USER_TOKEN)), Object.class
+                url(featuresUrl, feature.getMeta().getName()), DELETE, new HttpEntity<>(oauthToken(USER_TOKEN)), Object.class
         );
 
         // then
@@ -177,14 +182,14 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
     public void shouldDeleteFeatureWithAdminAuthority() {
 
         // given
-        FeatureDto feature = createTestFeature();
+        Feature feature = createTestFeature();
 
         // and
         createFeatureOAuth(feature);
 
         // when
         ResponseEntity response = template.exchange(
-                url("/api/features", feature.getMeta().getName()), DELETE, new HttpEntity<>(oauthToken(ADMIN_TOKEN)), Object.class
+                url(featuresUrl, feature.getMeta().getName()), DELETE, new HttpEntity<>(oauthToken(ADMIN_TOKEN)), Object.class
         );
 
         // then
@@ -195,33 +200,39 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
     public void shouldRetrieveFeatureListAnonymously() {
 
         // given
-        FeatureDto feature = createTestFeature();
+        Feature feature = createTestFeature();
 
         // and
         createFeatureOAuth(feature);
 
+        // and (anonymous user can only list approved features)
+        feature.getMeta().setStatus(FeatureStatus.APPROVED.jsonValue());
+        template.exchange(
+                url(featuresUrl, feature.getMeta().getName()), PUT, new HttpEntity<>(feature, oauthToken(ADMIN_TOKEN)), Object.class
+        );
+
         // when
-        ResponseEntity<List<FeatureDto>> response = template.exchange(
-                url("/api/features"), GET, null, new ParameterizedTypeReference<List<FeatureDto>>() {}
+        ResponseEntity<FeatureList> response = template.exchange(
+                url(featuresUrl), GET, null, FeatureList.class
         );
 
         // then
         assertSuccess(response);
-        assertThat(response.getBody()).hasSize(1);
+        assertThat(response.getBody().getFeatures()).hasSize(1);
     }
 
     @Test
     public void shouldRetrieveFeatureByNameAnonymously() {
 
         // given
-        FeatureDto feature = createTestFeature();
+        Feature feature = createTestFeature();
 
         // and
         createFeatureOAuth(feature);
 
         // when
-        ResponseEntity<FeatureDto> response = template.exchange(
-                url("/api/features/", feature.getMeta().getName()), GET, null, FeatureDto.class
+        ResponseEntity<Feature> response = template.exchange(
+                url(featuresUrl, feature.getMeta().getName()), GET, null, Feature.class
         );
 
         // then
@@ -229,9 +240,9 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
         assertThat(response.getBody()).isNotNull();
     }
 
-    private void createFeatureOAuth(FeatureDto feature) {
+    private void createFeatureOAuth(Feature feature) {
         template.exchange(
-                url("/api/features"), POST, new HttpEntity<Object>(feature, oauthToken(ADMIN_TOKEN)), Object.class
+                url(featuresUrl), POST, new HttpEntity<Object>(feature, oauthToken(ADMIN_TOKEN)), Object.class
         );
     }
 
@@ -243,8 +254,9 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
         return headers;
     }
 
-    private FeatureDto createTestFeature() {
-        FeatureDto feature = new FeatureDto();
+    private Feature createTestFeature() {
+        Feature feature = new Feature();
+        feature.setMeta(new FeatureMeta());
         feature.getMeta().setName("test_feature");
         return feature;
     }
