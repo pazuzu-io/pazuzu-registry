@@ -33,18 +33,6 @@ public class FeatureService {
         f.getDependencies().forEach(item -> collectRecursively(result, item));
     }
 
-    @Transactional
-    public <T> List<T> listFeatures(String name, Function<Feature, T> converter) {
-        return this.featureRepository.findByNameIgnoreCaseContaining(name).stream().map(converter).collect(Collectors.toList());
-    }
-
-    @Transactional
-    public <T> FeaturesWithTotalCount<T> getFeaturesWithTotalCount(int offset, int limit, Function<Feature, T> converter) {
-        List<T> features = featureRepository.getFeatures(offset, limit).stream().map(converter).collect(Collectors.toList());
-        long count = featureRepository.count();
-        return new FeaturesWithTotalCount<>(features, count);
-    }
-
     @Transactional(rollbackFor = ServiceException.class)
     public <T> T createFeature(String name, String description, String author, String snippet, String testSnippet,
                                List<String> dependencyNames, Function<Feature, T> converter) {
@@ -167,9 +155,10 @@ public class FeatureService {
      * @return paginated list of feature that match the search criteria with the totcal count.
      * @throws ServiceException
      */
-    public <T> FeaturesWithTotalCount<T> searchFeatures(String name, String author, FeatureStatus status,
-                                                        Integer offset, Integer limit,
-                                                        Function<Feature, T> converter) throws ServiceException {
+    @Transactional
+    public <T> FeaturesPage<Feature, T> searchFeatures(String name, String author, FeatureStatus status,
+                                              Integer offset, Integer limit,
+                                              Function<Feature, T> converter) throws ServiceException {
         Specification<Feature> spec = (root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -189,10 +178,8 @@ public class FeatureService {
         };
         Pageable pageable = new PageRequest(offset / limit, limit, Sort.Direction.ASC, "name");
         Page<Feature> page = featureRepository.findAll(spec, pageable);
-        return new FeaturesWithTotalCount<>(StreamSupport.stream(page.spliterator(), false)
-                                            .map(converter)
-                                            .collect(Collectors.toList()),
-                                        page.getTotalElements());
+        return new FeaturesPage<>(page, converter);
+
     }
 
     private String escapeLike(String name) {
