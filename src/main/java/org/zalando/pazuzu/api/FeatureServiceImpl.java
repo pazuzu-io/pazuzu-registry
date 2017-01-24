@@ -6,9 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.zalando.pazuzu.feature.FeatureService;
 import org.zalando.pazuzu.feature.FeatureStatus;
@@ -16,13 +13,11 @@ import org.zalando.pazuzu.feature.FeaturesWithTotalCount;
 import org.zalando.pazuzu.model.Feature;
 import org.zalando.pazuzu.model.FeatureList;
 import org.zalando.pazuzu.model.FeatureMeta;
+import org.zalando.pazuzu.model.Review;
 import org.zalando.pazuzu.security.Roles;
 
 import javax.annotation.security.RolesAllowed;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -31,11 +26,9 @@ import java.util.stream.Collectors;
  */
 @Service
 public class FeatureServiceImpl {
-    private static final String X_TOTAL_COUNT = "X-Total-Count";
     public static final int DEFAULT_OFFSET = 0;
     private static final Integer DEFAULT_LIMIT = 50;
     private final FeatureService featureService;
-
 
 
     @Autowired
@@ -44,12 +37,7 @@ public class FeatureServiceImpl {
     }
 
     @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
-    public ResponseEntity<FeatureList> featuresGet(@RequestParam(value = "q", required = false) String q,
-                                                   @RequestParam(value = "author", required = false) String author,
-                                                   @RequestParam(value = "fields", required = false) String fields,
-                                                   @RequestParam(value = "status", required = false) String status,
-                                                   @RequestParam(value = "offset", required = false) Integer offset,
-                                                   @RequestParam(value = "limit", required = false) Integer limit) {
+    public ResponseEntity<FeatureList> featuresGet(String q, String author, String fields, String status, Integer offset, Integer limit) {
         if (offset == null) {
             offset = DEFAULT_OFFSET;
         }
@@ -57,7 +45,7 @@ public class FeatureServiceImpl {
             limit = DEFAULT_LIMIT;
         }
         if (q != null) {
-            q =q.trim();
+            q = q.trim();
         }
         if (author != null) {
             author = author.trim();
@@ -66,7 +54,7 @@ public class FeatureServiceImpl {
         //TODO add limitation of author if non admin and asking for non approved feature
         FeatureStatus featureStatus = null;
         if (status == null) {
-            featureStatus = FeatureStatus.APPROVED;
+            featureStatus = null;
         } else {
             featureStatus = FeatureStatus.fromJsonValue(status);
         }
@@ -86,7 +74,7 @@ public class FeatureServiceImpl {
     }
 
     @RolesAllowed({Roles.USER})
-    public ResponseEntity<Feature> featuresPost(@RequestBody Feature feature) {
+    public ResponseEntity<Feature> featuresPost(Feature feature) {
         if (feature.getMeta() == null)
             feature.setMeta(new FeatureMeta());
         ServletUriComponentsBuilder servletUriComponentsBuilder = ServletUriComponentsBuilder.fromCurrentContextPath();
@@ -101,31 +89,25 @@ public class FeatureServiceImpl {
         return entity;
     }
 
+    @RolesAllowed({Roles.USER})
+    public ResponseEntity<Review> featuresNameReviewsPost(String name, Review review) {
+        org.zalando.pazuzu.feature.Feature feature = featureService.getFeature(name, t -> t);
+        Review newReview = featureService.updateFeature(feature.getName(), feature.getName(),
+                feature.getDescription(), feature.getAuthor(), feature.getSnippet(),
+                feature.getTestSnippet(), feature.getDependencies().stream().map(f -> f.getName()).collect(Collectors.toList()),
+                FeatureStatus.fromJsonValue(review.getReviewStatus().name()),
+                FeatureConverter::asReviewDto);
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
+        return new ResponseEntity<Review>(newReview, responseHeaders, HttpStatus.CREATED);
+    }
+
     @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
-    public ResponseEntity<Feature> featuresNameGet(@PathVariable("name") String name) {
+    public ResponseEntity<Feature> featuresNameGet(String name) {
         Feature feature = featureService.getFeature(name, FeatureConverter::asDto);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
         ResponseEntity<Feature> entity = new ResponseEntity<Feature>(feature, responseHeaders, HttpStatus.OK);
         return entity;
     }
-
-    @RolesAllowed({Roles.ADMIN})
-    public ResponseEntity<Feature> featuresNamePut(@PathVariable("name") String name, @RequestBody Feature feature) {
-        Feature featureDto = featureService.updateFeature(
-                name, feature.getMeta().getName(), feature.getMeta().getDescription(), feature.getMeta().getAuthor(),
-                feature.getSnippet(), feature.getTestSnippet(), feature.getMeta().getDependencies(),
-                FeatureStatus.fromJsonValue(feature.getMeta().getStatus()), FeatureConverter::asDto);
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
-        ResponseEntity<Feature> entity = new ResponseEntity<Feature>(featureDto, responseHeaders, HttpStatus.OK);
-        return entity;
-    }
-
-    @RolesAllowed({Roles.ADMIN})
-    public ResponseEntity<Void> featuresNameDelete(@PathVariable("name") String name) {
-        featureService.deleteFeature(name);
-        return ResponseEntity.noContent().build();
-    }
-
 }

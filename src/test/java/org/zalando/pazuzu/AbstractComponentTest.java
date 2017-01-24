@@ -72,7 +72,7 @@ public abstract class AbstractComponentTest {
         dto.getMeta().setName(NAME + id);
         dto.getMeta().setDescription(DESCRIPTION + id);
         dto.getMeta().setAuthor(AUTHOR + id);
-        dto.getMeta().setStatus(FeatureStatus.PENDING.jsonValue());
+        dto.getMeta().setStatus(FeatureMeta.StatusEnum.pending);
         Arrays.stream(dependencies).mapToObj(i -> NAME + i).forEach(dto.getMeta().getDependencies()::add);
         return dto;
     }
@@ -86,7 +86,7 @@ public abstract class AbstractComponentTest {
     protected void createAndAcceptFeature(Feature dto) throws JsonProcessingException {
         ResponseEntity<Feature> creationResponse = createFeature(dto);
         Feature feature = creationResponse.getBody();
-        feature.getMeta().setStatus(FeatureStatus.APPROVED.jsonValue());
+        feature.getMeta().setStatus(FeatureMeta.StatusEnum.approved);
         put(feature.getMeta().getName(), feature);
     }
 

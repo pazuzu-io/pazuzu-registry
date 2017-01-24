@@ -36,7 +36,7 @@ public class DependenciesServiceImpl {
         this.featureService = featureService;
     }
 
-    public ResponseEntity<DependenciesList> dependenciesGet(@RequestParam(value = "names") List<String> names) {
+    public ResponseEntity<DependenciesList> dependenciesGet(List<String> names) {
         List<Feature> features;
             if (names == null || names.isEmpty())
                 throw new FeatureNameEmptyException();

@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.zalando.pazuzu.model.Feature;
 import org.zalando.pazuzu.model.FeatureList;
+import org.zalando.pazuzu.model.Review;
 
 //
 // GENERATED CLASS, DO NOT EDIT
@@ -13,7 +14,7 @@ import org.zalando.pazuzu.model.FeatureList;
 //
 
 @RestController
-@RequestMapping("api")
+@RequestMapping(value="/api")
 public final class FeaturesApiImpl implements FeaturesApi {
   private FeatureServiceImpl impl;
 
@@ -45,13 +46,6 @@ public final class FeaturesApiImpl implements FeaturesApi {
   }
 
   @Override
-  @RequestMapping(value="/features/{name}",method=RequestMethod.DELETE )
-  public ResponseEntity<Void> featuresNameDelete( @PathVariable("name")
-    String name) {
-    return this.impl.featuresNameDelete(    name);
-  }
-
-  @Override
   @RequestMapping(value="/features/{name}",method=RequestMethod.GET , produces={ "application/json" })
   public ResponseEntity<Feature> featuresNameGet( @PathVariable("name")
     String name) {
@@ -59,13 +53,13 @@ public final class FeaturesApiImpl implements FeaturesApi {
   }
 
   @Override
-  @RequestMapping(value="/features/{name}",method=RequestMethod.PUT,consumes={ "application/json" } , produces={ "application/json" })
-  public ResponseEntity<Feature> featuresNamePut( @PathVariable("name")
+  @RequestMapping(value="/features/{name}/reviews",method=RequestMethod.POST,consumes={ "application/json" } , produces={ "application/json" })
+  public ResponseEntity<Review> featuresNameReviewsPost( @PathVariable("name")
     String name,
      @RequestBody
-    Feature feature) {
-    return this.impl.featuresNamePut(    name,
-      feature);
+    Review review) {
+    return this.impl.featuresNameReviewsPost(    name,
+      review);
   }
 
   @Override

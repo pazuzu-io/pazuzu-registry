@@ -88,115 +88,6 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
     }
 
     @Test
-    public void shouldFailToUpdateFeatureWithoutAuthorization() {
-
-        // given
-        Feature feature = createTestFeature();
-
-        // and
-        createFeatureOAuth(feature);
-
-        // when
-        ResponseEntity response = template.exchange(
-                url(featuresUrl, feature.getMeta().getName()), PUT, new HttpEntity<>(feature), Object.class
-        );
-
-        // then
-        assertUnauthorized(response);
-    }
-
-    @Test
-    public void shouldFailToUpdateFeatureWithUserAuthority() {
-
-        // given
-        Feature feature = createTestFeature();
-
-        // and
-        createFeatureOAuth(feature);
-
-        // when
-        ResponseEntity response = template.exchange(
-                url(featuresUrl, feature.getMeta().getName()), PUT, new HttpEntity<>(feature, oauthToken(USER_TOKEN)), Object.class
-        );
-
-        // then
-        assertForbidden(response);
-    }
-
-    @Test
-    public void shouldUpdateFeatureWithAdminAuthority() {
-
-        // given
-        Feature feature = createTestFeature();
-
-        // and
-        createFeatureOAuth(feature);
-
-        // when
-        feature.getMeta().setStatus(FeatureStatus.PENDING.jsonValue());
-        ResponseEntity response = template.exchange(
-                url(featuresUrl, feature.getMeta().getName()), PUT, new HttpEntity<>(feature, oauthToken(ADMIN_TOKEN)), Object.class
-        );
-
-        // then
-        assertSuccess(response);
-    }
-
-    @Test
-    public void shouldFailToDeleteFeatureWithoutAuthorization() {
-
-        // given
-        Feature feature = createTestFeature();
-
-        // and
-        createFeatureOAuth(feature);
-
-        // when
-        ResponseEntity response = template.exchange(
-                url(featuresUrl, feature.getMeta().getName()), DELETE, null, Object.class
-        );
-
-        // then
-        assertUnauthorized(response);
-    }
-
-    @Test
-    public void shouldFailToDeleteFeatureWithUserAuthority() {
-
-        // given
-        Feature feature = createTestFeature();
-
-        // and
-        createFeatureOAuth(feature);
-
-        // when
-        ResponseEntity response = template.exchange(
-                url(featuresUrl, feature.getMeta().getName()), DELETE, new HttpEntity<>(oauthToken(USER_TOKEN)), Object.class
-        );
-
-        // then
-        assertForbidden(response);
-    }
-
-    @Test
-    public void shouldDeleteFeatureWithAdminAuthority() {
-
-        // given
-        Feature feature = createTestFeature();
-
-        // and
-        createFeatureOAuth(feature);
-
-        // when
-        ResponseEntity response = template.exchange(
-                url(featuresUrl, feature.getMeta().getName()), DELETE, new HttpEntity<>(oauthToken(ADMIN_TOKEN)), Object.class
-        );
-
-        // then
-        assertNoContent(response);
-    }
-
-    @Test
     public void shouldRetrieveFeatureListAnonymously() {
 
         // given
@@ -206,7 +97,7 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
         createFeatureOAuth(feature);
 
         // and (anonymous user can only list approved features)
-        feature.getMeta().setStatus(FeatureStatus.APPROVED.jsonValue());
+        feature.getMeta().setStatus(FeatureMeta.StatusEnum.approved);
         template.exchange(
                 url(featuresUrl, feature.getMeta().getName()), PUT, new HttpEntity<>(feature, oauthToken(ADMIN_TOKEN)), Object.class
         );
