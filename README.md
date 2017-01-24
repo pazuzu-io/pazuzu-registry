@@ -34,6 +34,10 @@ mvn clean install
 java -jar target/pazuzu-registry.jar --spring.profiles.active=dev
 ```
 
+The server can also be started with the `dev-clean` profile. This profile 
+will start the application with a clean DB if the pre provisioned feature
+are not needed.
+
 How to setup OSX environment
 -----------------------------
  * Install [docker toolbox](https://www.docker.com/products/docker-toolbox])
