@@ -57,6 +57,16 @@ paths:
           description: The fields present in the response (JSON Field).
           required: false
           type: string
+        - name: status
+          in: query
+          description: Status of the features the call should return.
+          required: false
+          default: approved
+          type: string
+          enum:
+            - approved
+            - pending
+            - declined
         - name: offset
           in: query
           description: The offset to start from.
@@ -99,7 +109,7 @@ paths:
           description: Unexpected error.
           schema:
             $ref: '#/definitions/Error'
-  /pending-features:
+  /pendings:
     get:
       summary: Get pending features.
       description: Returns the features sorted by name (only status = pending).
@@ -164,7 +174,7 @@ paths:
           description: Unexpected error.
           schema:
             $ref: '#/definitions/Error'
-  /declined-features:
+  /declines:
     get:
       summary: Get declined features.
       description: Returns the features sorted by name (only status = declined).
@@ -229,7 +239,7 @@ paths:
           description: Unexpected error.
           schema:
             $ref: '#/definitions/Error'
-  /approved-features:
+  /approvals:
     get:
       summary: Get approved features.
       description: Returns the features sorted by name (only status = approved).
