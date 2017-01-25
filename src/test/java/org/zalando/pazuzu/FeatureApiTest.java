@@ -8,6 +8,7 @@ import org.zalando.pazuzu.exception.FeatureNotFoundException;
 import org.zalando.pazuzu.model.Feature;
 import org.zalando.pazuzu.model.FeatureList;
 import org.zalando.pazuzu.model.FeatureMeta;
+import org.zalando.pazuzu.model.Review;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -16,6 +17,8 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+import static org.zalando.pazuzu.assertion.RestTemplateAssert.assertCreated;
 
 public class FeatureApiTest extends AbstractComponentTest {
     private static ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>() {
@@ -188,5 +191,41 @@ public class FeatureApiTest extends AbstractComponentTest {
         assertThat(jaResult.getBody().getFeatures().size()).isEqualTo(2);
         assertThat(jaResult.getBody().getFeatures().stream().map(Feature::getMeta).map(FeatureMeta::getName))
                 .containsOnly("java", "java-node");
+    }
+
+    @Test
+    public void creatingAReviewWithStateApprovedShouldChangeStateOfFeature() throws Exception {
+        //given
+        ResponseEntity<Feature> createdResult = createFeature(newFeature("test"));
+
+        //when
+        Review review = new Review();
+        review.setReviewStatus(Review.ReviewStatusEnum.approved);
+        ResponseEntity<Review> exchange = template.exchange(url(featuresUrl, "test", "reviews"),
+                POST, new HttpEntity<>(review), Review.class);
+
+        //then
+        assertCreated(exchange);
+
+        ResponseEntity<Feature> result = template.getForEntity(createdResult.getHeaders().getLocation(), Feature.class);
+        assertThat(result.getBody().getMeta().getStatus()).isEqualTo(FeatureMeta.StatusEnum.approved);
+    }
+
+    @Test
+    public void creatingAReviewWithStateDeclinedShouldChangeStateOfFeature() throws Exception {
+        //given
+        ResponseEntity<Feature> createdResult = createFeature(newFeature("test"));
+
+        //when
+        Review review = new Review();
+        review.setReviewStatus(Review.ReviewStatusEnum.declined);
+        ResponseEntity<Review> exchange = template.exchange(url(featuresUrl, "test", "reviews"),
+                POST, new HttpEntity<>(review), Review.class);
+
+        //then
+        assertCreated(exchange);
+
+        ResponseEntity<Feature> result = template.getForEntity(createdResult.getHeaders().getLocation(), Feature.class);
+        assertThat(result.getBody().getMeta().getStatus()).isEqualTo(FeatureMeta.StatusEnum.declined);
     }
 }
