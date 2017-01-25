@@ -9,11 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.zalando.pazuzu.feature.FeatureService;
 import org.zalando.pazuzu.feature.FeatureStatus;
-import org.zalando.pazuzu.feature.FeaturesWithTotalCount;
-import org.zalando.pazuzu.model.Feature;
-import org.zalando.pazuzu.model.FeatureList;
-import org.zalando.pazuzu.model.FeatureMeta;
-import org.zalando.pazuzu.model.Review;
+import org.zalando.pazuzu.feature.FeaturesPage;
+import org.zalando.pazuzu.model.*;
 import org.zalando.pazuzu.security.Roles;
 
 import javax.annotation.security.RolesAllowed;
@@ -48,19 +45,20 @@ public class FeatureServiceImpl {
         }
         FeatureFields featureFields = FeatureFields.getFields(fields);
         Function<org.zalando.pazuzu.feature.Feature, Feature> converter = FeatureConverter.forFields(featureFields);
-        FeaturesWithTotalCount<Feature> featuresWithTotalCount =
+        FeaturesPage<?, Feature> featuresPage =
                 featureService.searchFeatures(sanitizeQuery(q), sanitizeQuery(author), featureStatus,
                         sanitizeOffset(offset), sanitizeLimit(limit), converter);
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
         FeatureList ret = new FeatureList();
-        ret.setFeatures(featuresWithTotalCount.getFeatures());
-        ret.setTotalCount((int) featuresWithTotalCount.getTotalCount());
-        //TODO add link.
+        ret.setFeatures(featuresPage.getContent());
+        ret.setTotalCount((int) featuresPage.getTotalElements());
+        addLinks(ret, featuresPage, sanitizeOffset(offset), sanitizeLimit(limit));
         ResponseEntity<FeatureList> entity = new ResponseEntity<FeatureList>(ret, responseHeaders, HttpStatus.OK);
         return entity;
     }
+
 
     private Integer sanitizeLimit(Integer limit) {
         return (limit == null ? DEFAULT_LIMIT: limit);
@@ -72,6 +70,27 @@ public class FeatureServiceImpl {
 
     private String sanitizeQuery(String q) {
         return (q == null ? null : q.trim());
+    }
+
+
+    private void addLinks(FeatureList features, FeaturesPage<?, Feature> page, Integer offset, Integer limit) {
+        FeatureListLinks links = new FeatureListLinks();
+        URI relative = ServletUriComponentsBuilder.fromCurrentContextPath().replacePath("").build().toUri();
+        if (page.hasNext()) {
+            Link next = new Link();
+            next.setHref("/" + relative.relativize(ServletUriComponentsBuilder.fromCurrentRequest()
+                    .replaceQueryParam("offset", offset + limit)
+                    .build().toUri()).toString());
+            links.setNext(next);
+        }
+        if (page.hasPrevious()) {
+            Link previous = new Link();
+            previous.setHref("/" + relative.relativize(ServletUriComponentsBuilder.fromCurrentRequest()
+                    .replaceQueryParam("offset", offset - limit)
+                    .build().toUri()).toString());
+            links.setPrev(previous);
+        }
+        features.setLinks(links);
     }
 
 

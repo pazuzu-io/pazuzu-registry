@@ -37,4 +37,4 @@ pazuzu:
       allowedOrigins: https://localhost:8080
 
 flyway:
-  locations: ['classpath:db/migration', 'classpath:db/features', 'classpath:dev/db/provisioning']
+  locations: ['classpath:db/migration']

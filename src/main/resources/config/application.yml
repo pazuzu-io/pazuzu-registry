@@ -36,3 +36,6 @@ pazuzu:
     admins: admin
     cors:
       allowedOrigins: https://pazuzu-ui.mentoring.zalan.do
+
+flyway:
+  locations: ['classpath:db/migration', 'classpath:db/features']

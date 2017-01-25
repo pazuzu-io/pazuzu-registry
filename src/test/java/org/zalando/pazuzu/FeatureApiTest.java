@@ -1,5 +1,6 @@
 package org.zalando.pazuzu;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
 import org.springframework.http.*;
 import org.zalando.pazuzu.exception.FeatureDuplicateException;
@@ -10,12 +11,15 @@ import org.zalando.pazuzu.model.FeatureList;
 import org.zalando.pazuzu.model.FeatureMeta;
 import org.zalando.pazuzu.model.Review;
 
+import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Fail.fail;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.zalando.pazuzu.assertion.RestTemplateAssert.assertCreated;
@@ -163,6 +167,81 @@ public class FeatureApiTest extends AbstractComponentTest {
         assertThat(nodResult.getBody().getFeatures().size()).isEqualTo(3);
         assertThat(nodResult.getBody().getFeatures().stream().map(Feature::getMeta).map(FeatureMeta::getName))
                 .containsOnly("node", "java-node", "node-mongo");
+    }
+
+    @Test
+    public void listFeaturesShouldReturnsPageLinks() throws Exception {
+        // given
+        IntStream.range(0, 100)
+                .forEach(i -> {
+                    try {
+                        createAndAcceptFeature(newFeature("java-" + i));
+                        createAndAcceptFeature(newFeature("java-node" + i));
+                        createAndAcceptFeature(newFeature("test-" + i));
+                    } catch (JsonProcessingException e) {
+                        fail("unable to proper set up features", e);
+                    }
+
+                });
+
+        //when
+        ResponseEntity<FeatureList> result0_10 = template.exchange(url(featuresUrl + "?limit=10"),
+                GET, null, FeatureList.class);
+
+        //then
+        assertThat(result0_10.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(result0_10.getBody().getFeatures().size()).isEqualTo(10);
+        assertThat(result0_10.getBody().getTotalCount()).isEqualTo(300);
+        assertThat(result0_10.getBody().getLinks().getNext()).isNotNull();
+        assertThat(result0_10.getBody().getLinks().getPrev()).isNull();
+        URI next0_10 = URI.create(result0_10.getBody().getLinks().getNext().getHref());
+        assertThat(next0_10.isAbsolute()).isFalse();
+        assertThat(next0_10.getPath()).isEqualTo("/api/features");
+        assertThat(next0_10.getQuery()).contains("limit=10");
+        assertThat(next0_10.getQuery()).contains("offset=10");
+        System.out.println(result0_10.getBody().getLinks());
+
+        //when (follow the link)
+        ResponseEntity<FeatureList> result10_10 = template.exchange(url(result0_10.getBody()
+                        .getLinks().getNext().getHref()),
+                GET, null, FeatureList.class);
+
+        //then
+        System.out.println(result10_10.getBody().getLinks());
+        assertThat(result10_10.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(result10_10.getBody().getFeatures().size()).isEqualTo(10);
+        assertThat(result10_10.getBody().getTotalCount()).isEqualTo(300);
+        assertThat(result10_10.getBody().getLinks().getNext()).isNotNull();
+        assertThat(result10_10.getBody().getLinks().getPrev()).isNotNull();
+        URI next10_10 = URI.create(result10_10.getBody().getLinks().getNext().getHref());
+        assertThat(next10_10.isAbsolute()).isFalse();
+        assertThat(next10_10.getPath()).isEqualTo("/api/features");
+        assertThat(next10_10.getQuery()).contains("limit=10");
+        assertThat(next10_10.getQuery()).contains("offset=20");
+        URI prev10_10 = URI.create(result10_10.getBody().getLinks().getPrev().getHref());
+        assertThat(prev10_10.isAbsolute()).isFalse();
+        assertThat(prev10_10.getPath()).isEqualTo("/api/features");
+        assertThat(prev10_10.getQuery()).contains("limit=10");
+        assertThat(prev10_10.getQuery()).contains("offset=0");
+
+        //when
+        ResponseEntity<FeatureList> result_test_90_10 = template.exchange(
+                url(featuresUrl + "?q=test&limit=10&offset=90"),
+                GET, null, FeatureList.class);
+
+        //then
+        System.out.println(result_test_90_10.getBody().getLinks());
+        assertThat(result_test_90_10.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(result_test_90_10.getBody().getFeatures().size()).isEqualTo(10);
+        assertThat(result_test_90_10.getBody().getTotalCount()).isEqualTo(100);
+        assertThat(result_test_90_10.getBody().getLinks().getNext()).isNull();
+        assertThat(result_test_90_10.getBody().getLinks().getPrev()).isNotNull();
+        URI prevtest_90_10 = URI.create(result_test_90_10.getBody().getLinks().getPrev().getHref());
+        assertThat(prevtest_90_10.isAbsolute()).isFalse();
+        assertThat(prevtest_90_10.getPath()).isEqualTo("/api/features");
+        assertThat(prevtest_90_10.getQuery()).contains("limit=10");
+        assertThat(prevtest_90_10.getQuery()).contains("offset=80");
+        assertThat(prevtest_90_10.getQuery()).contains("q=test");
     }
 
     @Test
