@@ -38,30 +38,19 @@ public class FeatureServiceImpl {
 
     @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
     public ResponseEntity<FeatureList> featuresGet(String q, String author, String fields, String status, Integer offset, Integer limit) {
-        if (offset == null) {
-            offset = DEFAULT_OFFSET;
-        }
-        if (limit == null) {
-            limit = DEFAULT_LIMIT;
-        }
-        if (q != null) {
-            q = q.trim();
-        }
-        if (author != null) {
-            author = author.trim();
-        }
         //TODO add validation base on role.
         //TODO add limitation of author if non admin and asking for non approved feature
         FeatureStatus featureStatus = null;
         if (status == null) {
-            featureStatus = null;
+            featureStatus = FeatureStatus.APPROVED;
         } else {
             featureStatus = FeatureStatus.fromJsonValue(status);
         }
         FeatureFields featureFields = FeatureFields.getFields(fields);
         Function<org.zalando.pazuzu.feature.Feature, Feature> converter = FeatureConverter.forFields(featureFields);
         FeaturesWithTotalCount<Feature> featuresWithTotalCount =
-                featureService.searchFeatures(q, author, featureStatus, offset, limit, converter);
+                featureService.searchFeatures(sanitizeQuery(q), sanitizeQuery(author), featureStatus,
+                        sanitizeOffset(offset), sanitizeLimit(limit), converter);
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
@@ -72,6 +61,19 @@ public class FeatureServiceImpl {
         ResponseEntity<FeatureList> entity = new ResponseEntity<FeatureList>(ret, responseHeaders, HttpStatus.OK);
         return entity;
     }
+
+    private Integer sanitizeLimit(Integer limit) {
+        return (limit == null ? DEFAULT_LIMIT: limit);
+    }
+
+    private Integer sanitizeOffset(Integer offset) {
+        return (offset == null ? DEFAULT_OFFSET: offset);
+    }
+
+    private String sanitizeQuery(String q) {
+        return (q == null ? null : q.trim());
+    }
+
 
     @RolesAllowed({Roles.USER})
     public ResponseEntity<Feature> featuresPost(Feature feature) {

@@ -15,12 +15,15 @@ import org.zalando.pazuzu.exception.ServiceException;
 import org.zalando.pazuzu.feature.FeatureStatus;
 import org.zalando.pazuzu.model.Feature;
 import org.zalando.pazuzu.model.FeatureMeta;
+import org.zalando.pazuzu.model.Review;
 
 import java.util.Arrays;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.springframework.http.HttpMethod.POST;
+import static org.zalando.pazuzu.assertion.RestTemplateAssert.assertCreated;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(PazuzuAppLauncher.class)
@@ -32,6 +35,7 @@ public abstract class AbstractComponentTest {
             SNIPPET = "feature-snippet-", TEST_SNIPPET = "feature-test-snippet-";
 
     protected final String featuresUrl = "/api/features";
+    protected final String reviewPath = "reviews";
     protected final String resolvedFeaturesUrl = "/api/dependencies";
     protected final TestRestTemplate template = new TestRestTemplate();
     protected final ObjectMapper mapper = new ObjectMapper();
@@ -56,12 +60,15 @@ public abstract class AbstractComponentTest {
         );
     }
 
-    protected void put(String name, Object body) throws JsonProcessingException {
-        template.put(
-                url(featuresUrl + "/{name}"),
+    protected void put(String name, Review body) throws JsonProcessingException {
+        ResponseEntity<Object> approval = template.exchange(
+                url(featuresUrl + "/{name}/reviews"),
+                POST,
                 new HttpEntity<>(mapper.writeValueAsString(body), contentType(MediaType.APPLICATION_JSON)),
+                Object.class,
                 name
         );
+        assertCreated(approval);
     }
 
     protected Feature newFeature(int id, int... dependencies) throws JsonProcessingException {
@@ -86,8 +93,9 @@ public abstract class AbstractComponentTest {
     protected void createAndAcceptFeature(Feature dto) throws JsonProcessingException {
         ResponseEntity<Feature> creationResponse = createFeature(dto);
         Feature feature = creationResponse.getBody();
-        feature.getMeta().setStatus(FeatureMeta.StatusEnum.approved);
-        put(feature.getMeta().getName(), feature);
+        Review review = new Review();
+        review.setReviewStatus(Review.ReviewStatusEnum.approved);
+        put(feature.getMeta().getName(), review);
     }
 
     protected ResponseEntity<Feature> createNewFeature(int id, int... dependencies) throws JsonProcessingException {

@@ -38,7 +38,7 @@ public class FeatureConverter {
     public static Review asReviewDto(org.zalando.pazuzu.feature.Feature feature) {
         Review dto = new Review();
         if (feature.getStatus() != null)
-            dto.setReviewStatus(Review.ReviewStatusEnum.valueOf(feature.getStatus().name()));
+            dto.setReviewStatus(Review.ReviewStatusEnum.valueOf(feature.getStatus().jsonValue()));
         return dto;
     }
 

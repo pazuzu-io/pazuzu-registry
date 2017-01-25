@@ -21,6 +21,7 @@ import org.zalando.pazuzu.feature.FeatureStatus;
 import org.zalando.pazuzu.model.Feature;
 import org.zalando.pazuzu.model.FeatureList;
 import org.zalando.pazuzu.model.FeatureMeta;
+import org.zalando.pazuzu.model.Review;
 import org.zalando.pazuzu.oauth2.ClientIdAuthorityGrantingAuthenticationExtractor;
 import org.zalando.pazuzu.security.Roles;
 import org.zalando.stups.oauth2.spring.server.TokenInfoResourceServerTokenServices;
@@ -97,10 +98,12 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
         createFeatureOAuth(feature);
 
         // and (anonymous user can only list approved features)
-        feature.getMeta().setStatus(FeatureMeta.StatusEnum.approved);
-        template.exchange(
-                url(featuresUrl, feature.getMeta().getName()), PUT, new HttpEntity<>(feature, oauthToken(ADMIN_TOKEN)), Object.class
+        Review review = new Review();
+        review.setReviewStatus(Review.ReviewStatusEnum.approved);
+        ResponseEntity<Object> approval = template.exchange(
+                url(featuresUrl, feature.getMeta().getName(), reviewPath), POST, new HttpEntity<>(review, oauthToken(ADMIN_TOKEN)), Object.class
         );
+        assertCreated(approval);
 
         // when
         ResponseEntity<FeatureList> response = template.exchange(
