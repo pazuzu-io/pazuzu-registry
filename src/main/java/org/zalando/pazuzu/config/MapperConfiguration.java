@@ -1,5 +1,6 @@
 package org.zalando.pazuzu.config;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +19,7 @@ public class MapperConfiguration {
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         return new ObjectMapper()
                 .setDateFormat(dateFormat)
+                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
                 .registerModule(new Jdk8Module())
                 .registerModule(new ProblemModule());
     }

@@ -1,5 +1,5 @@
 INSERT INTO FEATURE (NAME, DESCRIPTION, CREATED_AT, UPDATED_AT, STATUS, AUTHOR, SNIPPET, TEST_SNIPPET) VALUES
-  ('node', 'dummy node feature', now(), now(), 'DECLINED', 'Pazuzu team',
+  ('node', 'dummy node feature', now(), now(), 'APPROVED', 'Pazuzu team',
 
   'RUN set -ex \
   && for key in \
