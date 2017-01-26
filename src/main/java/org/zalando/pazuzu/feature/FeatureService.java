@@ -133,7 +133,7 @@ public class FeatureService {
             return Collections.emptySet();  // no need to go to database for this
 
         final Set<String> uniqueFeatureNames = new HashSet<>(
-                featureNames.stream().map(t -> t.toLowerCase()).collect(Collectors.toList()));
+                featureNames.stream().map(t -> safeToLowerCase(t)).collect(Collectors.toList()));
         Specification<Feature> spec = (root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -155,6 +155,17 @@ public class FeatureService {
         }
 
         return new HashSet<>(foundFeatures);
+    }
+
+    /**
+     * There are Locales, which might have troubles without specifying it here. For example the Turkish Language
+     * has 4 letters 'I'. Since we assume only English Locale, we specify it here.
+     *
+     * @param t
+     * @return String
+     */
+    private String safeToLowerCase(String t) {
+        return t.toLowerCase(Locale.ENGLISH);
     }
 
 
@@ -198,7 +209,7 @@ public class FeatureService {
     }
 
     private String escapeLike(String name) {
-        return "%" + name.replace("%", "|%").toLowerCase(Locale.ENGLISH) + "%";
+        return "%" + safeToLowerCase(name.replace("%", "|%")) + "%";
     }
 
     public List<Feature> resolveFeatures(List<String> featureNames) {
@@ -217,7 +228,7 @@ public class FeatureService {
         if (featureName == null || featureName.isEmpty())
             throw new FeatureNameEmptyException();
         Specification<Feature> spec = (root, query, builder) ->
-                builder.equal(builder.lower(root.get(Feature_.name)), featureName.toLowerCase());
+                builder.equal(builder.lower(root.get(Feature_.name)), safeToLowerCase(featureName));
         return Optional.ofNullable((Feature) featureRepository.findOne(spec));
     }
 }
