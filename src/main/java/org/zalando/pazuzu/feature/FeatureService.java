@@ -129,8 +129,24 @@ public class FeatureService {
     }
 
     public Set<Feature> loadFeatures(List<String> featureNames) throws ServiceException {
-        final Set<String> uniqueFeatureNames = null == featureNames ? new HashSet<>() : new HashSet<>(featureNames);
-        final Set<Feature> foundFeatures = featureRepository.findByNameIn(uniqueFeatureNames);
+        if (featureNames == null || featureNames.isEmpty())
+            return Collections.emptySet();  // no need to go to database for this
+
+        final Set<String> uniqueFeatureNames = new HashSet<>(
+                featureNames.stream().map(t -> t.toLowerCase()).collect(Collectors.toList()));
+        Specification<Feature> spec = (root, query, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (uniqueFeatureNames.size() > 1)
+                predicates.add(builder.lower(root.get(Feature_.name)).in(uniqueFeatureNames));
+            else
+                uniqueFeatureNames.stream().findFirst().map(fn ->
+                    predicates.add(builder.equal(builder.lower(root.get(Feature_.name)), fn))
+                );
+
+            return builder.and(predicates.toArray(new Predicate[predicates.size()]));
+        };
+        final Collection<Feature> foundFeatures = featureRepository.findAll(spec);
 
         if (foundFeatures.size() != uniqueFeatureNames.size()) {
             final Set<String> missingFeaturesNames = new HashSet<>(uniqueFeatureNames);
@@ -138,7 +154,7 @@ public class FeatureService {
             throw new FeatureNotFoundException("Feature missing: " + String.join(",", missingFeaturesNames));
         }
 
-        return foundFeatures;
+        return new HashSet<>(foundFeatures);
     }
 
 

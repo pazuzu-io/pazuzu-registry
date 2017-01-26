@@ -8,9 +8,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface FeatureRepository extends CrudRepository<Feature, Integer>, FeatureRepositoryCustom, JpaSpecificationExecutor {
-
-    List<Feature> findByNameIgnoreCaseContaining(String name);
-
     Optional<Feature> findByName(String name);
 
     Set<Feature> findByNameIn(Set<String> name);
