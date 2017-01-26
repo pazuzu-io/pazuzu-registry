@@ -223,7 +223,7 @@ definitions:
     properties:
       review-status:
         type: string
-        description: Status of the Review.
+        description: Status of the review.
         enum:
           - approved
           - declined
