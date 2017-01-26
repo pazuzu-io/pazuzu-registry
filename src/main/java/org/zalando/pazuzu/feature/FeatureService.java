@@ -72,7 +72,7 @@ public class FeatureService {
             throw new FeatureNameEmptyException();
         }
 
-        featureRepository.findByName(name).ifPresent(f -> {
+        tryLoadExistingFeature(name).ifPresent(f -> {
             throw new FeatureDuplicateException(String.format("Feature with name %s already exists", f.getName()));
         });
     }
@@ -207,8 +207,17 @@ public class FeatureService {
         return new ArrayList<>(expandedList);
     }
 
-    private Feature loadExistingFeature(String name) throws FeatureNotFoundException {
-        return featureRepository.findByName(name)
-                .orElseThrow(() -> new FeatureNotFoundException("Feature missing: " + name));
+    private Feature loadExistingFeature(String featureName) throws FeatureNotFoundException {
+        Optional<Feature> optionalFeature = tryLoadExistingFeature(featureName);
+        return optionalFeature
+                .orElseThrow(() -> new FeatureNotFoundException("Feature missing: " + featureName));
+    }
+
+    private Optional<Feature> tryLoadExistingFeature(String featureName) {
+        if (featureName == null || featureName.isEmpty())
+            throw new FeatureNameEmptyException();
+        Specification<Feature> spec = (root, query, builder) ->
+                builder.equal(builder.lower(root.get(Feature_.name)), featureName.toLowerCase());
+        return Optional.ofNullable((Feature) featureRepository.findOne(spec));
     }
 }

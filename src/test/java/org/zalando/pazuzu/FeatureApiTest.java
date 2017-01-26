@@ -122,6 +122,22 @@ public class FeatureApiTest extends AbstractComponentTest {
     }
 
     @Test
+    public void testShouldFailOnDuplicateFeatureCreationIgnoreCase() throws Exception {
+        // given
+        int id = 3;
+        createNewFeature(id);
+        // when
+        Feature duplicateFeature = newFeature(id);
+        duplicateFeature.getMeta().setName(duplicateFeature.getMeta().getName().toUpperCase());
+        ResponseEntity<Map> error = createFeatureError(duplicateFeature);
+        // then
+        assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertEqualErrors(
+                new FeatureDuplicateException("Feature with name " + NAME + id + " already exists"), error.getBody()
+        );
+    }
+
+    @Test
     public void returnsNotFoundWhenTryingToRetrieveNonExistingFeature() throws Exception {
         // when
         ResponseEntity<Map> result = template.getForEntity(url("/api/features/non_existing"), Map.class);
