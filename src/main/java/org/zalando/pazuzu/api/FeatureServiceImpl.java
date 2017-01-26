@@ -6,9 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.zalando.pazuzu.feature.FeatureService;
 import org.zalando.pazuzu.feature.FeatureStatus;
@@ -19,17 +16,16 @@ import org.zalando.pazuzu.security.Roles;
 import javax.annotation.security.RolesAllowed;
 import java.net.URI;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Created by hhueter on 16/01/2017.
  */
 @Service
 public class FeatureServiceImpl {
-    private static final String X_TOTAL_COUNT = "X-Total-Count";
     public static final int DEFAULT_OFFSET = 0;
     private static final Integer DEFAULT_LIMIT = 50;
     private final FeatureService featureService;
-
 
 
     @Autowired
@@ -38,24 +34,7 @@ public class FeatureServiceImpl {
     }
 
     @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
-    public ResponseEntity<FeatureList> featuresGet(@RequestParam(value = "q", required = false) String q,
-                                                   @RequestParam(value = "author", required = false) String author,
-                                                   @RequestParam(value = "fields", required = false) String fields,
-                                                   @RequestParam(value = "status", required = false) String status,
-                                                   @RequestParam(value = "offset", required = false) Integer offset,
-                                                   @RequestParam(value = "limit", required = false) Integer limit) {
-        if (offset == null) {
-            offset = DEFAULT_OFFSET;
-        }
-        if (limit == null) {
-            limit = DEFAULT_LIMIT;
-        }
-        if (q != null) {
-            q =q.trim();
-        }
-        if (author != null) {
-            author = author.trim();
-        }
+    public ResponseEntity<FeatureList> featuresGet(String q, String author, String fields, String status, Integer offset, Integer limit) {
         //TODO add validation base on role.
         //TODO add limitation of author if non admin and asking for non approved feature
         FeatureStatus featureStatus = null;
@@ -67,17 +46,32 @@ public class FeatureServiceImpl {
         FeatureFields featureFields = FeatureFields.getFields(fields);
         Function<org.zalando.pazuzu.feature.Feature, Feature> converter = FeatureConverter.forFields(featureFields);
         FeaturesPage<?, Feature> featuresPage =
-                featureService.searchFeatures(q, author, featureStatus, offset, limit, converter);
+                featureService.searchFeatures(sanitizeQuery(q), sanitizeQuery(author), featureStatus,
+                        sanitizeOffset(offset), sanitizeLimit(limit), converter);
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
         FeatureList ret = new FeatureList();
         ret.setFeatures(featuresPage.getContent());
         ret.setTotalCount((int) featuresPage.getTotalElements());
-        addLinks(ret, featuresPage, offset, limit);
+        addLinks(ret, featuresPage, sanitizeOffset(offset), sanitizeLimit(limit));
         ResponseEntity<FeatureList> entity = new ResponseEntity<FeatureList>(ret, responseHeaders, HttpStatus.OK);
         return entity;
     }
+
+
+    private Integer sanitizeLimit(Integer limit) {
+        return (limit == null ? DEFAULT_LIMIT: limit);
+    }
+
+    private Integer sanitizeOffset(Integer offset) {
+        return (offset == null ? DEFAULT_OFFSET: offset);
+    }
+
+    private String sanitizeQuery(String q) {
+        return (q == null ? null : q.trim());
+    }
+
 
     private void addLinks(FeatureList features, FeaturesPage<?, Feature> page, Integer offset, Integer limit) {
         FeatureListLinks links = new FeatureListLinks();
@@ -99,8 +93,9 @@ public class FeatureServiceImpl {
         features.setLinks(links);
     }
 
+
     @RolesAllowed({Roles.USER})
-    public ResponseEntity<Feature> featuresPost(@RequestBody Feature feature) {
+    public ResponseEntity<Feature> featuresPost(Feature feature) {
         if (feature.getMeta() == null)
             feature.setMeta(new FeatureMeta());
         ServletUriComponentsBuilder servletUriComponentsBuilder = ServletUriComponentsBuilder.fromCurrentContextPath();
@@ -115,31 +110,25 @@ public class FeatureServiceImpl {
         return entity;
     }
 
+    @RolesAllowed({Roles.USER})
+    public ResponseEntity<Review> featuresNameReviewsPost(String name, Review review) {
+        org.zalando.pazuzu.feature.Feature feature = featureService.getFeature(name, t -> t);
+        Review newReview = featureService.updateFeature(feature.getName(), feature.getName(),
+                feature.getDescription(), feature.getAuthor(), feature.getSnippet(),
+                feature.getTestSnippet(), feature.getDependencies().stream().map(f -> f.getName()).collect(Collectors.toList()),
+                FeatureStatus.fromJsonValue(review.getReviewStatus().name()),
+                FeatureConverter::asReviewDto);
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
+        return new ResponseEntity<Review>(newReview, responseHeaders, HttpStatus.CREATED);
+    }
+
     @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
-    public ResponseEntity<Feature> featuresNameGet(@PathVariable("name") String name) {
+    public ResponseEntity<Feature> featuresNameGet(String name) {
         Feature feature = featureService.getFeature(name, FeatureConverter::asDto);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
         ResponseEntity<Feature> entity = new ResponseEntity<Feature>(feature, responseHeaders, HttpStatus.OK);
         return entity;
     }
-
-    @RolesAllowed({Roles.ADMIN})
-    public ResponseEntity<Feature> featuresNamePut(@PathVariable("name") String name, @RequestBody Feature feature) {
-        Feature featureDto = featureService.updateFeature(
-                name, feature.getMeta().getName(), feature.getMeta().getDescription(), feature.getMeta().getAuthor(),
-                feature.getSnippet(), feature.getTestSnippet(), feature.getMeta().getDependencies(),
-                FeatureStatus.fromJsonValue(feature.getMeta().getStatus()), FeatureConverter::asDto);
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
-        ResponseEntity<Feature> entity = new ResponseEntity<Feature>(featureDto, responseHeaders, HttpStatus.OK);
-        return entity;
-    }
-
-    @RolesAllowed({Roles.ADMIN})
-    public ResponseEntity<Void> featuresNameDelete(@PathVariable("name") String name) {
-        featureService.deleteFeature(name);
-        return ResponseEntity.noContent().build();
-    }
-
 }

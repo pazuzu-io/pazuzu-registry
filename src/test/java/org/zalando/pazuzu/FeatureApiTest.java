@@ -2,25 +2,27 @@ package org.zalando.pazuzu;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
-import org.zalando.pazuzu.exception.*;
+import org.zalando.pazuzu.exception.FeatureDuplicateException;
+import org.zalando.pazuzu.exception.FeatureNameEmptyException;
+import org.zalando.pazuzu.exception.FeatureNotFoundException;
 import org.zalando.pazuzu.model.Feature;
 import org.zalando.pazuzu.model.FeatureList;
 import org.zalando.pazuzu.model.FeatureMeta;
+import org.zalando.pazuzu.model.Review;
 
 import java.net.URI;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Fail.fail;
 import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpMethod.POST;
+import static org.zalando.pazuzu.assertion.RestTemplateAssert.assertCreated;
 
 public class FeatureApiTest extends AbstractComponentTest {
     private static ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>() {
@@ -92,6 +94,17 @@ public class FeatureApiTest extends AbstractComponentTest {
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         // then
         assertEqualFeaturesIgnoreUpdatedAt(newFeature(2), result.getBody());
+    }
+
+    @Test
+    public void createdFeatureShouldHaveStatusPending() throws Exception {
+        // given
+        ResponseEntity<Feature> createdResult = createNewFeature(2);
+        // when
+        ResponseEntity<Feature> result = template.getForEntity(createdResult.getHeaders().getLocation(), Feature.class);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        // then
+        assertThat(result.getBody().getMeta().getStatus()).isEqualTo(FeatureMeta.StatusEnum.pending);
     }
 
     @Test
@@ -260,66 +273,38 @@ public class FeatureApiTest extends AbstractComponentTest {
     }
 
     @Test
-    public void deleteFeatureProperly() throws JsonProcessingException {
-        // given
-        createNewFeature(5);
-        // when
-        ResponseEntity<Void> response = template.exchange(url(featuresUrl + "/" + NAME + 5), HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
-        ResponseEntity<FeatureList> result = template.getForEntity(url(featuresUrl), FeatureList.class);
-        // then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        assertThat(result.getBody().getFeatures()).isEmpty();
+    public void creatingAReviewWithStateApprovedShouldChangeStateOfFeature() throws Exception {
+        //given
+        ResponseEntity<Feature> createdResult = createFeature(newFeature("test"));
+
+        //when
+        Review review = new Review();
+        review.setReviewStatus(Review.ReviewStatusEnum.approved);
+        ResponseEntity<Review> exchange = template.exchange(url(featuresUrl, "test", "reviews"),
+                POST, new HttpEntity<>(review), Review.class);
+
+        //then
+        assertCreated(exchange);
+
+        ResponseEntity<Feature> result = template.getForEntity(createdResult.getHeaders().getLocation(), Feature.class);
+        assertThat(result.getBody().getMeta().getStatus()).isEqualTo(FeatureMeta.StatusEnum.approved);
     }
 
     @Test
-    public void updateFeature() throws JsonProcessingException, InterruptedException, ParseException {
-        // given
-        createNewFeature(6);
-        createNewFeature(7);
-        Feature toBeUpdated = new Feature();
-        toBeUpdated.setMeta(new FeatureMeta());
-        toBeUpdated.getMeta().setName(NAME + 8);
-        ResponseEntity<Feature> feature = createFeature(toBeUpdated);
-        String beforeUpdatedAtString = feature.getBody().getMeta().getUpdatedAt();
-        Date beforeUpdate = (Date) dateFormat.get().parse(beforeUpdatedAtString);
-        // The Api does not return milliseconds so we need to wait to see changes in the seconds.
-        Thread.sleep(2000);
-        // when
-        ResponseEntity<Feature> putResponse = template.exchange(
-                url(featuresUrl + "/" + toBeUpdated.getMeta().getName()),
-                PUT,
-                new HttpEntity<>(mapper.writeValueAsString(newFeature(8, 6, 7)), contentType(MediaType.APPLICATION_JSON)),
-                Feature.class
-        );
-        // then
-        assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        Feature expected = newFeature(8, 6, 7);
-        String afterUpdatedAtString = putResponse.getBody().getMeta().getUpdatedAt();
-        Date afterUpdatedAt = dateFormat.get().parse(afterUpdatedAtString);
-        assertThat(afterUpdatedAt).isAfter(beforeUpdate);
-        assertEqualFeaturesIgnoreUpdatedAt(expected, putResponse.getBody());
-        ResponseEntity<Feature> getResponse = template.getForEntity(url(featuresUrl + "/" + NAME + 8), Feature.class);
-        assertEqualFeaturesIgnoreUpdatedAt(expected, getResponse.getBody());
-    }
+    public void creatingAReviewWithStateDeclinedShouldChangeStateOfFeature() throws Exception {
+        //given
+        ResponseEntity<Feature> createdResult = createFeature(newFeature("test"));
 
-    @Test
-    public void notFoundWhenDeletingNotExistingFeature() throws JsonProcessingException {
-        /// when
-        ResponseEntity<Map> response = template.exchange(url(featuresUrl + "/NotExistingFeature"), HttpMethod.DELETE, HttpEntity.EMPTY, Map.class);
-        // then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertEqualErrors(new FeatureNotFoundException("Feature missing: NotExistingFeature"), response.getBody());
-    }
+        //when
+        Review review = new Review();
+        review.setReviewStatus(Review.ReviewStatusEnum.declined);
+        ResponseEntity<Review> exchange = template.exchange(url(featuresUrl, "test", "reviews"),
+                POST, new HttpEntity<>(review), Review.class);
 
-    @Test
-    public void badRequestWhenDeletingStillReferencedFeature() throws JsonProcessingException {
-        // given
-        createNewFeature(9);
-        createNewFeature(10, 9);
-        // when
-        ResponseEntity<Map> response = template.exchange(url(featuresUrl + "/" + NAME + 9), HttpMethod.DELETE, HttpEntity.EMPTY, Map.class);
-        // then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertEqualErrors(new FeatureReferencedDeleteException("Can't delete feature because it is referenced from other feature(s): feature-10"), response.getBody());
+        //then
+        assertCreated(exchange);
+
+        ResponseEntity<Feature> result = template.getForEntity(createdResult.getHeaders().getLocation(), Feature.class);
+        assertThat(result.getBody().getMeta().getStatus()).isEqualTo(FeatureMeta.StatusEnum.declined);
     }
 }

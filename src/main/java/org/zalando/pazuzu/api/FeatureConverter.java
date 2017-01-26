@@ -2,6 +2,7 @@ package org.zalando.pazuzu.api;
 
 import org.zalando.pazuzu.model.Feature;
 import org.zalando.pazuzu.model.FeatureMeta;
+import org.zalando.pazuzu.model.Review;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -34,6 +35,13 @@ public class FeatureConverter {
         return dto;
     }
 
+    public static Review asReviewDto(org.zalando.pazuzu.feature.Feature feature) {
+        Review dto = new Review();
+        if (feature.getStatus() != null)
+            dto.setReviewStatus(Review.ReviewStatusEnum.valueOf(feature.getStatus().jsonValue()));
+        return dto;
+    }
+
     public static FeatureMeta asMetaDto(org.zalando.pazuzu.feature.Feature feature) {
         FeatureMeta dto = new FeatureMeta();
         dto.setName(feature.getName());
@@ -41,7 +49,7 @@ public class FeatureConverter {
         dto.setAuthor(feature.getAuthor());
         dto.setUpdatedAt(dateFormat.get().format(feature.getUpdatedAt()));
         dto.setCreatedAt(dateFormat.get().format(feature.getCreatedAt()));
-        dto.setStatus(feature.getStatus().jsonValue());
+        dto.setStatus(FeatureMeta.StatusEnum.valueOf(feature.getStatus().jsonValue()));
         dto.setDependencies(
                 feature.getDependencies().stream().map(
                         org.zalando.pazuzu.feature.Feature::getName).collect(Collectors.toList()));

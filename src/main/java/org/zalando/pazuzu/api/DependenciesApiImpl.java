@@ -17,7 +17,7 @@ import java.util.List;
 //
 
 @RestController
-@RequestMapping("api")
+@RequestMapping(value="/api")
 public final class DependenciesApiImpl implements DependenciesApi {
   private DependenciesServiceImpl impl;
 

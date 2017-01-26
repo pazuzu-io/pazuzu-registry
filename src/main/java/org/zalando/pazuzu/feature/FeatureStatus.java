@@ -3,9 +3,9 @@ package org.zalando.pazuzu.feature;
 import java.util.Objects;
 
 public enum FeatureStatus {
-    APPROVED("Approved"),
-    DECLINED("Declined"),
-    PENDING("Pending");
+    APPROVED("approved"),
+    DECLINED("declined"),
+    PENDING("pending");
 
     private final String jsonValue;
 

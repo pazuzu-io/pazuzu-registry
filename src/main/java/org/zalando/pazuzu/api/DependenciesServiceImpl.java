@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.zalando.pazuzu.exception.FeatureNameEmptyException;
 import org.zalando.pazuzu.feature.FeatureService;
 import org.zalando.pazuzu.model.DependenciesList;
@@ -36,7 +35,7 @@ public class DependenciesServiceImpl {
         this.featureService = featureService;
     }
 
-    public ResponseEntity<DependenciesList> dependenciesGet(@RequestParam(value = "names") List<String> names) {
+    public ResponseEntity<DependenciesList> dependenciesGet(List<String> names) {
         List<Feature> features;
             if (names == null || names.isEmpty())
                 throw new FeatureNameEmptyException();

@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   title: Pazuzu registry
   description: Generating Dockerfiles by sets of required functions.
-  version: "0.0.5"
+  version: "0.0.6"
 host: pazuzu.zalando.net
 basePath: /api
 schemes:
@@ -89,27 +89,27 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     post:
-      summary: Creates a new feature.
-      description: Creates a new feature with specified name, docker data, etc. Feature name is checked to be unique.
-      tags:
-        - Features
-      parameters:
-        - name: feature
-          required: true
-          in: body
-          schema:
-            $ref: '#/definitions/Feature'
-      consumes:
-        - application/json
-      responses:
-        201:
-          description: Feature successfully created.
-          schema:
-            $ref: '#/definitions/Feature'
-        default:
-          description: Unexpected error.
-          schema:
-            $ref: '#/definitions/Error'
+        summary: Creates a new feature.
+        description: Creates a new feature with specified name, docker data, etc. Feature name is checked to be unique. status, author and created_at must not be filled.
+        tags:
+          - Features
+        parameters:
+          - name: feature
+            required: true
+            in: body
+            schema:
+              $ref: '#/definitions/Feature'
+        consumes:
+          - application/json
+        responses:
+          201:
+            description: Feature successfully created.
+            schema:
+              $ref: '#/definitions/Feature'
+          default:
+            description: Unexpected error.
+            schema:
+              $ref: '#/definitions/Error'
   /features/{name}:
     parameters:
     - name: name
@@ -131,38 +131,30 @@ paths:
           description: Unexpected error.
           schema:
             $ref: '#/definitions/Error'
-    put:
-      summary: Replace this feature's content.
-      description: Replaces snippet, test_snippet and meta data for this feature.
+  /features/{name}/reviews:
+    post:
+      summary: Post a new review (approval or decline).
+      description: Creates a new review for this feature.
       tags:
         - Features
       parameters:
-        - name: feature
+        - name: name
+          in: path
+          description: The feature name.
+          required: true
+          type: string
+        - name: review
           required: true
           in: body
           schema:
-            $ref: '#/definitions/Feature'
+            $ref: '#/definitions/Review'
       consumes:
         - application/json
       responses:
-        200:
-          description: Feature successfully updated.
+        201:
+          description: Review succesfully added.
           schema:
-            $ref: "#/definitions/Feature"
-        default:
-          description: Unexpected exception.
-          schema:
-            $ref: "#/definitions/Error"
-    delete:
-      summary: Delete feature.
-      description: |
-        Delete this feature. If another feature depends on this feature nothing will be deleted and an error will be
-        returned.
-      tags:
-        - Features
-      responses:
-        204:
-          description: Feature successfully deleted.
+            $ref: '#/definitions/Review'
         default:
           description: Unexpected error.
           schema:
@@ -183,6 +175,10 @@ definitions:
       status:
         type: string
         description: Status of the feature.
+        enum:
+          - approved
+          - declined
+          - pending
       updated_at:
         type: string
         description: Last update date in ISO 8601 format.
@@ -222,6 +218,15 @@ definitions:
             $ref: '#/definitions/Link'
           next:
             $ref: '#/definitions/Link'
+  Review:
+    type: object
+    properties:
+      review-status:
+        type: string
+        description: Status of the review.
+        enum:
+          - approved
+          - declined
   DependenciesList:
     type: object
     properties:
