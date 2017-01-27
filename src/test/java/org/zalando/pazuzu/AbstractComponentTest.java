@@ -106,9 +106,9 @@ public abstract class AbstractComponentTest {
         return post(dto, Map.class);
     }
 
-    protected void assertEqualFeaturesIgnoreUpdatedAt(Feature expected, Feature actual) {
+    protected void assertEqualFeaturesIgnoreFixedProps(Feature expected, Feature actual) {
         assertThat(actual).isEqualToIgnoringGivenFields(expected, "meta");
-        assertThat(actual.getMeta()).isEqualToIgnoringGivenFields(expected.getMeta(), "updatedAt", "createdAt");
+        assertThat(actual.getMeta()).isEqualToIgnoringGivenFields(expected.getMeta(), "updatedAt", "createdAt", "author");
     }
 
     protected void assertEqualErrors(ServiceException expected, Map actual) {

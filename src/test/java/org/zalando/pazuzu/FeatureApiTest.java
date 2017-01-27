@@ -47,7 +47,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         int id = 1;
         ResponseEntity<Feature> result = createNewFeature(id);
         // then
-        assertEqualFeaturesIgnoreUpdatedAt(newFeature(id), result.getBody());
+        assertEqualFeaturesIgnoreFixedProps(newFeature(id), result.getBody());
     }
 
     @Test
@@ -93,7 +93,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         ResponseEntity<Feature> result = template.getForEntity(createdResult.getHeaders().getLocation(), Feature.class);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         // then
-        assertEqualFeaturesIgnoreUpdatedAt(newFeature(2), result.getBody());
+        assertEqualFeaturesIgnoreFixedProps(newFeature(2), result.getBody());
     }
 
     @Test
