@@ -5,6 +5,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.zalando.pazuzu.feature.FeatureService;
@@ -100,7 +101,7 @@ public class FeatureServiceImpl {
             feature.setMeta(new FeatureMeta());
         ServletUriComponentsBuilder servletUriComponentsBuilder = ServletUriComponentsBuilder.fromCurrentContextPath();
         Feature newFeature = featureService.createFeature(
-                feature.getMeta().getName(), feature.getMeta().getDescription(), feature.getMeta().getAuthor(),
+                feature.getMeta().getName(), feature.getMeta().getDescription(), getAuthenticatedUserName(),
                 feature.getSnippet(), feature.getTestSnippet(), feature.getMeta().getDependencies(), FeatureConverter::asDto);
         URI uri = servletUriComponentsBuilder.path("/api/features/{featureName}").buildAndExpand(newFeature.getMeta().getName()).toUri();
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -108,6 +109,11 @@ public class FeatureServiceImpl {
         responseHeaders.setLocation(uri);
         ResponseEntity<Feature> entity = new ResponseEntity<Feature>(newFeature, responseHeaders, HttpStatus.CREATED);
         return entity;
+    }
+
+    private String getAuthenticatedUserName() {
+        return SecurityContextHolder.getContext() != null && SecurityContextHolder.getContext().getAuthentication() != null ?
+                SecurityContextHolder.getContext().getAuthentication().getName() : "anonymous";
     }
 
     @RolesAllowed({Roles.USER})

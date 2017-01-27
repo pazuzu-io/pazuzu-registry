@@ -89,6 +89,22 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
     }
 
     @Test
+    public void shouldSetAuthorForCreatedFeatureWithUserAuthority() {
+
+        // given
+        Feature feature = createTestFeature();
+
+        // when
+        ResponseEntity<Feature> response = template.exchange(
+                url(featuresUrl), POST, new HttpEntity<>(feature, oauthToken(USER_TOKEN)), Feature.class
+        );
+
+        // then
+        assertCreated(response);
+        assertThat(response.getBody().getMeta().getAuthor()).isEqualTo(USER_UID);
+    }
+
+    @Test
     public void shouldRetrieveFeatureListAnonymously() {
 
         // given
