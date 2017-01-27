@@ -37,11 +37,11 @@ public class DependenciesServiceImpl {
 
     public ResponseEntity<DependenciesList> dependenciesGet(List<String> names) {
         List<Feature> features;
-            if (names == null || names.isEmpty())
-                throw new FeatureNameEmptyException();
-            features = featureService
-                    .resolveFeatures(names)
-                    .stream().map(FeatureConverter::asDto).collect(Collectors.toList());
+        if (names == null || names.isEmpty())
+            throw new FeatureNameEmptyException();
+        features = featureService
+                .resolveFeatures(names)
+                .stream().map(FeatureConverter::asDto).collect(Collectors.toList());
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
 

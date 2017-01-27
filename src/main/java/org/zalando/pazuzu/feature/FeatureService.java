@@ -72,7 +72,7 @@ public class FeatureService {
             throw new FeatureNameEmptyException();
         }
 
-        featureRepository.findByName(name).ifPresent(f -> {
+        tryLoadExistingFeature(name).ifPresent(f -> {
             throw new FeatureDuplicateException(String.format("Feature with name %s already exists", f.getName()));
         });
     }
@@ -129,8 +129,24 @@ public class FeatureService {
     }
 
     public Set<Feature> loadFeatures(List<String> featureNames) throws ServiceException {
-        final Set<String> uniqueFeatureNames = null == featureNames ? new HashSet<>() : new HashSet<>(featureNames);
-        final Set<Feature> foundFeatures = featureRepository.findByNameIn(uniqueFeatureNames);
+        if (featureNames == null || featureNames.isEmpty())
+            return Collections.emptySet();  // no need to go to database for this
+
+        final Set<String> uniqueFeatureNames = new HashSet<>(
+                featureNames.stream().map(t -> safeToLowerCase(t)).collect(Collectors.toList()));
+        Specification<Feature> spec = (root, query, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (uniqueFeatureNames.size() > 1)
+                predicates.add(builder.lower(root.get(Feature_.name)).in(uniqueFeatureNames));
+            else
+                uniqueFeatureNames.stream().findFirst().map(fn ->
+                    predicates.add(builder.equal(builder.lower(root.get(Feature_.name)), fn))
+                );
+
+            return builder.and(predicates.toArray(new Predicate[predicates.size()]));
+        };
+        final Collection<Feature> foundFeatures = featureRepository.findAll(spec);
 
         if (foundFeatures.size() != uniqueFeatureNames.size()) {
             final Set<String> missingFeaturesNames = new HashSet<>(uniqueFeatureNames);
@@ -138,7 +154,18 @@ public class FeatureService {
             throw new FeatureNotFoundException("Feature missing: " + String.join(",", missingFeaturesNames));
         }
 
-        return foundFeatures;
+        return new HashSet<>(foundFeatures);
+    }
+
+    /**
+     * There are Locales, which might have troubles without specifying it here. For example the Turkish Language
+     * has 4 letters 'I'. Since we assume only English Locale, we specify it here.
+     *
+     * @param t
+     * @return String
+     */
+    private String safeToLowerCase(String t) {
+        return t.toLowerCase(Locale.ENGLISH);
     }
 
 
@@ -182,7 +209,7 @@ public class FeatureService {
     }
 
     private String escapeLike(String name) {
-        return "%" + name.replace("%", "|%").toLowerCase(Locale.ENGLISH) + "%";
+        return "%" + safeToLowerCase(name.replace("%", "|%")) + "%";
     }
 
     public List<Feature> resolveFeatures(List<String> featureNames) {
@@ -191,8 +218,17 @@ public class FeatureService {
         return new ArrayList<>(expandedList);
     }
 
-    private Feature loadExistingFeature(String name) throws FeatureNotFoundException {
-        return featureRepository.findByName(name)
-                .orElseThrow(() -> new FeatureNotFoundException("Feature missing: " + name));
+    private Feature loadExistingFeature(String featureName) throws FeatureNotFoundException {
+        Optional<Feature> optionalFeature = tryLoadExistingFeature(featureName);
+        return optionalFeature
+                .orElseThrow(() -> new FeatureNotFoundException("Feature missing: " + featureName));
+    }
+
+    private Optional<Feature> tryLoadExistingFeature(String featureName) {
+        if (featureName == null || featureName.isEmpty())
+            throw new FeatureNameEmptyException();
+        Specification<Feature> spec = (root, query, builder) ->
+                builder.equal(builder.lower(root.get(Feature_.name)), safeToLowerCase(featureName));
+        return Optional.ofNullable((Feature) featureRepository.findOne(spec));
     }
 }

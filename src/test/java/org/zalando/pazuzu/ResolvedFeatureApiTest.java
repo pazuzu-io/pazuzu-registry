@@ -76,6 +76,22 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
 
     }
 
+    @Test
+    public void retrievingResolvedFeaturesShouldIgnoreCase() throws Exception {
+        createNewFeature(11);
+        ResponseEntity<DependenciesList> result = template.getForEntity(url(resolvedFeaturesUrl + "?names={name}"),
+                DependenciesList.class, NAME.toUpperCase() + "11");
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        List<String> featureNames = (result.getBody().getDepedencies()).stream()
+                .map(this::featureToName)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+        assertThat(featureNames.size()).isEqualTo(1);
+        assertThat(featureNames).containsOnly(NAME + 11);
+
+    }
+
     private Optional<String> featureToName(Feature feature) {
         if (feature.getMeta() != null)
             return Optional.of(feature.getMeta().getName());
