@@ -20,7 +20,7 @@
         <java.target>1.8</java.target>
         <mockito.version>1.9.5</mockito.version>
         <spring-boot.version>1.5.1.RELEASE</spring-boot.version>
-        <problem-spring-web.version>0.10.0</problem-spring-web.version>
+        <problem-spring-web.version>0.11.0</problem-spring-web.version>
     </properties>
 
     <dependencyManagement>

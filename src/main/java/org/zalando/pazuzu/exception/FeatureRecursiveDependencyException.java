@@ -2,7 +2,6 @@ package org.zalando.pazuzu.exception;
 
 
 import javax.ws.rs.core.Response.Status;
-import java.util.Optional;
 
 public class FeatureRecursiveDependencyException extends ServiceException {
 
@@ -10,7 +9,7 @@ public class FeatureRecursiveDependencyException extends ServiceException {
     private static final String TITLE = "Recursive dependencies found";
 
     public FeatureRecursiveDependencyException(String detail) {
-        super(Status.BAD_REQUEST, CODE, TITLE, Optional.ofNullable(detail));
+        super(Status.BAD_REQUEST, CODE, TITLE, detail);
     }
 
 }
