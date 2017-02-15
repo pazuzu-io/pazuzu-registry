@@ -100,7 +100,7 @@
         <dependency>
             <groupId>org.zalando.zauth</groupId>
             <artifactId>spring-social-zauth</artifactId>
-            <version>0.10.0</version>
+            <version>0.10.2</version>
         </dependency>
         <dependency>
             <groupId>org.zalando</groupId>
