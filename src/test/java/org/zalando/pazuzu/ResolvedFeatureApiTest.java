@@ -1,17 +1,20 @@
 package org.zalando.pazuzu;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import org.junit.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.zalando.pazuzu.model.Feature;
-import org.zalando.pazuzu.model.DependenciesList;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.junit.Test;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.zalando.pazuzu.model.DependenciesList;
+import org.zalando.pazuzu.model.Feature;
 
 public class ResolvedFeatureApiTest extends AbstractComponentTest {
 
@@ -26,8 +29,8 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
     @Test
     public void retrievingResolvedFeatureWithNonExistingNameShouldResultInError() throws Exception {
         // when
-        ResponseEntity<Map> result = template.getForEntity(url(resolvedFeaturesUrl + "?names={name}"),
-                Map.class, NAME + 1);
+        ResponseEntity<Map<String, Object>> result = template.exchange(url(resolvedFeaturesUrl + "?names={name}"),
+                HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, Object>>() {}, NAME + 1);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(result.getBody()).containsOnly(
                 entry("type", "http://pazuzu.io/error/feature_not_found"),

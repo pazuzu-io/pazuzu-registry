@@ -1,8 +1,24 @@
 package org.zalando.pazuzu;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Fail.fail;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+import static org.zalando.pazuzu.assertion.RestTemplateAssert.assertCreated;
+
+import java.net.URI;
+import java.util.Map;
+import java.util.stream.IntStream;
+
 import org.junit.Test;
-import org.springframework.http.*;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.zalando.pazuzu.exception.FeatureDuplicateException;
 import org.zalando.pazuzu.exception.FeatureNameEmptyException;
 import org.zalando.pazuzu.exception.FeatureNotFoundException;
@@ -11,26 +27,9 @@ import org.zalando.pazuzu.model.FeatureList;
 import org.zalando.pazuzu.model.FeatureMeta;
 import org.zalando.pazuzu.model.Review;
 
-import java.net.URI;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Map;
-import java.util.stream.IntStream;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
-import static org.assertj.core.api.Fail.fail;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.zalando.pazuzu.assertion.RestTemplateAssert.assertCreated;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class FeatureApiTest extends AbstractComponentTest {
-    private static ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>() {
-        @Override
-        protected DateFormat initialValue() {
-            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        }
-    };
 
     @Test
     public void retrievingFeaturesShouldReturnEmptyListWhenNoFeaturesAreStored() throws Exception {
@@ -55,7 +54,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         // when
         Feature feature = new Feature();
         feature.setSnippet(SNIPPET + 1);
-        final ResponseEntity<Map> error = createFeatureError(feature);
+        final ResponseEntity<Map<String, Object>> error = createFeatureError(feature);
         // then
         assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertEqualErrors(new FeatureNameEmptyException(), error.getBody());
@@ -66,7 +65,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         // when
         Feature dto = newFeature(1);
         dto.getMeta().setName("");
-        final ResponseEntity<Map> error = createFeatureError(dto);
+        final ResponseEntity<Map<String, Object>> error = createFeatureError(dto);
         // then
         assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertEqualErrors(new FeatureNameEmptyException(), error.getBody());
@@ -77,7 +76,8 @@ public class FeatureApiTest extends AbstractComponentTest {
         // when
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        ResponseEntity<Map> error = template.postForEntity(url(featuresUrl), new HttpEntity<>("{json crap}", headers), Map.class);
+        ResponseEntity<Map<String, Object>> error = template.exchange(url(featuresUrl), HttpMethod.POST, new HttpEntity<>("{json crap}", headers), new ParameterizedTypeReference<Map<String, Object>>() {
+		});
         // then
         assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(error.getBody())
@@ -113,7 +113,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         int id = 3;
         createNewFeature(id);
         // when
-        ResponseEntity<Map> error = createFeatureError(newFeature(id));
+        ResponseEntity<Map<String, Object>> error = createFeatureError(newFeature(id));
         // then
         assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertEqualErrors(
@@ -129,7 +129,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         // when
         Feature duplicateFeature = newFeature(id);
         duplicateFeature.getMeta().setName(duplicateFeature.getMeta().getName().toUpperCase());
-        ResponseEntity<Map> error = createFeatureError(duplicateFeature);
+        ResponseEntity<Map<String, Object>> error = createFeatureError(duplicateFeature);
         // then
         assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertEqualErrors(
@@ -140,7 +140,7 @@ public class FeatureApiTest extends AbstractComponentTest {
     @Test
     public void returnsNotFoundWhenTryingToRetrieveNonExistingFeature() throws Exception {
         // when
-        ResponseEntity<Map> result = template.getForEntity(url("/api/features/non_existing"), Map.class);
+        ResponseEntity<Map<String, Object>> result = template.exchange(url("/api/features/non_existing"), HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, Object>>() {});
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertEqualErrors(new FeatureNotFoundException("Feature missing: non_existing"), result.getBody());
