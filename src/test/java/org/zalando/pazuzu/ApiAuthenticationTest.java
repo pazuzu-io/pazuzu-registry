@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -36,7 +37,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpMethod.*;
 import static org.zalando.pazuzu.assertion.RestTemplateAssert.*;
 
-@ActiveProfiles("oauth")
+@ActiveProfiles({"oauth", "test"})
 public class ApiAuthenticationTest extends AbstractComponentTest {
 
     private static final String ADMIN_TOKEN = "admin";
@@ -47,7 +48,7 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
 
     private static final String USER_UID = "user";
 
-    @Autowired
+    @MockBean
     private ResourceServerTokenServices resourceServerTokenServices;
 
     @Before
@@ -184,14 +185,4 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
                 .extractAuthentication(responseMap, "clientid");
     }
 
-    @Configuration
-    public static class TestConfiguration {
-
-        @Bean
-        @Primary
-        public ResourceServerTokenServices mockResourceServerTokenService() {
-
-            return mock(TokenInfoResourceServerTokenServices.class);
-        }
-    }
 }

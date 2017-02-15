@@ -1,34 +1,39 @@
 package org.zalando.pazuzu;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.assertj.core.util.Strings;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.TestRestTemplate;
-import org.springframework.boot.test.WebIntegrationTest;
-import org.springframework.http.*;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.zalando.pazuzu.exception.ServiceException;
-import org.zalando.pazuzu.feature.FeatureStatus;
-import org.zalando.pazuzu.model.Feature;
-import org.zalando.pazuzu.model.FeatureMeta;
-import org.zalando.pazuzu.model.Review;
-
-import java.util.Arrays;
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.springframework.http.HttpMethod.POST;
 import static org.zalando.pazuzu.assertion.RestTemplateAssert.assertCreated;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(PazuzuAppLauncher.class)
-@WebIntegrationTest(randomPort = true)
+import java.util.Arrays;
+import java.util.Map;
+
+import org.assertj.core.util.Strings;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.zalando.pazuzu.exception.ServiceException;
+import org.zalando.pazuzu.model.Feature;
+import org.zalando.pazuzu.model.FeatureMeta;
+import org.zalando.pazuzu.model.Review;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment=WebEnvironment.RANDOM_PORT, classes=PazuzuAppLauncher.class)
 @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:cleanDatabase.sql")
+@ActiveProfiles("test")
 public abstract class AbstractComponentTest {
 
     protected static final String NAME = "feature-", DESCRIPTION = "feature-description-", AUTHOR = "feature-author-",
