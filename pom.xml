@@ -85,12 +85,7 @@
         <dependency>
             <groupId>org.zalando.stups</groupId>
             <artifactId>spring-boot-zalando-stups-tokens</artifactId>
-            <version>0.9.9</version>
-        </dependency>
-        <dependency>
-            <groupId>org.zalando.stups</groupId>
-            <artifactId>tokens</artifactId>
-            <version>0.9.9</version>
+            <version>0.9.11</version>
         </dependency>
         <dependency>
             <groupId>org.zalando.stups</groupId>
