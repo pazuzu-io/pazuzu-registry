@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -57,9 +58,19 @@ public abstract class AbstractComponentTest {
         return headers;
     }
 
-    protected <T> ResponseEntity<T> post(Object body, Class<T> type) throws JsonProcessingException {
-        return template.postForEntity(
+    protected <T> ResponseEntity<T> post(Object body, ParameterizedTypeReference<T> type) throws JsonProcessingException {
+        return template.exchange(
                 url(featuresUrl),
+                POST,
+                new HttpEntity<>(mapper.writeValueAsString(body), contentType(MediaType.APPLICATION_JSON)),
+                type
+        );
+    }
+
+    protected <T> ResponseEntity<T> post(Object body, Class<T> type) throws JsonProcessingException {
+        return template.exchange(
+                url(featuresUrl),
+                POST,
                 new HttpEntity<>(mapper.writeValueAsString(body), contentType(MediaType.APPLICATION_JSON)),
                 type
         );
@@ -107,8 +118,8 @@ public abstract class AbstractComponentTest {
         return createFeature(newFeature(id, dependencies));
     }
 
-    protected ResponseEntity<Map> createFeatureError(Feature dto) throws JsonProcessingException {
-        return post(dto, Map.class);
+    protected ResponseEntity<Map<String, Object>> createFeatureError(Feature dto) throws JsonProcessingException {
+        return post(dto, new ParameterizedTypeReference<Map<String, Object>>() {});
     }
 
     protected void assertEqualFeaturesIgnoreFixedProps(Feature expected, Feature actual) {
@@ -116,7 +127,7 @@ public abstract class AbstractComponentTest {
         assertThat(actual.getMeta()).isEqualToIgnoringGivenFields(expected.getMeta(), "updatedAt", "createdAt", "author");
     }
 
-    protected void assertEqualErrors(ServiceException expected, Map actual) {
+    protected void assertEqualErrors(ServiceException expected, Map<String, Object> actual) {
         if (expected.getDetail().isPresent())
             assertThat(actual).containsOnly(
                     entry("type", expected.getType().toString()),

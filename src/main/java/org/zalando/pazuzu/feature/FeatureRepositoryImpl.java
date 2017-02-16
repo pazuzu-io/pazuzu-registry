@@ -12,7 +12,7 @@ public class FeatureRepositoryImpl implements FeatureRepositoryCustom {
 
     @Override
     public List<Feature> getFeatures(int offset, int limit) {
-        return em.createQuery("from Feature f").setFirstResult(offset).setMaxResults(limit).getResultList();
+        return em.createQuery("from Feature f", Feature.class).setFirstResult(offset).setMaxResults(limit).getResultList();
     }
 
 }

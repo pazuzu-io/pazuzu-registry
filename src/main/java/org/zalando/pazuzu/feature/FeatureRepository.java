@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public interface FeatureRepository extends CrudRepository<Feature, Integer>, FeatureRepositoryCustom, JpaSpecificationExecutor {
+public interface FeatureRepository extends CrudRepository<Feature, Integer>, FeatureRepositoryCustom, JpaSpecificationExecutor<Feature> {
     Optional<Feature> findByName(String name);
 
     Set<Feature> findByNameIn(Set<String> name);

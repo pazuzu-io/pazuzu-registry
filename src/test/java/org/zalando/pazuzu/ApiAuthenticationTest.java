@@ -1,15 +1,20 @@
 package org.zalando.pazuzu;
 
 
-import com.google.common.collect.ImmutableMap;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+import static org.zalando.pazuzu.assertion.RestTemplateAssert.assertCreated;
+import static org.zalando.pazuzu.assertion.RestTemplateAssert.assertSuccess;
+import static org.zalando.pazuzu.assertion.RestTemplateAssert.assertUnauthorized;
+
+import java.util.Collections;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -18,24 +23,14 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.MultiValueMap;
-import org.zalando.pazuzu.feature.FeatureStatus;
 import org.zalando.pazuzu.model.Feature;
 import org.zalando.pazuzu.model.FeatureList;
 import org.zalando.pazuzu.model.FeatureMeta;
 import org.zalando.pazuzu.model.Review;
 import org.zalando.pazuzu.oauth2.ClientIdAuthorityGrantingAuthenticationExtractor;
 import org.zalando.pazuzu.security.Roles;
-import org.zalando.stups.oauth2.spring.server.TokenInfoResourceServerTokenServices;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpMethod.*;
-import static org.zalando.pazuzu.assertion.RestTemplateAssert.*;
+import com.google.common.collect.ImmutableMap;
 
 @ActiveProfiles({"oauth", "test"})
 public class ApiAuthenticationTest extends AbstractComponentTest {
@@ -66,7 +61,7 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
         Feature feature = createTestFeature();
 
         // when
-        ResponseEntity response = template.exchange(
+        ResponseEntity<?> response = template.exchange(
                 url(featuresUrl), POST, new HttpEntity<>(feature), Object.class
         );
 
@@ -81,7 +76,7 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
         Feature feature = createTestFeature();
 
         // when
-        ResponseEntity response = template.exchange(
+        ResponseEntity<?> response = template.exchange(
                 url(featuresUrl), POST, new HttpEntity<>(feature, oauthToken(USER_TOKEN)), Object.class
         );
 

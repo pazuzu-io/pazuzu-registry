@@ -1,5 +1,8 @@
 package org.zalando.pazuzu.api;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -11,24 +14,12 @@ import org.zalando.pazuzu.feature.FeatureService;
 import org.zalando.pazuzu.model.DependenciesList;
 import org.zalando.pazuzu.model.Feature;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * Created by hhueter on 20/01/2017.
  */
 @Service
 public class DependenciesServiceImpl {
     private final FeatureService featureService;
-
-    private static ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>() {
-        @Override
-        protected DateFormat initialValue() {
-            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        }
-    };
 
     @Autowired
     public DependenciesServiceImpl(FeatureService featureService) {
