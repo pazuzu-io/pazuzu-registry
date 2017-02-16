@@ -62,7 +62,7 @@ public abstract class AbstractComponentTest {
     protected <T> ResponseEntity<T> post(Object body, ParameterizedTypeReference<T> type) throws JsonProcessingException {
         return template.exchange(
                 url(featuresUrl),
-                HttpMethod.POST,
+                POST,
                 new HttpEntity<>(mapper.writeValueAsString(body), contentType(MediaType.APPLICATION_JSON)),
                 type
         );

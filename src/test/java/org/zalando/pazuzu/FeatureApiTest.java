@@ -15,7 +15,6 @@ import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -76,8 +75,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         // when
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        ResponseEntity<Map<String, Object>> error = template.exchange(url(featuresUrl), HttpMethod.POST, new HttpEntity<>("{json crap}", headers), new ParameterizedTypeReference<Map<String, Object>>() {
-		});
+        ResponseEntity<Map<String, Object>> error = template.exchange(url(featuresUrl), POST, new HttpEntity<>("{json crap}", headers), new ParameterizedTypeReference<Map<String, Object>>() {});
         // then
         assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(error.getBody())
@@ -140,7 +138,7 @@ public class FeatureApiTest extends AbstractComponentTest {
     @Test
     public void returnsNotFoundWhenTryingToRetrieveNonExistingFeature() throws Exception {
         // when
-        ResponseEntity<Map<String, Object>> result = template.exchange(url("/api/features/non_existing"), HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, Object>>() {});
+        ResponseEntity<Map<String, Object>> result = template.exchange(url("/api/features/non_existing"), GET, null, new ParameterizedTypeReference<Map<String, Object>>() {});
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertEqualErrors(new FeatureNotFoundException("Feature missing: non_existing"), result.getBody());
