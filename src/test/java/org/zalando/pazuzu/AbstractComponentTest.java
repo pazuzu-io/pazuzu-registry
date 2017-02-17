@@ -128,11 +128,11 @@ public abstract class AbstractComponentTest {
     }
 
     protected void assertEqualErrors(ServiceException expected, Map<String, Object> actual) {
-        if (expected.getDetail().isPresent())
+        if (expected.getDetail() != null)
             assertThat(actual).containsOnly(
                     entry("type", expected.getType().toString()),
                     entry("title", expected.getTitle()),
-                    entry("detail", expected.getDetail().get()),
+                    entry("detail", expected.getDetail()),
                     entry("status", expected.getStatus().getStatusCode()));
         else
             assertThat(actual).containsOnly(
