@@ -2,7 +2,6 @@ package org.zalando.pazuzu.exception;
 
 
 import javax.ws.rs.core.Response.Status;
-import java.util.Optional;
 
 public class FeatureNotFoundException extends ServiceException {
 
@@ -13,8 +12,8 @@ public class FeatureNotFoundException extends ServiceException {
         super(Status.NOT_FOUND, CODE, TITLE);
     }
 
-    public FeatureNotFoundException(String details) {
-        super(Status.NOT_FOUND, CODE, TITLE, Optional.ofNullable(details));
+    public FeatureNotFoundException(String detail) {
+        super(Status.NOT_FOUND, CODE, TITLE, detail);
     }
 
 }
