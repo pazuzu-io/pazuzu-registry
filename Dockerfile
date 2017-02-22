@@ -1,7 +1,5 @@
-FROM registry.opensource.zalan.do/stups/openjdk:8-cd26
-RUN mkdir /usr/pazuzu
-COPY ./target/pazuzu-registry.jar /usr/pazuzu
+FROM registry.opensource.zalan.do/stups/openjdk:latest
+COPY ./target/pazuzu-registry.jar /pazuzu-registry.jar
 COPY scm-source.json /
-WORKDIR /usr/pazuzu
 EXPOSE 8080
-CMD ["java", "-jar", "pazuzu-registry.jar"]
+CMD java $JAVA_OPTS $(appdynamics-agent) $(java-dynamic-memory-opts) /pazuzu-registry.jar
