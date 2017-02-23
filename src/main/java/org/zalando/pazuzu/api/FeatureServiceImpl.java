@@ -1,5 +1,11 @@
 package org.zalando.pazuzu.api;
 
+import java.net.URI;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import javax.annotation.security.RolesAllowed;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -11,13 +17,13 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.zalando.pazuzu.feature.FeatureService;
 import org.zalando.pazuzu.feature.FeatureStatus;
 import org.zalando.pazuzu.feature.FeaturesPage;
-import org.zalando.pazuzu.model.*;
+import org.zalando.pazuzu.model.Feature;
+import org.zalando.pazuzu.model.FeatureList;
+import org.zalando.pazuzu.model.FeatureListLinks;
+import org.zalando.pazuzu.model.FeatureMeta;
+import org.zalando.pazuzu.model.Link;
+import org.zalando.pazuzu.model.Review;
 import org.zalando.pazuzu.security.Roles;
-
-import javax.annotation.security.RolesAllowed;
-import java.net.URI;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Created by hhueter on 16/01/2017.
@@ -38,12 +44,9 @@ public class FeatureServiceImpl {
     public ResponseEntity<FeatureList> featuresGet(String q, String author, String fields, String status, Integer offset, Integer limit) {
         //TODO add validation base on role.
         //TODO add limitation of author if non admin and asking for non approved feature
-        FeatureStatus featureStatus = null;
-        if (status == null) {
-            featureStatus = FeatureStatus.APPROVED;
-        } else {
-            featureStatus = FeatureStatus.fromJsonValue(status);
-        }
+        FeatureStatus featureStatus = (status == null)
+                ? FeatureStatus.APPROVED
+                : FeatureStatus.fromJsonValue(status);
         FeatureFields featureFields = FeatureFields.getFields(fields);
         Function<org.zalando.pazuzu.feature.Feature, Feature> converter = FeatureConverter.forFields(featureFields);
         FeaturesPage<?, Feature> featuresPage =
@@ -56,23 +59,21 @@ public class FeatureServiceImpl {
         ret.setFeatures(featuresPage.getContent());
         ret.setTotalCount((int) featuresPage.getTotalElements());
         addLinks(ret, featuresPage, sanitizeOffset(offset), sanitizeLimit(limit));
-        ResponseEntity<FeatureList> entity = new ResponseEntity<FeatureList>(ret, responseHeaders, HttpStatus.OK);
-        return entity;
+        return new ResponseEntity<>(ret, responseHeaders, HttpStatus.OK);
     }
 
 
     private Integer sanitizeLimit(Integer limit) {
-        return (limit == null ? DEFAULT_LIMIT: limit);
+        return limit == null ? DEFAULT_LIMIT : limit;
     }
 
     private Integer sanitizeOffset(Integer offset) {
-        return (offset == null ? DEFAULT_OFFSET: offset);
+        return offset == null ? DEFAULT_OFFSET : offset;
     }
 
     private String sanitizeQuery(String q) {
-        return (q == null ? null : q.trim());
+        return q == null ? null : q.trim();
     }
-
 
     private void addLinks(FeatureList features, FeaturesPage<?, Feature> page, Integer offset, Integer limit) {
         FeatureListLinks links = new FeatureListLinks();
@@ -107,8 +108,7 @@ public class FeatureServiceImpl {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
         responseHeaders.setLocation(uri);
-        ResponseEntity<Feature> entity = new ResponseEntity<Feature>(newFeature, responseHeaders, HttpStatus.CREATED);
-        return entity;
+        return new ResponseEntity<>(newFeature, responseHeaders, HttpStatus.CREATED);
     }
 
     private String getAuthenticatedUserName() {
@@ -121,12 +121,12 @@ public class FeatureServiceImpl {
         org.zalando.pazuzu.feature.Feature feature = featureService.getFeature(name, t -> t);
         Review newReview = featureService.updateFeature(feature.getName(), feature.getName(),
                 feature.getDescription(), feature.getAuthor(), feature.getSnippet(),
-                feature.getTestSnippet(), feature.getDependencies().stream().map(f -> f.getName()).collect(Collectors.toList()),
+                feature.getTestSnippet(), feature.getDependencies().stream().map(org.zalando.pazuzu.feature.Feature::getName).collect(Collectors.toList()),
                 FeatureStatus.fromJsonValue(review.getReviewStatus().name()),
                 FeatureConverter::asReviewDto);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
-        return new ResponseEntity<Review>(newReview, responseHeaders, HttpStatus.CREATED);
+        return new ResponseEntity<>(newReview, responseHeaders, HttpStatus.CREATED);
     }
 
     @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
@@ -134,7 +134,6 @@ public class FeatureServiceImpl {
         Feature feature = featureService.getFeature(name, FeatureConverter::asDto);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
-        ResponseEntity<Feature> entity = new ResponseEntity<Feature>(feature, responseHeaders, HttpStatus.OK);
-        return entity;
+        return new ResponseEntity<>(feature, responseHeaders, HttpStatus.OK);
     }
 }
