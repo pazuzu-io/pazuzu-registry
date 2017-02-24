@@ -1,7 +1,7 @@
 # pazuzu-registry
 ------------------------------------------------------------
 
-[![Build Status](https://travis-ci.org/zalando/pazuzu-registry.svg?branch=master)](https://travis-ci.org/zalando/pazuzu-registry)
+[![Build Status](https://travis-ci.org/zalando-incubator/pazuzu-registry.svg?branch=master)](https://travis-ci.org/zalando/pazuzu-registry)
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/018a3e5ab4bc4888aa785aa736e0aa6e)](https://www.codacy.com/app/pgronkiewicz/pazuzu-registry)
 [![Codacy Badge](https://api.codacy.com/project/badge/coverage/018a3e5ab4bc4888aa785aa736e0aa6e)](https://www.codacy.com/app/Pazuzu/pazuzu-registry)
 [![Stories in Ready](https://badge.waffle.io/zalando/pazuzu-registry.png?label=ready&title=Ready)](http://waffle.io/zalando/pazuzu-registry)
