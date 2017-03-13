@@ -50,7 +50,7 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
         ResponseEntity<DependenciesList> result = template.getForEntity(url(resolvedFeaturesUrl + "?names={name}"),
                 DependenciesList.class, NAME + "1," + NAME + 4);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-        List<Feature> resolvedFeature = result.getBody().getDepedencies();
+        List<Feature> resolvedFeature = result.getBody().getDependencies();
         assertThat(resolvedFeature.size()).isEqualTo(3);
         List<String> featureNames = (resolvedFeature).stream()
                 .map(this::featureToName)
@@ -69,7 +69,7 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
         ResponseEntity<DependenciesList> result = template.getForEntity(url(resolvedFeaturesUrl + "?names={name}"),
                 DependenciesList.class, NAME + "12," + NAME + 13);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-        List<String> featureNames = (result.getBody().getDepedencies()).stream()
+        List<String> featureNames = (result.getBody().getDependencies()).stream()
                 .map(this::featureToName)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -85,7 +85,7 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
         ResponseEntity<DependenciesList> result = template.getForEntity(url(resolvedFeaturesUrl + "?names={name}"),
                 DependenciesList.class, NAME.toUpperCase() + "11");
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-        List<String> featureNames = (result.getBody().getDepedencies()).stream()
+        List<String> featureNames = (result.getBody().getDependencies()).stream()
                 .map(this::featureToName)
                 .filter(Optional::isPresent)
                 .map(Optional::get)

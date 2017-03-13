@@ -37,7 +37,7 @@ public class DependenciesServiceImpl {
         responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
 
         DependenciesList ret = new DependenciesList();
-        ret.setDepedencies(features);
+        ret.setDependencies(features);
         ret.setRequestedFeatures(names);
 
         ResponseEntity<DependenciesList> entity = new ResponseEntity<DependenciesList>(ret, responseHeaders, HttpStatus.OK);
