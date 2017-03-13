@@ -235,7 +235,7 @@ definitions:
         type: array
         items:
           type: string
-      depedencies:
+      dependencies:
         description: Topologicaly sorted list of features resulting of the dependencies resolution.
         type: array
         items:
