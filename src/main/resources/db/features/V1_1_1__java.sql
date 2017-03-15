@@ -7,8 +7,7 @@ RUN apt-get update
 RUN echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections
 RUN echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections
 RUN apt-get update && apt-get install -y oracle-java8-installer
-RUN update-java-alternatives -s java-8-oracle', '#!/usr/bin/env bats
-
+RUN update-java-alternatives -s java-8-oracle', '
 @test "Check that Java is installed" {
     command java -version
 }');
