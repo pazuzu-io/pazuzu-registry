@@ -75,7 +75,8 @@ public class FeatureApiTest extends AbstractComponentTest {
         // when
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        ResponseEntity<Map<String, Object>> error = template.exchange(url(featuresUrl), POST, new HttpEntity<>("{json crap}", headers), new ParameterizedTypeReference<Map<String, Object>>() {});
+        ResponseEntity<Map<String, Object>> error = template.exchange(url(featuresUrl), POST, new HttpEntity<>("{json crap}", headers), new ParameterizedTypeReference<Map<String, Object>>() {
+        });
         // then
         assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(error.getBody())
@@ -138,7 +139,8 @@ public class FeatureApiTest extends AbstractComponentTest {
     @Test
     public void returnsNotFoundWhenTryingToRetrieveNonExistingFeature() throws Exception {
         // when
-        ResponseEntity<Map<String, Object>> result = template.exchange(url("/api/features/non_existing"), GET, null, new ParameterizedTypeReference<Map<String, Object>>() {});
+        ResponseEntity<Map<String, Object>> result = template.exchange(url("/api/features/non_existing"), GET, null, new ParameterizedTypeReference<Map<String, Object>>() {
+        });
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertEqualErrors(new FeatureNotFoundException("Feature missing: non_existing"), result.getBody());
@@ -172,7 +174,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         assertThat(jaResult.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(jaResult.getBody().getFeatures().size()).isEqualTo(2);
         assertThat(jaResult.getBody().getFeatures().stream().map(Feature::getMeta).map(FeatureMeta::getName))
-                .containsOnly("java", "java-node");
+                .containsOnly("java:1", "java-node:1");
         // when
         ResponseEntity<FeatureList> nodResult = template.exchange(url(featuresUrl + "?q=nod"),
                 GET, null, FeatureList.class);
@@ -180,7 +182,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         assertThat(nodResult.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(nodResult.getBody().getFeatures().size()).isEqualTo(3);
         assertThat(nodResult.getBody().getFeatures().stream().map(Feature::getMeta).map(FeatureMeta::getName))
-                .containsOnly("node", "java-node", "node-mongo");
+                .containsOnly("node:1", "java-node:1", "node-mongo:1");
     }
 
     @Test
@@ -283,7 +285,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         assertThat(jaResult.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(jaResult.getBody().getFeatures().size()).isEqualTo(2);
         assertThat(jaResult.getBody().getFeatures().stream().map(Feature::getMeta).map(FeatureMeta::getName))
-                .containsOnly("java", "java-node");
+                .containsOnly("java:1", "java-node:1");
     }
 
     @Test

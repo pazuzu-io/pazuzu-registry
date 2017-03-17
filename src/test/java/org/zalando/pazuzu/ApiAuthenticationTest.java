@@ -163,7 +163,7 @@ public class ApiAuthenticationTest extends AbstractComponentTest {
     private Feature createTestFeature() {
         Feature feature = new Feature();
         feature.setMeta(new FeatureMeta());
-        feature.getMeta().setName("test_feature");
+        feature.getMeta().setName("test_feature:1");
         return feature;
     }
 

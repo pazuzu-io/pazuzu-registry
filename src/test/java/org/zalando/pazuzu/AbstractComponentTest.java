@@ -32,7 +32,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment=WebEnvironment.RANDOM_PORT, classes=PazuzuAppLauncher.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = PazuzuAppLauncher.class)
 @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:cleanDatabase.sql")
 @ActiveProfiles("test")
 public abstract class AbstractComponentTest {
@@ -92,7 +92,7 @@ public abstract class AbstractComponentTest {
         dto.setSnippet(SNIPPET + id);
         dto.setTestSnippet(TEST_SNIPPET + id);
         dto.setMeta(new FeatureMeta());
-        dto.getMeta().setName(NAME + id);
+        dto.getMeta().setName(NAME + id + ":1");
         dto.getMeta().setDescription(DESCRIPTION + id);
         dto.getMeta().setAuthor(AUTHOR + id);
         dto.getMeta().setStatus(FeatureMeta.StatusEnum.pending);
@@ -119,7 +119,8 @@ public abstract class AbstractComponentTest {
     }
 
     protected ResponseEntity<Map<String, Object>> createFeatureError(Feature dto) throws JsonProcessingException {
-        return post(dto, new ParameterizedTypeReference<Map<String, Object>>() {});
+        return post(dto, new ParameterizedTypeReference<Map<String, Object>>() {
+        });
     }
 
     protected void assertEqualFeaturesIgnoreFixedProps(Feature expected, Feature actual) {
@@ -145,7 +146,7 @@ public abstract class AbstractComponentTest {
     protected Feature newFeature(String featureName) {
         Feature ret = new Feature();
         ret.setMeta(new FeatureMeta());
-        ret.getMeta().setName(featureName);
+        ret.getMeta().setName(featureName + ":1");
         return ret;
     }
 }

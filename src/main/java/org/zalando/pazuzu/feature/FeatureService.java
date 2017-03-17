@@ -57,8 +57,16 @@ public class FeatureService {
     }
 
     private void setFeatureName(String name, Feature feature) throws BadRequestException {
-        nameGuardCheck(name);
-        feature.setName(name);
+        NameVersion nameVersion = NameVersion.parse(name);
+
+        if (!nameVersion.version().isPresent()) {
+            throw new FeatureVersionEmptyException();
+        }
+
+        nameGuardCheck(nameVersion.name());
+
+        feature.setName(nameVersion.name());
+        nameVersion.version().ifPresent(feature::setVersion);
     }
 
     private void createDependencies(List<String> dependencyNames, Feature newFeature) {
@@ -113,7 +121,9 @@ public class FeatureService {
 
     @Transactional
     public <T> T getFeature(String featureName, Function<Feature, T> converter) throws ServiceException {
-        return converter.apply(loadExistingFeature(featureName));
+        return converter.apply(
+                loadLatestVersionOfFeature(featureName)
+                        .orElseThrow(() -> new FeatureNotFoundException("Feature missing: " + featureName)));
     }
 
     @Transactional(rollbackFor = ServiceException.class)
@@ -141,7 +151,7 @@ public class FeatureService {
                 predicates.add(builder.lower(root.get(Feature_.name)).in(uniqueFeatureNames));
             else
                 uniqueFeatureNames.stream().findFirst().map(fn ->
-                    predicates.add(builder.equal(builder.lower(root.get(Feature_.name)), fn))
+                        predicates.add(builder.equal(builder.lower(root.get(Feature_.name)), fn))
                 );
 
             return builder.and(predicates.toArray(new Predicate[predicates.size()]));
@@ -171,25 +181,26 @@ public class FeatureService {
 
     /**
      * Search feature base on give search criteria, ordered by name.
-     * @param name string the name should contains.
-     * @param author string the author should contains.
-     * @param status the status of the feature, if not present do no filter on status.
-     * @param offset the offset of the result list (must be present)
-     * @param limit the maximum size of the returned list (must be present)
+     *
+     * @param name      string the name should contains.
+     * @param author    string the author should contains.
+     * @param status    the status of the feature, if not present do no filter on status.
+     * @param offset    the offset of the result list (must be present)
+     * @param limit     the maximum size of the returned list (must be present)
      * @param converter the converter that will be used to map the feature to the expected result type
-     * @param <T> the list item result type
-     * @return paginated list of feature that match the search criteria with the totcal count.
+     * @param <T>       the list item result type
+     * @return paginated list of feature that match the search criteria with the total count.
      * @throws ServiceException
      */
     @Transactional
     public <T> FeaturesPage<Feature, T> searchFeatures(String name, String author, FeatureStatus status,
-                                              Integer offset, Integer limit,
-                                              Function<Feature, T> converter) throws ServiceException {
+                                                       Integer offset, Integer limit,
+                                                       Function<Feature, T> converter) throws ServiceException {
         Specification<Feature> spec = (root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (name != null) {
-                predicates.add(builder.like(builder.lower(root.get(Feature_.name)), escapeLike(name), '|' ));
+                predicates.add(builder.like(builder.lower(root.get(Feature_.name)), escapeLike(name), '|'));
             }
 
             if (author != null) {
@@ -231,4 +242,28 @@ public class FeatureService {
                 builder.equal(builder.lower(root.get(Feature_.name)), safeToLowerCase(featureName));
         return Optional.ofNullable((Feature) featureRepository.findOne(spec));
     }
+
+    /**
+     * First loads all features matching the specified name. Then if version is specified finds and returns the feature
+     * with that exact version. Otherwise returns the latest version of the feature.
+     */
+    private Optional<Feature> loadLatestVersionOfFeature(String name) {
+        NameVersion nameVersion = NameVersion.parse(name);
+
+        Specification<Feature> spec = (root, query, builder) ->
+                builder.equal(builder.lower(root.get(Feature_.name)), safeToLowerCase(nameVersion.name()));
+
+        List<Feature> features = featureRepository.findAll(spec);
+
+        if (nameVersion.version().isPresent()) {
+            return features.stream()
+                    .filter(f -> f.getVersion().equals(nameVersion.version().get()))
+                    .findAny();
+        } else {
+            return features.stream()
+                    .sorted(new FeatureComparator().reversed())
+                    .findFirst();
+        }
+    }
+
 }

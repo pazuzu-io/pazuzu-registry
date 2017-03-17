@@ -25,9 +25,6 @@ import org.zalando.pazuzu.model.Link;
 import org.zalando.pazuzu.model.Review;
 import org.zalando.pazuzu.security.Roles;
 
-/**
- * Created by hhueter on 16/01/2017.
- */
 @Service
 public class FeatureServiceImpl {
     public static final int DEFAULT_OFFSET = 0;

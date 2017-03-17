@@ -1,10 +1,16 @@
 package org.zalando.pazuzu.feature;
 
+import com.google.common.base.MoreObjects;
+
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"name", "version"})
+})
 public class Feature {
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -13,26 +19,38 @@ public class Feature {
             joinColumns = @JoinColumn(name = "feature_id", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "dependency_feature_id", nullable = false))
     private Set<Feature> dependencies;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "version", nullable = false)
+    private String version;
+
     @Column(name = "description")
     private String description;
+
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+
     @Column(name = "author", length = 256)
     private String author;
+
     @Column(name = "status", length = 256)
     @Enumerated(EnumType.STRING)
     private FeatureStatus status;
+
     @Column(name = "snippet")
     private String snippet;
+
     @Column(name = "test_snippet")
     private String testSnippet;
 
@@ -60,6 +78,15 @@ public class Feature {
 
     public Feature setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public Feature setVersion(String version) {
+        this.version = version;
         return this;
     }
 
@@ -145,7 +172,17 @@ public class Feature {
         }
 
         Feature other = (Feature) obj;
-        return this.getId() == other.getId(); // TODO (review) Is comparison with "==" intended?
+        return Objects.equals(this.getId(), other.getId());
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", this.id)
+                .add("name", this.name)
+                .add("version", this.version)
+                .omitNullValues()
+                .toString();
     }
 
     public boolean containsDependencyRecursively(Feature existing) {

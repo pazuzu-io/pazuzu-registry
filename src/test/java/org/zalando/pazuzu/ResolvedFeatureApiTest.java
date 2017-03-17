@@ -30,7 +30,8 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
     public void retrievingResolvedFeatureWithNonExistingNameShouldResultInError() throws Exception {
         // when
         ResponseEntity<Map<String, Object>> result = template.exchange(url(resolvedFeaturesUrl + "?names={name}"),
-                HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, Object>>() {}, NAME + 1);
+                HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, Object>>() {
+                }, NAME + 1);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(result.getBody()).containsOnly(
                 entry("type", "http://pazuzu.io/error/feature_not_found"),
@@ -57,7 +58,7 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
-        assertThat(featureNames).containsOnly(NAME + 1, NAME + 3, NAME + 4);
+        assertThat(featureNames).containsOnly(NAME + 1 + ":1", NAME + 3 + ":1", NAME + 4 + ":1");
 
     }
 
@@ -75,7 +76,7 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
                 .map(Optional::get)
                 .collect(Collectors.toList());
         assertThat(featureNames.size()).isEqualTo(3);
-        assertThat(featureNames).containsOnly(NAME + 11, NAME + 12, NAME + 13);
+        assertThat(featureNames).containsOnly(NAME + 11 + ":1", NAME + 12 + ":1", NAME + 13 + ":1");
 
     }
 
@@ -91,7 +92,7 @@ public class ResolvedFeatureApiTest extends AbstractComponentTest {
                 .map(Optional::get)
                 .collect(Collectors.toList());
         assertThat(featureNames.size()).isEqualTo(1);
-        assertThat(featureNames).containsOnly(NAME + 11);
+        assertThat(featureNames).containsOnly(NAME + 11 + ":1");
 
     }
 

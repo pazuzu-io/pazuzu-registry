@@ -44,7 +44,7 @@ public class FeatureConverter {
 
     public static FeatureMeta asMetaDto(org.zalando.pazuzu.feature.Feature feature) {
         FeatureMeta dto = new FeatureMeta();
-        dto.setName(feature.getName());
+        dto.setName(feature.getName() + ":" + feature.getVersion());
         dto.setDescription(feature.getDescription());
         dto.setAuthor(feature.getAuthor());
         dto.setUpdatedAt(dateFormat.get().format(feature.getUpdatedAt()));
@@ -58,6 +58,7 @@ public class FeatureConverter {
 
     /**
      * Return the feature converter for the provided feature fields.
+     *
      * @param featureFields the fields that should be return
      * @return the feature converter
      */

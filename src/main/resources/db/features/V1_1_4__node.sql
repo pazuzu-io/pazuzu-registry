@@ -1,5 +1,5 @@
 INSERT INTO FEATURE (NAME, VERSION, DESCRIPTION, CREATED_AT, UPDATED_AT, STATUS, AUTHOR, SNIPPET, TEST_SNIPPET) VALUES
-  ('node', '5.11.1', 'dummy node feature', now(), now(), 'APPROVED', 'Pazuzu team',
+  ('node', '6.0.0', 'dummy node feature', now(), now(), 'APPROVED', 'Pazuzu team',
 
   'RUN set -ex \
   && for key in \
@@ -16,7 +16,7 @@ INSERT INTO FEATURE (NAME, VERSION, DESCRIPTION, CREATED_AT, UPDATED_AT, STATUS,
   done
 
 ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 5.11.1
+ENV NODE_VERSION 6.0.0
 
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
   && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
