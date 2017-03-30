@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
-  title: Pazuzu registry
-  description: Generating Dockerfiles by sets of required functions.
+  title: Pazuzu Registry
+  description: A feature registry for customized Docker images
   version: "0.0.6"
 host: pazuzu.zalando.net
 basePath: /api
@@ -12,15 +12,13 @@ produces:
 paths:
   /dependencies:
     get:
-      summary: Topologicaly sorted list of features.
-      description: |
-        Returns the list of features topologicaly sorted base on the dependencies base on list of top features.
+      description: Returns the list of features topologically sorted based on the dependencies.
       tags:
         - Features
       parameters:
         - name: names
           in: query
-          description: Exact names of the features the call should return.
+          description: The exact names of the features the call should return.
           required: true
           type: array
           maxItems: 128
@@ -28,45 +26,44 @@ paths:
             type: string
       responses:
         200:
-          description: A list of features.
+          description: The request was successful.
           schema:
             $ref: '#/definitions/DependenciesList'
         default:
-          description: Unexpected error.
+          description: An unexpected error occurred.
           schema:
             $ref: '#/definitions/Error'
   /features:
     get:
-      summary: Get features.
-      description: Returns the features sorted by name.
+      description: Returns all features sorted by name.
       tags:
         - Features
       parameters:
         - name: q
           in: query
-          description: Part of the name of the features the call should return.
+          description: A part of the name of features to return.
           required: false
           type: string
         - name: author
           in: query
-          description: Name of the author of the returned features.
+          description: The name of the author of features to return.
           required: false
           type: string
         - name: fields
           in: query
-          description: The fields present in the response (JSON Field).
+          description: The JSON fields present in the response.
           required: false
           type: string
         - name: status
           in: query
-          description: Status of the features the call should return.
+          description: The status of features to return.
           required: false
           default: approved
           type: string
           enum:
-            - approved
-            - pending
-            - declined
+          - approved
+          - pending
+          - declined
         - name: offset
           in: query
           description: The offset to start from.
@@ -74,42 +71,44 @@ paths:
           type: integer
         - name: limit
           in: query
-          description: Maximum number of features to return.
+          description: The maximum number of features to return.
           required: false
           default: 50
           maximum: 1000
           type: integer
       responses:
         200:
-          description: A list of features.
+          description: The request was successful.
           schema:
             $ref: '#/definitions/FeatureList'
         default:
-          description: Unexpected error.
+          description: An unexpected error occurred.
           schema:
             $ref: '#/definitions/Error'
     post:
-        summary: Creates a new feature.
-        description: Creates a new feature with specified name, docker data, etc. Feature name is checked to be unique. status, author and created_at must not be filled.
-        tags:
-          - Features
-        parameters:
-          - name: feature
-            required: true
-            in: body
-            schema:
-              $ref: '#/definitions/Feature'
-        consumes:
-          - application/json
-        responses:
-          201:
-            description: Feature successfully created.
-            schema:
-              $ref: '#/definitions/Feature'
-          default:
-            description: Unexpected error.
-            schema:
-              $ref: '#/definitions/Error'
+      description: |
+        Creates a new feature with specified name, docker data, etc.
+        The name of the featureFeature name is checked to be unique.
+        The `status`, `author` and `created_at` fields of the feature's `meta` property must not be set.
+      tags:
+        - Features
+      parameters:
+        - name: feature
+          required: true
+          in: body
+          schema:
+            $ref: '#/definitions/Feature'
+      consumes:
+        - application/json
+      responses:
+        201:
+          description: The feature has been created successfully.
+          schema:
+            $ref: '#/definitions/Feature'
+        default:
+          description: An unexpected error occurred.
+          schema:
+            $ref: '#/definitions/Error'
   /features/{name}:
     parameters:
     - name: name
@@ -118,23 +117,21 @@ paths:
       required: true
       type: string
     get:
-      summary: Get single feature.
-      description: Returns all the feature data without its dependencies.
+      description: Returns a single feature without its dependencies.
       tags:
         - Features
       responses:
         200:
-          description: A single feature.
+          description: The request was successful.
           schema:
             $ref: '#/definitions/Feature'
         default:
-          description: Unexpected error.
+          description: An unexpected error occurred.
           schema:
             $ref: '#/definitions/Error'
   /features/{name}/reviews:
     post:
-      summary: Post a new review (approval or decline).
-      description: Creates a new review for this feature.
+      description: Creates a new review (approval or decline) for a feature.
       tags:
         - Features
       parameters:
@@ -152,11 +149,11 @@ paths:
         - application/json
       responses:
         201:
-          description: Review succesfully added.
+          description: The review has been created successfully.
           schema:
             $ref: '#/definitions/Review'
         default:
-          description: Unexpected error.
+          description: An unexpected error occurred.
           schema:
             $ref: '#/definitions/Error'
 definitions:
@@ -165,31 +162,31 @@ definitions:
     properties:
       name:
         type: string
-        description: Unique identifier representing a specific feature.
+        description: A unique identifier representing a specific feature.
       description:
         type: string
-        description: Description of the feature.
+        description: A description of the feature.
       author:
         type: string
-        description: Name of the feature author.
+        description: The name of the feature's author.
       status:
         type: string
-        description: Status of the feature.
+        description: The status of the feature.
         enum:
-          - approved
-          - declined
-          - pending
+        - approved
+        - declined
+        - pending
       updated_at:
         type: string
-        description: Last update date in ISO 8601 format.
+        description: The last update date in ISO 8601 format.
       created_at:
         type: string
-        description: Creation date in ISO 8601 format.
+        description: The creation date in ISO 8601 format.
       dependencies:
         type: array
         items:
           type: string
-        description: Array of feature names.
+        description: An array of feature names.
   Feature:
     type: object
     properties:
@@ -197,10 +194,10 @@ definitions:
         $ref: '#/definitions/FeatureMeta'
       snippet:
         type: string
-        description: Docker file part to be used with that feature.
+        description: The Dockerfile part to be used with that feature.
       test_snippet:
         type: string
-        description: How to test that feature is working.
+        description: How to test that the feature is working.
   FeatureList:
     type: object
     properties:
@@ -221,22 +218,22 @@ definitions:
   Review:
     type: object
     properties:
-      review-status:
+      review_status:
         type: string
-        description: Status of the review.
+        description: The status of the review.
         enum:
-          - approved
-          - declined
+        - approved
+        - declined
   DependenciesList:
     type: object
     properties:
       requested_features:
-        description: List of feature name for which dependencies have been requested.
+        description: A list of feature name for which dependencies have been requested.
         type: array
         items:
           type: string
       dependencies:
-        description: Topologicaly sorted list of features resulting of the dependencies resolution.
+        description: A topologically sorted list of features resulting from the dependencies resolution.
         type: array
         items:
           $ref: '#/definitions/Feature'
@@ -245,7 +242,7 @@ definitions:
     properties:
       href:
         type: string
-        description: The URL for the link.
+        description: The URL of the link.
   Error:
     type: object
     properties:
