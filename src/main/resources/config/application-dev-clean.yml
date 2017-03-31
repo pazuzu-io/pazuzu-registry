@@ -34,7 +34,7 @@ endpoints:
 pazuzu:
   registry:
     cors:
-      allowedOrigins: https://localhost:8080
+      allowedOrigins: '*'
 
 flyway:
   locations: ['classpath:db/migration']
