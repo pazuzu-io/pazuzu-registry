@@ -74,14 +74,12 @@ OAuth is enabled by default for production (prod profile) or optionally when a o
 
 ### Acquiring token for testing
 
-For testing purpose is convenient to acquire token from Zalando OAuth2 token server. This can be easily done using
-`zign` in order to install it follow this steps:
+For testing purpose is convenient to acquire a token from Zalando OAuth2 token server. This can be easily done using `ztoken`. In order to install it follow these steps:
 
 ```bash
-sudo pip3 install --upgrade stups
-sudo pip3 install --upgrade stups-zign
+sudo pip3 install -U stups
 stups configure stups.zalan.do
-zign token
+ztoken
 ```
 
 License
