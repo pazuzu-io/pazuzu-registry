@@ -62,6 +62,26 @@ scm-source
 docker build --tag <pierone_related_address>
 ```
 
+## Authentication
+
+### Enabling OAuth authentication
+
+OAuth is enabled by default for production (prod profile) or optionally when a oauth profile has been specified.
+
+```
+-Dspring.profiles.active=dev,oauth
+```
+
+### Acquiring token for testing
+
+For testing purpose is convenient to acquire a token from Zalando OAuth2 token server. This can be easily done using `ztoken`. In order to install it follow these steps:
+
+```bash
+sudo pip3 install -U stups
+stups configure stups.zalan.do
+ztoken
+```
+
 License
 -------
 
