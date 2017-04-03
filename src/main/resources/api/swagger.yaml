@@ -3,7 +3,8 @@ info:
   title: Pazuzu Registry
   description: A feature registry for customized Docker images
   version: "0.0.6"
-host: pazuzu.zalando.net
+# host: pazuzu.zalando.net
+host: localhost:8080
 basePath: /api
 schemes:
   - http
