@@ -1,0 +1,36 @@
+version: '2'
+services:
+  web:
+    extends:
+      file: docker-compose-base.yml
+      service: web
+    image: pierone.stups.zalan.do/mentoring/pazuzu-registry:352.80
+    links:
+    - db
+    environment:
+    - 'SPRING_APPLICATION_JSON={
+        "spring": {
+          "profiles": {
+            "active": "dev"
+          },
+          "datasource": {
+            "username": "postgres",
+            "url": "jdbc:postgresql://db:5432/postgres"
+          }
+        },
+        "pazuzu": {
+          "registry": {
+            "admins": "jnarloch"
+          }
+        }
+      }'
+  db:
+    image: registry.opensource.zalan.do/stups/postgres:9.4.5-1
+    ports:
+    - "5432:5432"
+    expose:
+    - "5432"
+    volumes:
+    - postgres-data:/var/lib/postgresql/data
+volumes:
+  postgres-data: {}
