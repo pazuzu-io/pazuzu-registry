@@ -55,40 +55,66 @@ java -jar target/pazuzu-registry.jar --spring.profiles.active=dev
 
 This starts the service on port [8080](http://localhost:8080). The `dev` profile uses an in-memory database which is populated with some initial features, but is not persisted when the service is shut down. The server can also be started with the `dev-clean` profile, if the pre-provisioned features are not needed.
 
-How to start the server locally (without OAuth)
------------------------------------------------
+## How to explore the service's API
+
+When the service is running its API specification is exposed under the [/api](http://localhost:8080/api) endpoint. This endpoint serves a JSON respresention of the Swagger file mentioned before.
+
+You can use [Swagger UI](http://swagger.io/swagger-ui/) to get a nice HTML rendering of the API specification. To do so, follow these steps:
+
+1. Open a new shell and clone the Swagger UI project next to `pazuzu-registry`.
+
 ```bash
-mvn clean install
-java -jar target/pazuzu-registry.jar --spring.profiles.active=dev
+git clone https://github.com/swagger-api/swagger-ui.git
 ```
 
-The server can also be started with the `dev-clean` profile. This profile 
-will start the application with a clean DB if the pre provisioned feature
-are not needed.
+2. Start a server that runs the Swagger UI.
 
-How to setup OSX environment
------------------------------
- * Install [docker toolbox](https://www.docker.com/products/docker-toolbox])
- * `docker-machine start`
- * `docker-machine env default`
- * eval or export result of env command to your .bashrc or .zshrc
- * `brew install python3` # in case if you have no python installed
- * `sudo pip3 install `--upgrade scm-source
- * `run scm_source`
-
-
-How a start the server locally in a container with Postgres storage
------------------------------------------------------------
-```
-docker-compose up -d
-```
-OSX devs : Note your host ip is on DOCKER_HOST env variable
-How to build Docker image for Stups infrastructure (Zalando related)
---------------------------------------------------------------------
 ```bash
-scm-source
-docker build --tag <pierone_related_address>
+cd swagger-ui/dist
+python -m SimpleHTTPServer 8000
 ```
+
+3. Visit [localhost:8000](http://localhost:8080), enter `http://localhost:8080/api` in the UI and hit the Explore button. You should now see an HTML page which explains the API.
+
+## How to run the service locally inside a Docker container
+
+* Install [Docker CE](https://docs.docker.com/engine/installation/) if not already done so.
+* Install [Docker Compose](https://docs.docker.com/compose/install/) if not already done so.
+* Install Python 3, Pip, and the `scm-source`, see below. For more information about `scm-source` visit [STUPS documentation](https://docs.stups.io/).
+
+To install Python 3 and Pip on macOS, run:
+
+```bash
+brew install python3
+```
+
+To install Python 3 and Pip on Ubuntu, run:
+
+```bash
+sudo apt-get install python3 python3-pip
+```
+
+To install `scm-source` on both macOS and Ubuntu, run:
+
+```bash
+sudo pip3 install -U scm-source
+```
+
+To build and run the Docker image locally, run:
+
+```bash
+scm-source # Generates a scm-source.json file required for STUPS deployment.
+docker-compose -f docker-compose-base.yml up
+```
+
+## How to run the service locally inside a Docker container with Postgres storage
+
+```bash
+scm-source # Generates a scm-source.json file required for STUPS deployment.
+docker-compose -f docker-compose.yml up
+```
+
+*THE FOLLOWING MATERIAL IS NOT YET UPDATED*
 
 ## Authentication
 
@@ -110,8 +136,7 @@ stups configure stups.zalan.do
 ztoken
 ```
 
-License
--------
+## License
 
 The MIT License (MIT)
 Copyright © 2016 Zalando SE, https://tech.zalando.com
