@@ -1,0 +1,24 @@
+version: '2'
+services:
+  web:
+    build: .
+    image: pierone.stups.zalan.do/mentoring/pazuzu-registry:354.81
+    ports:
+    - "8080:8080"
+    environment:
+      - 'SPRING_APPLICATION_JSON={
+            "spring": {
+                "profiles": {
+                    "active": "dev"
+                }
+            },
+            "datasource":{
+                "username": "postgres",
+                "url": "jdbc:postgresql://postgres-db:5432/postgres"
+            },
+            "pazuzu": {
+                "registry": {
+                    "admins": "jnarloch"
+                }
+            }
+        }'

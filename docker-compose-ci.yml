@@ -1,0 +1,16 @@
+version: '2'
+services:
+  web:
+    extends:
+      file: common.yml
+      service: web
+  postgres-db:
+    image: registry.opensource.zalan.do/stups/postgres:9.4.5-1
+    ports:
+    - "5432:5432"
+    expose:
+    - "5432"
+    volumes:
+    - postgres-data:/var/lib/postgresql/data
+volumes:
+  postgres-data: {}
