@@ -1,31 +1,59 @@
-# pazuzu-registry
-------------------------------------------------------------
+# Pazuzu Registry
 
 [![Build Status](https://travis-ci.org/zalando-incubator/pazuzu-registry.svg?branch=master)](https://travis-ci.org/zalando-incubator/pazuzu-registry)
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/018a3e5ab4bc4888aa785aa736e0aa6e)](https://www.codacy.com/app/pgronkiewicz/pazuzu-registry)
 [![Codacy Badge](https://api.codacy.com/project/badge/coverage/018a3e5ab4bc4888aa785aa736e0aa6e)](https://www.codacy.com/app/Pazuzu/pazuzu-registry)
 [![Stories in Ready](https://badge.waffle.io/zalando-incubator/pazuzu-registry.png?label=ready&title=Ready)](http://waffle.io/zalando-incubator/pazuzu-registry)
 
-What is Pazuzu?
----------------
-Pazuzu is a tool that builds Docker images from feature snippets, while 
-resolving all dependencies between them. One of the common use cases is 
-Continuous Integration environment, where jobs require specific tooling present 
-for building and testing. Pazuzu can significantly ease that process, by letting user 
-choose from a wide selection of predefined Dockerfile snippets that represent 
-those dependencies (e.g. Golang, Python, Android SDK, customized NPM installs). 
+## What is Pazuzu
 
-What is Pazuzu Registry?
-------------------------
-Pazuzu Registry is a central storage of features, together with their 
-dependencies and test cases. You can access it by command line and
-request your custom Dockerfile which you can pipe to Docker build
-command.
+Pazuzu is a tool that builds Docker images from feature snippets, while resolving all dependencies between them. One of the common use cases is Continuous Integration environment, where jobs require specific tooling present for building and testing. Pazuzu can significantly ease that process, by letting user choose from a wide selection of predefined Dockerfile snippets that represent those dependencies (e.g. Golang, Python, Android SDK, customized NPM installs).
 
-What is current stage?
-----------------------
-Project is still in early stages - this file will be updated to reflect the 
-progress and document usage and functionality
+The Pazuzu project is divided into three sub-projects:
+
+1. Pazuzu Registry
+2. [Pazuzu CLI](https://github.com/zalando-incubator/pazuzu)
+3. [Pazuzu UI](https://github.com/zalando-incubator/pazuzu-ui)
+
+## What is Pazuzu Registry
+
+Pazuzu Registry is a central storage of features. A feature basically consists of instructions to be included in a Dockerfile, a list of feature dependencies, and other metadata. The registry is accessable via REST API.
+
+## What is the status of the project
+
+The basic functionality is already implemented. However, work has to be done cleaning up things, resolving issues, and writing documentation. Feel free to provide pull requests to support this effort.
+
+## How to build
+
+Clone the repository and change into the project directory. Then build the project via Maven.
+
+```bash
+git clone https://github.com/zalando-incubator/pazuzu-registry.git
+cd pazuzu-registry
+mvn package
+```
+
+The build does three things:
+
+1. It generates Java code from an [Open API](https://www.openapis.org/) definition file, also called [Swagger](http://swagger.io/) file, which is located in `src/main/resources/api/swagger.yaml`. The generated source code can be found in `target/generated-sources/swagger-codegen`.
+
+2. It compiles the Java sources.
+
+3. It builds an executable jar file which contains everything to run the service.
+
+For subsequent builds which require a cleanup of previous build artifacts, you can run:
+
+```bash
+mvn clean package
+```
+
+## How to run the service locally
+
+```bash
+java -jar target/pazuzu-registry.jar --spring.profiles.active=dev
+```
+
+This starts the service on port [8080](http://localhost:8080). The `dev` profile uses an in-memory database which is populated with some initial features, but is not persisted when the service is shut down. The server can also be started with the `dev-clean` profile, if the pre-provisioned features are not needed.
 
 How to start the server locally (without OAuth)
 -----------------------------------------------
