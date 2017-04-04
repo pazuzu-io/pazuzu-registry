@@ -2,7 +2,7 @@ version: '2'
 services:
   web:
     extends:
-      file: common.yml
+      file: docker-compose-common.yml
       service: web
     environment:
       - 'SPRING_APPLICATION_JSON={
