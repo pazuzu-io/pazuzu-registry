@@ -2,7 +2,7 @@ version: '2'
 services:
   web:
     extends:
-      file: common.yml
+      file: docker-compose-common.yml
       service: web
   postgres-db:
     image: registry.opensource.zalan.do/stups/postgres:9.4.5-1
