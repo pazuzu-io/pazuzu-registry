@@ -1,0 +1,24 @@
+version: '2'
+services:
+  web:
+    extends:
+      file: common.yml
+      service: web
+    environment:
+      - 'SPRING_APPLICATION_JSON={
+          "spring": {
+          "profiles": {
+            "active": "dev"
+          },
+        }
+        "datasource":{
+          "username": "postgres",
+          "url": "jdbc:postgresql://postgres-db:5432/postgres"
+          }
+        },
+        "pazuzu": {
+          "registry": {
+            "admins": "jnarloch"
+            }
+          }
+        }'
