@@ -47,7 +47,7 @@ For subsequent builds which require a cleanup of previous build artifacts, you c
 mvn clean package
 ```
 
-## How to run the service locally
+## Running the service locally with in-memory storage
 
 ```bash
 java -jar target/pazuzu-registry.jar --spring.profiles.active=dev
@@ -55,7 +55,7 @@ java -jar target/pazuzu-registry.jar --spring.profiles.active=dev
 
 This starts the service on port [8080](http://localhost:8080). The `dev` profile uses an in-memory database which is populated with some initial features, but is not persisted when the service is shut down. The server can also be started with the `dev-clean` profile, if the pre-provisioned features are not needed.
 
-## How to explore the service's API
+## Exploring the service's API with Swagger UI
 
 When the service is running its API specification is exposed under the [/api](http://localhost:8080/api) endpoint. This endpoint serves a JSON respresention of the Swagger file mentioned before.
 
@@ -76,7 +76,7 @@ python -m SimpleHTTPServer 8000
 
 3. Visit [localhost:8000](http://localhost:8080), enter `http://localhost:8080/api` in the UI and hit the Explore button. You should now see an HTML page which explains the API.
 
-## How to run the service locally inside a Docker container
+## Running the service locally inside a Docker container
 
 * Install [Docker CE](https://docs.docker.com/engine/installation/) if not already done so.
 * Install [Docker Compose](https://docs.docker.com/compose/install/) if not already done so.
@@ -107,11 +107,35 @@ scm-source # Generates a scm-source.json file required for STUPS deployment.
 docker-compose -f docker-compose-base.yml up
 ```
 
-## How to run the service locally inside a Docker container with Postgres storage
+## Running the service locally in a Docker container with Postgres storage
 
 ```bash
-scm-source # Generates a scm-source.json file required for STUPS deployment.
-docker-compose -f docker-compose.yml up
+scm-source
+# Generates a scm-source.json file required for STUPS deployment.
+
+docker-compose -f docker-compose.yml up -d
+# Builds the container and runs it in the background.
+```
+
+To check if the container is up and running, execute:
+
+```bash
+docker-compose ps
+```
+
+The output should look something like this:
+
+```bash
+        Name                      Command               State           Ports
+--------------------------------------------------------------------------------------
+pazuzuregistry_db_1    /docker-entrypoint.sh postgres   Up      0.0.0.0:5432->5432/tcp
+pazuzuregistry_web_1   /bin/sh -c java $JAVA_OPTS ...   Up      0.0.0.0:8080->8080/tcp
+```
+
+To stutdown the service gracefully, without removing it, run:
+
+```bash
+docker-compose stop
 ```
 
 *THE FOLLOWING MATERIAL IS NOT YET UPDATED*
