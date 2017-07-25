@@ -1,9 +1,9 @@
 # Pazuzu Registry
 
-[![Build Status](https://travis-ci.org/zalando-incubator/pazuzu-registry.svg?branch=master)](https://travis-ci.org/zalando-incubator/pazuzu-registry)
+[![Build Status](https://travis-ci.org/pazuzu-io/pazuzu-registry.svg?branch=master)](https://travis-ci.org/pazuzu-io/pazuzu-registry)
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/018a3e5ab4bc4888aa785aa736e0aa6e)](https://www.codacy.com/app/pgronkiewicz/pazuzu-registry)
 [![Codacy Badge](https://api.codacy.com/project/badge/coverage/018a3e5ab4bc4888aa785aa736e0aa6e)](https://www.codacy.com/app/Pazuzu/pazuzu-registry)
-[![Stories in Ready](https://badge.waffle.io/zalando-incubator/pazuzu-registry.png?label=ready&title=Ready)](http://waffle.io/zalando-incubator/pazuzu-registry)
+[![Stories in Ready](https://badge.waffle.io/pazuzu-io/pazuzu-registry.png?label=ready&title=Ready)](http://waffle.io/pazuzu-io/pazuzu-registry)
 
 ## What is Pazuzu
 
@@ -12,8 +12,8 @@ Pazuzu is a tool that builds Docker images from feature snippets, while resolvin
 The Pazuzu project is divided into three sub-projects:
 
 1. Pazuzu Registry
-2. [Pazuzu CLI](https://github.com/zalando-incubator/pazuzu)
-3. [Pazuzu UI](https://github.com/zalando-incubator/pazuzu-ui)
+2. [Pazuzu CLI](https://github.com/pazuzu-io/pazuzu)
+3. [Pazuzu UI](https://github.com/pazuzu-io/pazuzu-ui)
 
 ## What is Pazuzu Registry
 
@@ -28,7 +28,7 @@ The basic functionality is already implemented. However, work has to be done cle
 Clone the repository and change into the project directory. Then build the project via Maven.
 
 ```bash
-git clone https://github.com/zalando-incubator/pazuzu-registry.git
+git clone https://github.com/pazuzu-io/pazuzu-registry.git
 cd pazuzu-registry
 mvn package
 ```
@@ -150,15 +150,6 @@ OAuth is enabled by default for production (prod profile) or optionally when a o
 -Dspring.profiles.active=dev,oauth
 ```
 
-### Acquiring token for testing
-
-For testing purpose is convenient to acquire a token from Zalando OAuth2 token server. This can be easily done using `ztoken`. In order to install it follow these steps:
-
-```bash
-sudo pip3 install -U stups
-stups configure stups.zalan.do
-ztoken
-```
 
 ## License
 

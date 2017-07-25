@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.zalando.pazuzu</groupId>
+    <groupId>io.pazuzu</groupId>
     <artifactId>pazuzu-registry</artifactId>
     <version>1.1.2-SNAPSHOT</version>
 
@@ -180,8 +180,8 @@
                 <configuration>
                     <apiFile>${project.basedir}/src/main/resources/api/swagger.yaml</apiFile>
                     <language>springinterfacesResponseEntityNoSwaggerAnnotations</language>
-                    <apiPackage>org.zalando.pazuzu.api</apiPackage>
-                    <modelPackage>org.zalando.pazuzu.model</modelPackage>
+                    <apiPackage>io.pazuzu.registry.api</apiPackage>
+                    <modelPackage>io.pazuzu.registry.model</modelPackage>
                 </configuration>
                 <executions>
                     <execution>
