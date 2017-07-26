@@ -5,8 +5,8 @@ approvals:
   pattern: "^(:\\+1:|👍)$"
   from:
     # commenter must be either one of:
-    # a public zalando org member
+    # a public Pazuzu org member
     orgs:
-      - zalando
+      - pazuzu-io
     # a collaborator of the repo
     collaborators: true
