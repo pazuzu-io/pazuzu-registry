@@ -20,7 +20,7 @@ services:
         },
         "pazuzu": {
           "registry": {
-            "admins": "jnarloch"
+            "admins": "test"
           }
         }
       }'

@@ -61,7 +61,8 @@ public class OAuthConfiguration extends ResourceServerConfigurerAdapter {
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .antMatchers("/api/health").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/**").permitAll()
-                .antMatchers("/api/**").access("#oauth2.hasScope('uid')")
+                .antMatchers("/api/**").permitAll()
+                //FIXME: disabled oauth
                 .anyRequest().permitAll();
         // @formatter:on
     }
