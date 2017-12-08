@@ -22,11 +22,14 @@ spring:
     hibernate:
       ddl-auto: validate
 
+management:
+  context-path: /_manage
+  port: 8081
+
 endpoints:
   enabled: false
   health:
     enabled: true
-    path: /api/health
 
 server:
   use-forward-headers: true

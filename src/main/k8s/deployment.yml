@@ -1,0 +1,61 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: pazuzu-registry
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+        maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: pazuzu-registry
+    spec:
+      containers:
+      - name: pazuzu-registry
+        image: $DOCKER_IMAGE_NAME
+        ports:
+        - containerPort: 8080
+        - containerPort: 8081
+        env:
+        - name: DBURL
+          value: "jdbc:postgresql://localhost:5432/pazuzu-registry"
+        - name: DBUSER
+          value: "postgres"
+        - name: DBPASSWORD
+          value: #This can be blank due to postgres trust, no pwd required when communicating over localhost
+        readinessProbe:
+          httpGet:
+            path: /_manage/health
+            port: 8081
+          initialDelaySeconds: 45
+          timeoutSeconds: 3
+        livenessProbe:
+          httpGet:
+            path: /_manage/health
+            port: 8081
+          initialDelaySeconds: 120
+          timeoutSeconds: 3
+      - name: db
+        image: postgres:9.4.15-alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: "pazuzu-registry"
+        resources:
+          # The resource limits/requests given here are EXAMPLE VALUES!
+          # The values were chosen to be appropriate for this template project,
+          # and will likely not be appropriate for a productive application.
+          # Please adapt them to your project's requirements.
+          # For documentation, refer to https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+          limits:
+            # no cpu limit
+            memory: "1000Mi"
+          requests:
+            cpu: "50m"
+            memory: "1000Mi"
+      imagePullSecrets:
+      - name: quay.io
