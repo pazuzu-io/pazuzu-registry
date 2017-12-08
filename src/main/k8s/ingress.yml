@@ -1,0 +1,17 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: $HOST_NAME_PREFIX.$DOCKER_IMAGE_REPO
+spec:
+  backend:
+    serviceName: pazuzu-registry
+    servicePort: 8080
+  rules:
+    - host: $K8S_SERVICE_HOSTNAME
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: pazuzu-registry
+              servicePort: 8080

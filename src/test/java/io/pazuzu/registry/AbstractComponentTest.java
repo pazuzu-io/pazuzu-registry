@@ -32,7 +32,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment=WebEnvironment.RANDOM_PORT, classes=PazuzuAppLauncher.class)
+// Required due to https://github.com/spring-projects/spring-boot/issues/4424
+@SpringBootTest(properties = {"management.port=0"}, webEnvironment=WebEnvironment.RANDOM_PORT, classes=PazuzuAppLauncher.class)
 @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:cleanDatabase.sql")
 @ActiveProfiles("test")
 public abstract class AbstractComponentTest {
@@ -46,10 +47,12 @@ public abstract class AbstractComponentTest {
     protected final TestRestTemplate template = new TestRestTemplate();
     protected final ObjectMapper mapper = new ObjectMapper();
     @Value("${local.server.port}")
-    private int port;
+    private int webPort;
+    @Value("${local.management.port}")
+    private int managementPort;
 
     protected String url(String... paths) {
-        return "http://127.0.0.1:" + port + Strings.join(paths).with("/");
+        return "http://127.0.0.1:" + webPort + Strings.join(paths).with("/");
     }
 
     protected HttpHeaders contentType(MediaType contentType) {

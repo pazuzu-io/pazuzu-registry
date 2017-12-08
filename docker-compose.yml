@@ -25,7 +25,7 @@ services:
         }
       }'
   db:
-    image: registry.opensource.zalan.do/stups/postgres:9.4.5-1
+    image: postgres:9.4.15-alpine
     ports:
     - "5432:5432"
     expose:
