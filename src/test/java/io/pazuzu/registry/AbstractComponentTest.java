@@ -1,14 +1,12 @@
 package io.pazuzu.registry;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
-import static org.springframework.http.HttpMethod.POST;
-
-import java.util.Arrays;
-import java.util.Map;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.pazuzu.registry.assertion.RestTemplateAssert;
 import io.pazuzu.registry.exception.ServiceException;
+import io.pazuzu.registry.model.Feature;
+import io.pazuzu.registry.model.FeatureMeta;
+import io.pazuzu.registry.model.Review;
 import org.assertj.core.util.Strings;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,24 +14,23 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
-import io.pazuzu.registry.model.Feature;
-import io.pazuzu.registry.model.FeatureMeta;
-import io.pazuzu.registry.model.Review;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+import static org.springframework.http.HttpMethod.POST;
 
 @RunWith(SpringRunner.class)
 // Required due to https://github.com/spring-projects/spring-boot/issues/4424
-@SpringBootTest(properties = {"management.port=0"}, webEnvironment=WebEnvironment.RANDOM_PORT, classes=PazuzuAppLauncher.class)
+@SpringBootTest(properties = {"management.port=0"}, webEnvironment = WebEnvironment.RANDOM_PORT, classes = PazuzuAppLauncher.class)
 @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:cleanDatabase.sql")
 @ActiveProfiles("test")
 public abstract class AbstractComponentTest {
@@ -94,11 +91,11 @@ public abstract class AbstractComponentTest {
         Feature dto = new Feature();
         dto.setSnippet(SNIPPET + id);
         dto.setTestSnippet(TEST_SNIPPET + id);
-        dto.setMeta(new FeatureMeta());
+        dto.setMeta(new FeatureMeta("name", "description", "author", FeatureMeta.FeatureStatus.approved, new Date(), new Date(), new ArrayList<>()));
         dto.getMeta().setName(NAME + id);
         dto.getMeta().setDescription(DESCRIPTION + id);
         dto.getMeta().setAuthor(AUTHOR + id);
-        dto.getMeta().setStatus(FeatureMeta.StatusEnum.pending);
+        dto.getMeta().setStatus(FeatureMeta.FeatureStatus.pending);
         Arrays.stream(dependencies).mapToObj(i -> NAME + i).forEach(dto.getMeta().getDependencies()::add);
         return dto;
     }
@@ -113,7 +110,7 @@ public abstract class AbstractComponentTest {
         ResponseEntity<Feature> creationResponse = createFeature(dto);
         Feature feature = creationResponse.getBody();
         Review review = new Review();
-        review.setReviewStatus(Review.ReviewStatusEnum.approved);
+        review.setReviewStatus(Review.ReviewStatus.approved);
         put(feature.getMeta().getName(), review);
     }
 
@@ -122,7 +119,8 @@ public abstract class AbstractComponentTest {
     }
 
     protected ResponseEntity<Map<String, Object>> createFeatureError(Feature dto) throws JsonProcessingException {
-        return post(dto, new ParameterizedTypeReference<Map<String, Object>>() {});
+        return post(dto, new ParameterizedTypeReference<Map<String, Object>>() {
+        });
     }
 
     protected void assertEqualFeaturesIgnoreFixedProps(Feature expected, Feature actual) {
@@ -147,7 +145,7 @@ public abstract class AbstractComponentTest {
 
     protected Feature newFeature(String featureName) {
         Feature ret = new Feature();
-        ret.setMeta(new FeatureMeta());
+        ret.setMeta(new FeatureMeta("name", "description", "author", FeatureMeta.FeatureStatus.approved, new Date(), new Date(), new ArrayList<>()));
         ret.getMeta().setName(featureName);
         return ret;
     }

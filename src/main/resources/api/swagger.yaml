@@ -1,8 +1,8 @@
 swagger: '2.0'
 info:
   title: Pazuzu Registry
-  description: A feature registry for customized Docker images
-  version: "0.0.6"
+  description: A feature registry for constructing various file formats.
+  version: "0.1"
 host: localhost:8080
 basePath: /api
 schemes:
@@ -178,9 +178,11 @@ definitions:
         - pending
       updated_at:
         type: string
+        format: date-time
         description: The last update date in ISO 8601 format.
       created_at:
         type: string
+        format: date-time
         description: The creation date in ISO 8601 format.
       dependencies:
         type: array

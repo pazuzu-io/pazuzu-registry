@@ -1,15 +1,9 @@
 package io.pazuzu.registry.api;
 
-import java.net.URI;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import javax.annotation.security.RolesAllowed;
-
 import io.pazuzu.registry.feature.FeatureService;
 import io.pazuzu.registry.feature.FeatureStatus;
 import io.pazuzu.registry.feature.FeaturesPage;
-import io.pazuzu.registry.security.Roles;
+import io.pazuzu.registry.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,30 +12,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import io.pazuzu.registry.model.Feature;
-import io.pazuzu.registry.model.FeatureList;
-import io.pazuzu.registry.model.FeatureListLinks;
-import io.pazuzu.registry.model.FeatureMeta;
-import io.pazuzu.registry.model.Link;
-import io.pazuzu.registry.model.Review;
 
-/**
- * Created by hhueter on 16/01/2017.
- */
+import java.net.URI;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+
 @Service
-public class FeatureServiceImpl {
+public class FeatureApiService {
     public static final int DEFAULT_OFFSET = 0;
     private static final Integer DEFAULT_LIMIT = 50;
     private final FeatureService featureService;
 
 
     @Autowired
-    public FeatureServiceImpl(FeatureService featureService) {
+    public FeatureApiService(FeatureService featureService) {
         this.featureService = featureService;
     }
 
-    @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
-    public ResponseEntity<FeatureList> featuresGet(String q, String author, String fields, String status, Integer offset, Integer limit) {
+    public ResponseEntity<FeatureList> listFeatures(String q, String author, String fields, String status, Integer offset, Integer limit) {
         //TODO add validation base on role.
         //TODO add limitation of author if non admin and asking for non approved feature
         FeatureStatus featureStatus = (status == null)
@@ -95,9 +84,7 @@ public class FeatureServiceImpl {
         features.setLinks(links);
     }
 
-
-    @RolesAllowed({Roles.USER})
-    public ResponseEntity<Feature> featuresPost(Feature feature) {
+    public ResponseEntity<Feature> createFeature(Feature feature) {
         if (feature.getMeta() == null)
             feature.setMeta(new FeatureMeta());
         ServletUriComponentsBuilder servletUriComponentsBuilder = ServletUriComponentsBuilder.fromCurrentContextPath();
@@ -116,8 +103,7 @@ public class FeatureServiceImpl {
                 SecurityContextHolder.getContext().getAuthentication().getName() : "anonymous";
     }
 
-    @RolesAllowed({Roles.USER})
-    public ResponseEntity<Review> featuresNameReviewsPost(String name, Review review) {
+    public ResponseEntity<Review> reviewFeature(String name, Review review) {
         io.pazuzu.registry.feature.Feature feature = featureService.getFeature(name, t -> t);
         Review newReview = featureService.updateFeature(feature.getName(), feature.getName(),
                 feature.getDescription(), feature.getAuthor(), feature.getSnippet(),
@@ -129,8 +115,7 @@ public class FeatureServiceImpl {
         return new ResponseEntity<>(newReview, responseHeaders, HttpStatus.CREATED);
     }
 
-    @RolesAllowed({Roles.ANONYMOUS, Roles.USER})
-    public ResponseEntity<Feature> featuresNameGet(String name) {
+    public ResponseEntity<Feature> getFeature(String name) {
         Feature feature = featureService.getFeature(name, FeatureConverter::asDto);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());

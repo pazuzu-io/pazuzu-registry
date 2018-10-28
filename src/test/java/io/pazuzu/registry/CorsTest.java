@@ -3,7 +3,7 @@ package io.pazuzu.registry;
 import org.junit.Test;
 import org.springframework.http.*;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CorsTest extends AbstractComponentTest {
 

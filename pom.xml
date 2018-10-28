@@ -5,22 +5,17 @@
 
     <groupId>io.pazuzu</groupId>
     <artifactId>pazuzu-registry</artifactId>
-    <version>1.1.2-SNAPSHOT</version>
-
-    <parent>
-        <groupId>org.zalando.stups.build</groupId>
-        <artifactId>stups-parent</artifactId>
-        <version>7</version>
-        <relativePath />
-    </parent>
+    <version>0.1-SNAPSHOT</version>
 
     <properties>
         <java.version>1.8</java.version>
         <java.source>1.8</java.source>
         <java.target>1.8</java.target>
-        <mockito.version>1.9.5</mockito.version>
-        <spring-boot.version>1.5.1.RELEASE</spring-boot.version>
-        <problem-spring-web.version>0.11.0</problem-spring-web.version>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <mockito.version>1.10.19</mockito.version>
+        <spring-boot.version>2.0.6.RELEASE</spring-boot.version>
+        <problem-spring-web.version>0.22.0</problem-spring-web.version>
     </properties>
 
     <dependencyManagement>
@@ -29,7 +24,7 @@
                 <!-- Import dependency management from Spring Boot -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>1.5.4.RELEASE</version>
+                <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -38,8 +33,23 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.zalando</groupId>
+            <artifactId>twintip-spring-web</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security.oauth.boot</groupId>
+            <artifactId>spring-security-oauth2-autoconfigure</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
             <version>${spring-boot.version}</version>
         </dependency>
         <dependency>
@@ -83,29 +93,9 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.zalando.stups</groupId>
-            <artifactId>spring-boot-zalando-stups-tokens</artifactId>
-            <version>0.9.11</version>
-        </dependency>
-        <dependency>
-            <groupId>org.zalando.stups</groupId>
-            <artifactId>stups-spring-oauth2-server</artifactId>
-            <version>1.0.11</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.5.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.zalando.zauth</groupId>
-            <artifactId>spring-social-zauth</artifactId>
-            <version>0.10.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.zalando</groupId>
-            <artifactId>twintip-spring-web</artifactId>
-            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -170,27 +160,6 @@
                 <configuration>
                     <argLine>${surefireArgLine}</argLine>
                 </configuration>
-            </plugin>
-
-            <!-- Generate REST default interface from Swagger spec -->
-            <plugin>
-                <groupId>org.zalando.maven.plugins</groupId>
-                <artifactId>swagger-codegen-maven-plugin</artifactId>
-                <version>0.4.34</version>
-                <configuration>
-                    <apiFile>${project.basedir}/src/main/resources/api/swagger.yaml</apiFile>
-                    <language>springinterfacesResponseEntityNoSwaggerAnnotations</language>
-                    <apiPackage>io.pazuzu.registry.api</apiPackage>
-                    <modelPackage>io.pazuzu.registry.model</modelPackage>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>swagger-codegen</id>
-                        <goals>
-                            <goal>codegen</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <!-- For code coverage -->

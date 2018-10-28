@@ -1,32 +1,27 @@
 package io.pazuzu.registry;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
-import static org.assertj.core.api.Fail.fail;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static io.pazuzu.registry.assertion.RestTemplateAssert.assertCreated;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import io.pazuzu.registry.exception.FeatureDuplicateException;
+import io.pazuzu.registry.exception.FeatureNameEmptyException;
+import io.pazuzu.registry.exception.FeatureNotFoundException;
+import io.pazuzu.registry.model.Feature;
+import io.pazuzu.registry.model.FeatureList;
+import io.pazuzu.registry.model.FeatureMeta;
+import io.pazuzu.registry.model.Review;
+import org.junit.Test;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 
 import java.net.URI;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-import io.pazuzu.registry.exception.FeatureDuplicateException;
-import io.pazuzu.registry.exception.FeatureNameEmptyException;
-import io.pazuzu.registry.exception.FeatureNotFoundException;
-import org.junit.Test;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import io.pazuzu.registry.model.Feature;
-import io.pazuzu.registry.model.FeatureList;
-import io.pazuzu.registry.model.FeatureMeta;
-import io.pazuzu.registry.model.Review;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static io.pazuzu.registry.assertion.RestTemplateAssert.assertCreated;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Fail.fail;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 
 public class FeatureApiTest extends AbstractComponentTest {
 
@@ -51,7 +46,8 @@ public class FeatureApiTest extends AbstractComponentTest {
     @Test
     public void createFeatureShouldFailOnWrongNameNull() throws Exception {
         // when
-        Feature feature = new Feature();
+
+        Feature feature = newFeature("");
         feature.setSnippet(SNIPPET + 1);
         final ResponseEntity<Map<String, Object>> error = createFeatureError(feature);
         // then
@@ -75,7 +71,8 @@ public class FeatureApiTest extends AbstractComponentTest {
         // when
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        ResponseEntity<Map<String, Object>> error = template.exchange(url(featuresUrl), POST, new HttpEntity<>("{json crap}", headers), new ParameterizedTypeReference<Map<String, Object>>() {});
+        ResponseEntity<Map<String, Object>> error = template.exchange(url(featuresUrl), POST, new HttpEntity<>("{json crap}", headers), new ParameterizedTypeReference<Map<String, Object>>() {
+        });
         // then
         assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(error.getBody())
@@ -102,7 +99,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         ResponseEntity<Feature> result = template.getForEntity(createdResult.getHeaders().getLocation(), Feature.class);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         // then
-        assertThat(result.getBody().getMeta().getStatus()).isEqualTo(FeatureMeta.StatusEnum.pending);
+        assertThat(result.getBody().getMeta().getStatus()).isEqualTo(FeatureMeta.FeatureStatus.pending);
     }
 
     @Test
@@ -138,7 +135,8 @@ public class FeatureApiTest extends AbstractComponentTest {
     @Test
     public void returnsNotFoundWhenTryingToRetrieveNonExistingFeature() throws Exception {
         // when
-        ResponseEntity<Map<String, Object>> result = template.exchange(url("/api/features/non_existing"), GET, null, new ParameterizedTypeReference<Map<String, Object>>() {});
+        ResponseEntity<Map<String, Object>> result = template.exchange(url("/api/features/non_existing"), GET, null, new ParameterizedTypeReference<Map<String, Object>>() {
+        });
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertEqualErrors(new FeatureNotFoundException("Feature missing: non_existing"), result.getBody());
@@ -293,7 +291,7 @@ public class FeatureApiTest extends AbstractComponentTest {
 
         //when
         Review review = new Review();
-        review.setReviewStatus(Review.ReviewStatusEnum.approved);
+        review.setReviewStatus(Review.ReviewStatus.approved);
         ResponseEntity<Review> exchange = template.exchange(url(featuresUrl, "test", "reviews"),
                 POST, new HttpEntity<>(review), Review.class);
 
@@ -301,7 +299,7 @@ public class FeatureApiTest extends AbstractComponentTest {
         assertCreated(exchange);
 
         ResponseEntity<Feature> result = template.getForEntity(createdResult.getHeaders().getLocation(), Feature.class);
-        assertThat(result.getBody().getMeta().getStatus()).isEqualTo(FeatureMeta.StatusEnum.approved);
+        assertThat(result.getBody().getMeta().getStatus()).isEqualTo(FeatureMeta.FeatureStatus.approved);
     }
 
     @Test
@@ -311,7 +309,7 @@ public class FeatureApiTest extends AbstractComponentTest {
 
         //when
         Review review = new Review();
-        review.setReviewStatus(Review.ReviewStatusEnum.declined);
+        review.setReviewStatus(Review.ReviewStatus.declined);
         ResponseEntity<Review> exchange = template.exchange(url(featuresUrl, "test", "reviews"),
                 POST, new HttpEntity<>(review), Review.class);
 
@@ -319,6 +317,6 @@ public class FeatureApiTest extends AbstractComponentTest {
         assertCreated(exchange);
 
         ResponseEntity<Feature> result = template.getForEntity(createdResult.getHeaders().getLocation(), Feature.class);
-        assertThat(result.getBody().getMeta().getStatus()).isEqualTo(FeatureMeta.StatusEnum.declined);
+        assertThat(result.getBody().getMeta().getStatus()).isEqualTo(FeatureMeta.FeatureStatus.declined);
     }
 }

@@ -10,10 +10,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import io.pazuzu.registry.exception.*;
 
 import javax.persistence.criteria.Predicate;
-import javax.ws.rs.BadRequestException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -57,7 +55,7 @@ public class FeatureService {
         return converter.apply(newFeature);
     }
 
-    private void setFeatureName(String name, Feature feature) throws BadRequestException {
+    private void setFeatureName(String name, Feature feature) throws ServiceException {
         nameGuardCheck(name);
         feature.setName(name);
     }
@@ -68,7 +66,7 @@ public class FeatureService {
         newFeature.setDependencies(dependencies);
     }
 
-    private void nameGuardCheck(String name) throws BadRequestException {
+    private void nameGuardCheck(String name) throws ServiceException {
         if (StringUtils.isEmpty(name)) {
             throw new FeatureNameEmptyException();
         }
@@ -133,8 +131,7 @@ public class FeatureService {
         if (featureNames == null || featureNames.isEmpty())
             return Collections.emptySet();  // no need to go to database for this
 
-        final Set<String> uniqueFeatureNames = new HashSet<>(
-                featureNames.stream().map(t -> safeToLowerCase(t)).collect(Collectors.toList()));
+        final Set<String> uniqueFeatureNames = featureNames.stream().map(this::safeToLowerCase).collect(Collectors.toSet());
         Specification<Feature> spec = (root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -142,7 +139,7 @@ public class FeatureService {
                 predicates.add(builder.lower(root.get(Feature_.name)).in(uniqueFeatureNames));
             else
                 uniqueFeatureNames.stream().findFirst().map(fn ->
-                    predicates.add(builder.equal(builder.lower(root.get(Feature_.name)), fn))
+                        predicates.add(builder.equal(builder.lower(root.get(Feature_.name)), fn))
                 );
 
             return builder.and(predicates.toArray(new Predicate[predicates.size()]));
@@ -172,25 +169,26 @@ public class FeatureService {
 
     /**
      * Search feature base on give search criteria, ordered by name.
-     * @param name string the name should contains.
-     * @param author string the author should contains.
-     * @param status the status of the feature, if not present do no filter on status.
-     * @param offset the offset of the result list (must be present)
-     * @param limit the maximum size of the returned list (must be present)
+     *
+     * @param name      string the name should contains.
+     * @param author    string the author should contains.
+     * @param status    the status of the feature, if not present do no filter on status.
+     * @param offset    the offset of the result list (must be present)
+     * @param limit     the maximum size of the returned list (must be present)
      * @param converter the converter that will be used to map the feature to the expected result type
-     * @param <T> the list item result type
+     * @param <T>       the list item result type
      * @return paginated list of feature that match the search criteria with the totcal count.
      * @throws ServiceException
      */
     @Transactional
     public <T> FeaturesPage<Feature, T> searchFeatures(String name, String author, FeatureStatus status,
-                                              Integer offset, Integer limit,
-                                              Function<Feature, T> converter) throws ServiceException {
+                                                       Integer offset, Integer limit,
+                                                       Function<Feature, T> converter) throws ServiceException {
         Specification<Feature> spec = (root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (name != null) {
-                predicates.add(builder.like(builder.lower(root.get(Feature_.name)), escapeLike(name), '|' ));
+                predicates.add(builder.like(builder.lower(root.get(Feature_.name)), escapeLike(name), '|'));
             }
 
             if (author != null) {
@@ -230,6 +228,6 @@ public class FeatureService {
             throw new FeatureNameEmptyException();
         Specification<Feature> spec = (root, query, builder) ->
                 builder.equal(builder.lower(root.get(Feature_.name)), safeToLowerCase(featureName));
-        return Optional.ofNullable((Feature) featureRepository.findOne(spec));
+        return featureRepository.findOne(spec);
     }
 }
