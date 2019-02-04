@@ -31,19 +31,21 @@ public final class FeatureApiImpl implements FeatureApi {
                                                             Integer offset,
                                                     @RequestParam(value = "limit", required = false)
                                                             Integer limit) {
-        return this.featureApiService.listFeatures(q,
-                author,
-                fields,
-                status,
-                offset,
-                limit);
+        //return this.featureApiService.listFeatures(q,
+//                author,
+//                fields,
+//                status,
+//                offset,
+//                limit);
+        return null;
     }
 
     @Override
     @RequestMapping(value = "/features/{name}", method = RequestMethod.GET, produces = {"application/json"})
     public ResponseEntity<Feature> getFeature(@PathVariable("name")
                                                       String name) {
-        return this.featureApiService.getFeature(name);
+        //return this.featureApiService.getFeature(name);
+        return null;
     }
 
     @Override
@@ -52,15 +54,17 @@ public final class FeatureApiImpl implements FeatureApi {
                                                         String name,
                                                 @RequestBody
                                                         Review review) {
-        return this.featureApiService.reviewFeature(name,
-                review);
+        //return this.featureApiService.reviewFeature(name,
+        //        review);
+        return null;
     }
 
     @Override
     @RequestMapping(value = "/features", method = RequestMethod.POST, consumes = {"application/json"}, produces = {"application/json"})
     public ResponseEntity<Feature> createFeature(@RequestBody
                                                          Feature feature) {
-        return this.featureApiService.createFeature(feature);
+        //return this.featureApiService.createFeature(feature);
+        return null;
     }
 
 }

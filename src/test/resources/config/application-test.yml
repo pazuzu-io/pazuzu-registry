@@ -6,12 +6,16 @@ spring:
   profiles:
     active: test
   datasource:
-    url: jdbc:hsqldb:mem:testdb;sql.syntax_pgs=true
-    username: sa
-    password:
+    url: jdbc:postgresql://localhost/postgres-docker
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
     hibernate:
       ddl-auto: validate
+      temp:
+        use_jdbc_metadata_defaults: false
   flyway:
     locations: ['classpath:db/migration', 'classpath:dev/db/provisioning']
 

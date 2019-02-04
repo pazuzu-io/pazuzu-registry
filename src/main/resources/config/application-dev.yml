@@ -9,7 +9,18 @@ spring:
     password:
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create-drop
+      show-sql: true
+      show_sql: true
+      format_sql: true
+    properties:
+      hibernate.id.new_generator_mappings: true
+      hibernate.connection.provider_disables_autocommit: true
+      hibernate.cache.use_second_level_cache: false
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: true
+      hibernate.hbm2ddl.auto: validate
+      hibernate.jdbc.time_zone: UTC
   flyway:
     locations: ['classpath:db/migration', 'classpath:db/features', 'classpath:dev/db/provisioning']
 
@@ -28,3 +39,12 @@ pazuzu:
   registry:
     cors:
       allowedOrigins: '*'
+
+
+logging:
+  level:
+    org:
+      hibernate:
+        type: DEBUG
+        tool:
+          hbm2ddl: DEBUG

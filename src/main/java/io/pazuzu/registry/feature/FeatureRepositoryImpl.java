@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import io.pazuzu.registry.domain.Feature;
+
 
 public class FeatureRepositoryImpl implements FeatureRepositoryCustom {
 
