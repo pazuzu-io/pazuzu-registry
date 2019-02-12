@@ -1,12 +1,3 @@
-tokens:
-  access-token-uri: https://token.services.auth.zalando.com/oauth2/access_token?realm=/services
-  credentials-directory: /meta/credentials
-  token-info-uri: https://info.services.auth.zalando.com/oauth2/tokeninfo
-  token-configuration-list:
-   - token-id: kio
-     scopes:
-      - uid
-
 twintip:
   mapping: /api
   yaml: classpath:/api/swagger.yaml
@@ -20,25 +11,34 @@ spring:
     password: ${DBPASSWORD}
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create-drop
+      show-sql: true
+      show_sql: true
+      format_sql: true
+    properties:
+      hibernate.id.new_generator_mappings: true
+      hibernate.connection.provider_disables_autocommit: true
+      hibernate.cache.use_second_level_cache: false
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: true
+      hibernate.hbm2ddl.auto: validate
+      hibernate.jdbc.time_zone: UTC
+  #flyway:
+    #locations: ['classpath:db/migration', 'classpath:db/features']
 
 management:
-  context-path: /_manage
-  port: 8081
+  server:
+    servlet:
+      context-path: /_manage
+    port: 8081
+  endpoints:
+    enabled-by-default: false
+  endpoint:
+    health:
+      enabled: true
 
-endpoints:
-  enabled: false
-  health:
-    enabled: true
-
-server:
-  use-forward-headers: true
-
-pazuzu:
-  registry:
-    admins: admin
-    cors:
-      allowedOrigins: https://pazuzu-ui.mentoring.zalan.do
-
-flyway:
-  locations: ['classpath:db/migration', 'classpath:db/features']
+logging:
+  level:
+    org:
+      hibernate:
+        type: trace

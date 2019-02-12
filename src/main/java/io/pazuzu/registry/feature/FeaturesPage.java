@@ -1,6 +1,5 @@
 package io.pazuzu.registry.feature;
 
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,6 +28,11 @@ public class FeaturesPage<F, T> implements Page<T> {
     @Override
     public long getTotalElements() {
         return page.getTotalElements();
+    }
+
+    @Override
+    public <U> Page<U> map(Function<? super T, ? extends U> converter) {
+        return page.map(f -> converter.apply(this.converter.apply(f)));
     }
 
     @Override
@@ -91,11 +95,6 @@ public class FeaturesPage<F, T> implements Page<T> {
     @Override
     public Pageable previousPageable() {
         return page.previousPageable();
-    }
-
-    @Override
-    public <S> Page<S> map(Converter<? super T, ? extends S> c) {
-        return page.map(f -> c.convert(converter.apply(f)));
     }
 
     @Override
