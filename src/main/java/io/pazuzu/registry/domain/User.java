@@ -37,6 +37,14 @@ public class User {
     )
     private Set<Feature> features = new HashSet<>();
 
+    public User() {
+
+    }
+
+    public User(String username) {
+        this.username = username;
+    }
+
     public Long getId() {
         return id;
     }

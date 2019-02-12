@@ -26,6 +26,14 @@ public class LanguageType {
     @Column(name = "DESCRIPTION")
     private String description;
 
+    public LanguageType() {
+
+    }
+
+    public LanguageType(String name) {
+        this.name = name;
+    }
+
     public Long getId() {
         return id;
     }

@@ -36,7 +36,16 @@ public class FeatureBase {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+
     private Set<FeatureLatest> featureLatest = new HashSet<>();
+
+    public FeatureBase() {
+
+    }
+
+    public FeatureBase(String name) {
+        this.name = name;
+    }
 
     public String getName() {
         return name;

@@ -29,6 +29,13 @@ public class Package {
     @Column(name = "VERSION")
     private String version;
 
+    public Package() {
+    }
+
+    public Package(String name) {
+        this.name = name;
+    }
+
     public Long getId() {
         return id;
     }

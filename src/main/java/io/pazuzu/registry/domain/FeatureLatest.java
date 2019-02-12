@@ -75,6 +75,18 @@ public class FeatureLatest {
         this.changedAt = changedAt;
     }
 
+    @PrePersist
+    public void setDatesAtCreation() {
+        this.changedAt = new Date();
+        setChangedAt();
+    }
+
+    @PreUpdate
+    public void setChangedAt() {
+
+        this.changedAt = new Date();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

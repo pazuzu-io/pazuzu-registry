@@ -57,6 +57,13 @@ public class Feature {
     @JoinColumn(name = "CATEGORY_ID", nullable = false)
     private Category category;
 
+    public Feature() {
+    }
+
+    public Feature(String name) {
+        this.name = name;
+    }
+
 
     public Long getId() {
         return id;

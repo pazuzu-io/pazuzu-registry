@@ -47,6 +47,14 @@ public class Language {
     )
     private Set<Group> groups = new HashSet<>();
 
+    public Language() {
+
+    }
+
+    public Language(String name) {
+        this.name = name;
+    }
+
 
     public Long getId() {
         return id;

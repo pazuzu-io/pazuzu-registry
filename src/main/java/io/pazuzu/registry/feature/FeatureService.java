@@ -21,16 +21,17 @@ import io.pazuzu.registry.domain.Feature;
 @Service
 public class FeatureService {
 
-//    private final FeatureRepository featureRepository;
-//
-//    @Autowired
-//    public FeatureService(FeatureRepository featureRepository) {
-//        this.featureRepository = featureRepository;
-//    }
-//
+    private final FeatureRepository featureRepository;
+
+    @Autowired
+    public FeatureService(FeatureRepository featureRepository) {
+        this.featureRepository = featureRepository;
+    }
+
 //    private static void collectRecursively(Collection<Feature> result, Feature f) {
 //        result.add(f);
-//        f.getDependencies().forEach(item -> collectRecursively(result, item));
+//        f.get
+//        f.getLatest().getDependencies().forEach(item -> collectRecursively(result, item));
 //    }
 //
 //    @Transactional(rollbackFor = ServiceException.class)

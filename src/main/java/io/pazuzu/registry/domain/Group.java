@@ -27,6 +27,14 @@ public class Group {
     @JoinColumn(name = "LANGUAGE_ID")
     private Language language;
 
+    public Group() {
+
+    }
+
+    public Group(String name) {
+        this.name = name;
+    }
+
     public Long getId() {
         return id;
     }
